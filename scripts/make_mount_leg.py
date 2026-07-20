@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Desenha a 'perninha do lado de cá' (montado) em pixel art, com as cores reais da
-calça e bota do paper doll. Vista de lado: coxa curta do quadril → canela → bota
-apontando p/ frente. Vira para o LESTE; o jogo espelha p/ oeste.
-Saída: public/assets/64/player/mount_leg.png (Scale2x 2x)."""
+"""Desenha a 'perninha do lado de cá' (montado) em pixel art — pose de MONTARIA.
+Perfil de lado: quadril/bunda no topo (a cinturinha abaixo do cinto), coxa DOBRADA
+saindo do quadril p/ frente-baixo, joelho, canela vertical e bota apontando p/ frente.
+O quadril fica ATRÁS (conecta no corpo), a bota À FRENTE. Vira p/ LESTE; jogo espelha
+p/ oeste. Saída: public/assets/64/player/mount_leg.png (Scale2x 2x)."""
 import os
 import numpy as np
 from PIL import Image
@@ -22,30 +23,31 @@ C = {
     'B': (0x8a, 0x6d, 0x4a, 255),   # bota highlight
 }
 
-# 16 col x 22 linhas — coxa desce do quadril (topo-esq), canela, bota p/ direita
+# perfil de montaria (vira leste): quadril/bunda no topo-ATRÁS (col baixa=trás),
+# coxa dobra p/ frente-baixo, joelho, canela vertical, bota p/ FRENTE (col alta=direita)
 ART = [
-    '.ooooo..........',
-    'oppppdo.........',
-    'oppppPdo........',
-    '.opppPddo.......',
-    '.oppPPsddo......',
-    '..opPPPsdo......',
-    '..opPPPsdo......',
-    '..oppPPsdo......',
-    '...opPPsdo......',
-    '...opPPsso......',
-    '...opPPsso......',
-    '...opPPsso......',
-    '...opPPsso......',
-    '...oppPsso......',
-    '...ooPPsoo......',
-    '..obBBPsbo......',
-    '.obBBBPsbbo.....',
-    '.obBBBBPsbbbo...',
-    '.obBBBBBbbbbbo..',
-    '.obBBBBBBbbbbbo.',
-    '..oobBBbbbbbboo.',
-    '....oooooooo....',
+    '...ooooo.........',   # 0  topo do quadril
+    '..opppppo........',   # 1  quadril / bunda (a cinturinha abaixo do cinto)
+    '.oppppppPo.......',   # 2  quadril
+    '.oppppPPPPo......',   # 3  quadril -> coxa
+    '.opppPPPPPPo.....',   # 4  coxa (grossa)
+    '..opPPPPPPPPo....',   # 5  coxa desce p/ frente-baixo
+    '..oopPPPPPPsdo...',   # 6  coxa
+    '....ooPPPPssdo...',   # 7  joelho (dobra)
+    '......oPPPsddo...',   # 8  canela topo
+    '......oPPPsdo....',   # 9  canela
+    '......oPPPsdo....',   # 10 canela (vertical, fina)
+    '......oPPPsdo....',   # 11 canela
+    '......oPPPsdo....',   # 12 canela
+    '......oPPPsdo....',   # 13 canela baixa
+    '......oPPPsdo....',   # 14 tornozelo
+    '.....obBBBbo.....',   # 15 cano da bota
+    '.....obBBBbo.....',   # 16 cano da bota
+    '.....obBBBBbo....',   # 17 bota
+    '.....obBBBBBbbo..',   # 18 pé começa a apontar p/ frente
+    '.....obBBBBBBBbo.',   # 19 pé aponta p/ frente (direita)
+    '.....oobBBBBBBBbo',   # 20 ponta do pé
+    '.......ooooooooo.',   # 21 sola
 ]
 h = len(ART)
 w = max(len(r) for r in ART)

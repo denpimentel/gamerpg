@@ -462,7 +462,7 @@
         const bob = cycle === 'walk' && ai.bob ? ai.bob[col % ai.bob.length] : 0;
         for (const spr of Object.values(layers)) spr.setPosition(mx * K, 24 + (my + bob) * K);
         // perninha do lado de cá: mesma base fixa + o MESMO bob do tronco (cavalga junto)
-        if (legSpr.visible) legSpr.setPosition((d4 === 'w' ? -12 : 12), -14 + bob * K);
+        if (legSpr.visible) legSpr.setPosition((d4 === 'w' ? -3 : 3), -13 + bob * K);
         return;
       }
       const off = RIDE_OFF[cycle][d4];
@@ -503,7 +503,7 @@
       legSpr.setVisible(showLeg);
       if (showLeg) {
         legSpr.setFlipX(d4 === 'w');                 // asset vira leste; espelha p/ oeste
-        legSpr.setScale(0.6);                         // ~30% menor que antes
+        legSpr.setScale(0.48);                        // perna de montaria dobrada, compacta
         doll.bringToTop(legSpr);                      // container ignora setDepth: reordena p/ frente
         // posição (x,y) + bob de cavalgada são aplicados por applyRide (sincroniza com o tronco)
       }
