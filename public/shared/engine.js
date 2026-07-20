@@ -76,6 +76,55 @@ window.RPGLab = (function () {
     }
   }
 
+  // Movimento livre (contínuo, px/s) com colisão AABB que desliza nas paredes.
+  class FreeWalker {
+    /**
+     * opts: { tile, x|tx, y|ty, speed (px/s), mode (4|8), radius,
+     *         walkablePx(px, py)->bool, setAnim(state, dir) }
+     */
+    constructor(scene, sprite, opts) {
+      this.scene = scene;
+      this.sprite = sprite;
+      const tile = opts.tile || 64;
+      this.speed = opts.speed || 90;
+      this.mode = opts.mode || 8;
+      this.radius = opts.radius != null ? opts.radius : 14;
+      this.walkablePx = opts.walkablePx;
+      this.setAnim = opts.setAnim;
+      this.x = opts.x != null ? opts.x : opts.tx * tile + tile / 2;
+      this.y = opts.y != null ? opts.y : opts.ty * tile + tile / 2;
+      this.dir = 's';
+      this.moving = false;
+      sprite.setPosition(Math.round(this.x), Math.round(this.y));
+      this.setAnim('idle', this.dir);
+    }
+    // caixa nos "pés": livre se o ponto e os 4 lados do raio couberem
+    free(px, py) {
+      const r = this.radius;
+      return this.walkablePx(px, py)
+        && this.walkablePx(px - r, py) && this.walkablePx(px + r, py)
+        && this.walkablePx(px, py - r) && this.walkablePx(px, py + r);
+    }
+    update(vec, dt) {
+      const secs = Math.min(dt || 16, 50) / 1000; // clamp evita salto após lag
+      let state = 'idle';
+      if (vec && (vec.x || vec.y)) {
+        const len = Math.hypot(vec.x, vec.y) || 1;
+        const nx = vec.x / len, ny = vec.y / len;
+        const step = this.speed * secs;
+        const q = quantize({ x: nx, y: ny }, this.mode);
+        this.dir = DIR_NAMES[q.dx + ',' + q.dy];
+        let moved = false;
+        if (nx && this.free(this.x + nx * step, this.y)) { this.x += nx * step; moved = true; }
+        if (ny && this.free(this.x, this.y + ny * step)) { this.y += ny * step; moved = true; }
+        if (moved) this.sprite.setPosition(Math.round(this.x), Math.round(this.y));
+        state = moved ? 'walk' : 'idle';
+      }
+      this.moving = state === 'walk';
+      this.setAnim(state, this.dir);
+    }
+  }
+
   // NPC que vagueia aleatoriamente dentro de uma área
   class Wanderer {
     constructor(scene, walker, opts = {}) {
@@ -92,11 +141,11 @@ window.RPGLab = (function () {
         const dirs = [[1, 0], [-1, 0], [0, 1], [0, -1], null, null];
         const d = dirs[(Math.random() * dirs.length) | 0];
         this.vec = d ? { x: d[0], y: d[1] } : null;
-        this.scene.time.delayedCall(300 + Math.random() * 900, () => { this.vec = null; });
+        this.scene.time.delayedCall(500 + Math.random() * 1400, () => { this.vec = null; });
         this.schedule();
       });
     }
-    update() { this.walker.update(this.vec); }
+    update(dt) { this.walker.update(this.vec, dt); }
   }
 
   class Joystick {
@@ -183,5 +232,5 @@ window.RPGLab = (function () {
     };
   }
 
-  return { GridWalker, Wanderer, Joystick, ActionButton, keyboardVec, makeKeys, parseMap, quantize };
+  return { GridWalker, FreeWalker, Wanderer, Joystick, ActionButton, keyboardVec, makeKeys, parseMap, quantize };
 })();

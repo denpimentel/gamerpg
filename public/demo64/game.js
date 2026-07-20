@@ -1,6 +1,6 @@
 /* Ilha de Elmsong 2.0 — 3 biomas, 15 monstros (CC0), paper doll LPC com inventário */
 (function () {
-  const { GridWalker, Wanderer, Joystick, ActionButton, keyboardVec, makeKeys } = RPGLab;
+  const { FreeWalker, Wanderer, Joystick, ActionButton, keyboardVec, makeKeys } = RPGLab;
   const TILE = 64, WORLD_W = 55, WORLD_H = 15;
 
   // --- mundo: 4 ilhas + pontes ---
@@ -179,6 +179,12 @@
       this.add.sprite(x * TILE, y * TILE, 'rocks1', 0).setDepth(-86));
 
     const walkableBase = (tx, ty) => onLand(tx, ty) && !blocked.has(tx + ',' + ty);
+    // versões pixel para o movimento livre
+    const walkablePx = (px, py) => walkableBase(Math.floor(px / TILE), Math.floor(py / TILE));
+    const walkablePxZone = (zone) => (px, py) => {
+      const tx = Math.floor(px / TILE), ty = Math.floor(py / TILE);
+      return walkableBase(tx, ty) && inRect(zone, tx, ty);
+    };
 
     // ------- monstros -------
     const mk = (key, sheet, s, e, rate, rep) => {
@@ -196,9 +202,9 @@
       cont.add([spr, lbl]);
       mk(texIdle + ':a', texIdle, 0, -1, opts.rate ?? 9, -1);
       if (texWalk) mk(texWalk + ':a', texWalk, 0, opts.walkEnd ?? -1, opts.rate ?? 9, -1);
-      const walker = new GridWalker(this, cont, {
-        tile: TILE, tx: cell[0], ty: cell[1], stepMs: opts.stepMs ?? 420, mode: 4,
-        walkable: (tx, ty) => walkableBase(tx, ty) && inRect(zone, tx, ty),
+      const walker = new FreeWalker(this, cont, {
+        tile: TILE, tx: cell[0], ty: cell[1], speed: opts.speed ?? 52, mode: 4,
+        walkablePx: walkablePxZone(zone),
         setAnim: (st, dir) => {
           if (dir.includes('w')) spr.setFlipX(opts.faceRight ? true : false);
           else if (dir.includes('e')) spr.setFlipX(opts.faceRight ? false : true);
@@ -220,9 +226,9 @@
       const lbl = this.add.text(0, -56, nome, { fontFamily: 'sans-serif', fontSize: '12px',
         color: '#ffd76a', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5);
       cont.add([spr, lbl]);
-      const walker = new GridWalker(this, cont, {
-        tile: TILE, tx: cell[0], ty: cell[1], stepMs: 380, mode: 4,
-        walkable: (tx, ty) => walkableBase(tx, ty) && inRect(zone, tx, ty),
+      const walker = new FreeWalker(this, cont, {
+        tile: TILE, tx: cell[0], ty: cell[1], speed: 58, mode: 4,
+        walkablePx: walkablePxZone(zone),
         setAnim: (st, dir) => {
           if (dir.includes('w')) spr.setFlipX(true);
           else if (dir.includes('e')) spr.setFlipX(false);
@@ -245,9 +251,9 @@
       const lbl = this.add.text(0, -70, nome, { fontFamily: 'sans-serif', fontSize: '12px',
         color: '#9fdcff', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5);
       cont.add([spr, lbl]);
-      const walker = new GridWalker(this, cont, {
-        tile: TILE, tx: cell[0], ty: cell[1], stepMs: 400, mode: 4,
-        walkable: (tx, ty) => walkableBase(tx, ty) && inRect(zone, tx, ty),
+      const walker = new FreeWalker(this, cont, {
+        tile: TILE, tx: cell[0], ty: cell[1], speed: 54, mode: 4,
+        walkablePx: walkablePxZone(zone),
         setAnim: (st, dir) => {
           if (st === 'walk') spr.play(base + '-walk-' + dir, true);
           else { spr.anims.stop(); spr.setTexture(base + '-idle', ROWS[dir]); }
@@ -263,9 +269,9 @@
     mk('sheep-idle', 'sheep', 0, -1, 3, -1);
     [[3, 8], [10, 9], [16, 4]].forEach(([sx, sy], i) => {
       const s = this.add.sprite(0, 0, 'sheep', 0).setOrigin(0.5, 0.8).setScale(SCALE.sheep);
-      const w = new GridWalker(this, s, {
-        tile: TILE, tx: sx, ty: sy, stepMs: 520, mode: 4,
-        walkable: (tx, ty) => walkableBase(tx, ty),
+      const w = new FreeWalker(this, s, {
+        tile: TILE, tx: sx, ty: sy, speed: 40, mode: 4,
+        walkablePx,
         setAnim: (st, dir) => {
           if (dir.includes('w')) s.setFlipX(true);
           else if (dir.includes('e')) s.setFlipX(false);
@@ -343,9 +349,9 @@
       doll.setDepth(doll.y);
     };
 
-    this.player = new GridWalker(this, doll, {
-      tile: TILE, tx: SPAWN.x, ty: SPAWN.y, stepMs: 210, mode: 8,
-      walkable: walkableBase,
+    this.player = new FreeWalker(this, doll, {
+      tile: TILE, tx: SPAWN.x, ty: SPAWN.y, speed: 165, mode: 8, radius: 12,
+      walkablePx,
       setAnim: (st, dir) => { if (!P.attacking) setDoll(st, dir); },
     });
 
@@ -390,9 +396,9 @@
     window.__scene = this;
   }
 
-  function update() {
-    if (!this.P.attacking) this.player.update(keyboardVec(this.keys) || this.joy.vec);
-    this.mobs.forEach(m => m.update());
+  function update(time, delta) {
+    if (!this.P.attacking) this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
+    this.mobs.forEach(m => m.update(delta));
   }
 
   new Phaser.Game({

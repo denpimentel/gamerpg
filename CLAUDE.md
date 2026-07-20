@@ -90,8 +90,12 @@ assets/            → downloads brutos (zips, BMPs Reiner, mirror Tiny Swords) 
 
 ## Convenções dos demos
 
-- Movimento: grid + tween (`GridWalker`), nunca física livre — mantém a vibe Tibia e
-  simplifica colisão (Set de células bloqueadas).
+- Movimento: `demo64` usa **`FreeWalker`** (movimento livre, velocidade px/s, colisão AABB
+  com raio que desliza nas paredes; player 165px/s, mobs ~40-58px/s). `GridWalker`
+  (grid+tween estilo Tibia) continua no engine para quem preferir. Ambos têm a mesma API
+  `update(vec, dt)` + `setAnim(state, dir)`; trocar é só instanciar o outro. A colisão
+  do FreeWalker usa `walkablePx(px,py)` (converte pixel→tile) em vez de `walkable(tx,ty)`.
+  `Wanderer.update(dt)` repassa o delta. O loop principal é `update(time, delta)`.
 - Profundidade: `sprite.setDepth(sprite.y)` para sobreposição correta; chão em depth negativo.
 - Touch: joystick virtual (lado esquerdo da tela) + botão de ação (direita); teclado
   WASD/setas + espaço. Testar sempre nos dois.
