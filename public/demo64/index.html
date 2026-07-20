@@ -56,7 +56,7 @@
 </div>
 <div id="game"></div>
 <script src="../vendor/phaser.min.js"></script>
-<script src="../shared/engine.js?v=combate"></script>
+<script src="../shared/engine.js?v=range30"></script>
 <script>
 // inventário DOM — conversa com o jogo via window.__equip
 const WEAPONS_UI = [
@@ -71,7 +71,7 @@ const MOUNTS_UI = [
   ['none', 'A pé', 'dismount'],
   ['marrom', 'Marrom', 'horse_marrom'], ['preto', 'Preto', 'horse_preto'],
   ['cinza', 'Cinza', 'horse_cinza'], ['dourado', 'Dourado', 'horse_dourado'],
-  ['branco', 'Branco', 'horse_branco'],
+  ['branco', 'Branco', 'horse_branco'], ['porco', 'Porco Rosa ✦', 'mount_porco'],
 ];
 function buildSlots(elId, items, kind) {
   const el = document.getElementById(elId);
@@ -102,6 +102,6 @@ addEventListener('keydown', e => {
   if (e.key === 'i' || e.key === 'I') document.getElementById('inv').classList.toggle('open');
 });
 </script>
-<script src="game.js?v=montaria"></script>
+<script src="game.js?v=range30"></script>
 </body>
 </html>
