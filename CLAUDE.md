@@ -15,18 +15,18 @@ Hospedagem: sempre no calneyserver, exposto na rede local para jogar pelo celula
   (não sobrevive a reboot; se precisar permanente, criar unit systemd)
 - Porta 8310 registrada em `~/docs/ports.md`. Antes de abrir outra porta: `~/scripts/port-check`.
 
-## Estado atual (2026-07-19)
+## Estado atual (2026-07-19, tarde)
 
-Comparativo de resolução de pixel art — 3 mini-jogos completos (mapa, personagem andando
-em grid com animação, NPCs, colisão, touch + teclado):
+O usuário escolheu o 64×64 — demos 32/128 foram DELETADOS (zips brutos ainda em `assets/`).
+Único demo: **`public/demo64/` — Ilha de Elmsong**:
 
-| Demo | Resolução | Pack | Tema |
-|------|-----------|------|------|
-| `public/demo32/` | 32×32 | LPC (CC-BY-SA) | Vila com lagoa, soldado, slime — 4 direções |
-| `public/demo64/` | 64×64 | Tiny Swords (CC0) | Ilha com espuma animada, guerreiro, goblin, ovelhas — 8 dir, flip lateral |
-| `public/demo128/` | 128×128 | Reiner's (prerendered) | Clareira Diablo-like, Freya, esqueleto — 8 direções reais |
+- 3 biomas lado a lado (campo/grama, deserto/areia, pedra/elevation) ligados por pontes.
+- 15 NPCs rotulados: 12 monstros Pixel Adventure (CC0) + 2 goblins Tiny Swords + ovelhas.
+- **Paper doll LPC**: personagem em camadas (weapon_behind → body → feet → legs → torso →
+  head → weapon), 5 armas + 5 armaduras trocáveis via inventário DOM (🎒 / tecla I),
+  visíveis andando e atacando. `window.__equip(kind, id)` é a ponte DOM→jogo.
 
-Hub em `public/index.html`. Licenças em `CREDITS.md`.
+Hub em `public/index.html`. Licenças em `CREDITS.md` (monstros CC0; LPC é CC-BY-SA!).
 
 ## Arquitetura
 
@@ -59,6 +59,17 @@ assets/            → downloads brutos (zips, BMPs Reiner, mirror Tiny Swords) 
   (a célula (0,0) é moita escura). Lagoa pronta: water.png linhas 2-4.
 - itch.io está atrás de Cloudflare agressivo (curl/playwright/stealth falham) — preferir
   OpenGameArt (download direto), GitHub mirrors e reinerstilesets.de.
+- **LPC generator** (repo `LiberatedPixelCup/Universal-LPC-Spritesheet-Character-Generator`):
+  um PNG por animação por item em `spritesheets/<cat>/<item>/<tipo>/{walk,slash,thrust}.png`.
+  Grade 64×64: walk 9 cols (col 0 = parado), slash 6, thrust 8; linhas n/w/s/e.
+  ⚠ Sheets de ATAQUE de armas grandes (longsword/mace/waraxe slash) são **192×192**
+  (1152×768) — alinhar com origem `(0.95*64+64)/192` vs 0.95 dos frames 64.
+  Armas têm camada `*_behind` (desenha atrás do corpo). A árvore da API do GitHub vem
+  TRUNCADA (>56k arquivos) — navegar por `contents/` em subdiretórios.
+- Mirrors com PNG real do Pixel Adventure (o repo `parwam/Pixel-Adventure` usa Git LFS
+  sem quota): `clecioespindola/godotPlatformer2D` (parcial) e
+  `ChrisTutorials/ChrisTutorials-2D-Godot-Platformer` (pack completo em
+  `Art/Pixel Adventure 2/Enemies/`). Frame size está no nome do arquivo: `Idle (36x30).png`.
 
 ## Convenções dos demos
 
