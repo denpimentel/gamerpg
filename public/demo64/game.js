@@ -109,11 +109,13 @@
     }
   }
 
+  // pedra usa o bloco 4×4 do Tilemap_Elevation: col 0=oeste, 3=leste, 1/2=miolo;
+  // linha 0=norte, 3=sul (borda contornada de baixo), 1/2=miolo. frame = linha*4 + col
   function paintStone(scene, rect, depth) {
     for (let y = 0; y < rect.h; y++) for (let x = 0; x < rect.w; x++) {
-      const c = x === 0 ? 0 : (x === rect.w - 1 ? 2 : 1);
-      const r = y === 0 ? 0 : (y === rect.h - 1 ? 2 : 1);
-      scene.add.image((rect.x + x) * TILE, (rect.y + y) * TILE, 'elev', r * 4 + c)
+      const col = x === 0 ? 0 : (x === rect.w - 1 ? 3 : 1 + (x % 2));
+      const row = y === 0 ? 0 : (y === rect.h - 1 ? 3 : 1 + (y % 2));
+      scene.add.image((rect.x + x) * TILE, (rect.y + y) * TILE, 'elev', row * 4 + col)
         .setOrigin(0).setDepth(depth);
     }
   }
