@@ -172,6 +172,7 @@
     }
     this.load.spritesheet('aihero-idle', A + 'player/hero_ia/idle.png', { frameWidth: 92, frameHeight: 92 });
     this.load.spritesheet('aihero-walk', A + 'player/hero_ia/walk.png', { frameWidth: 92, frameHeight: 92 });
+    this.load.image('mount-leg', A + 'player/mount_leg.png'); // pezinho do lado de cá (montado)
   }
 
   function paintRect(scene, rect, base, depth, tex = 'flat') {
@@ -411,9 +412,12 @@
     const mkMount = () => this.add.sprite(0, 24 - 32 * K + 3, 'mt-marrom-standf', 2)
       .setScale(SCALE.player / 2).setVisible(false);
     const mountB = mkMount(), mountF = mkMount();
+    // "pezinho do lado de cá" — perna dobrada dedicada (só montarias IA, vistas e/w),
+    // desenhada NA FRENTE da montaria e ATRÁS do tronco do cavaleiro
+    const legSpr = this.add.sprite(0, 24, 'mount-leg').setOrigin(0.5, 0).setScale(SCALE.player / 2).setVisible(false);
     const aiSpr = this.aiSpr = this.add.sprite(0, 24, 'aihero-idle', 2)
       .setOrigin(0.5, 0.93).setVisible(false);
-    doll.add([mountB, ...Object.values(layers), aiSpr, mountF]);
+    doll.add([mountB, legSpr, ...Object.values(layers), aiSpr, mountF]);
     for (const [d, r] of Object.entries(ROWS)) {
       this.anims.create({ key: 'aihero-walk-' + d, frameRate: 11, repeat: -1,
         frames: this.anims.generateFrameNumbers('aihero-walk', { start: r * 6, end: r * 6 + 5 }) });
@@ -492,20 +496,18 @@
       // (crop invertido da cintura p/ baixo — a "perna do lado de cá")
       const attacking = state === 'attack';
       const anim = attacking ? ATTACK_ANIM[P.weapon] : 'walk';
+      // pezinho do lado de cá: perna dobrada dedicada, só montaria IA e vistas laterais
+      const showLeg = ai && (d4 === 'e' || d4 === 'w');
+      legSpr.setVisible(showLeg);
+      if (showLeg) {
+        legSpr.setFlipX(d4 === 'w');                 // asset vira leste; espelha p/ oeste
+        legSpr.setScale(0.85);
+        legSpr.setPosition((d4 === 'w' ? -14 : 14), -8 + (ai.legY || 0));
+        doll.bringToTop(legSpr);                      // container ignora setDepth: reordena p/ frente
+      }
       for (const [name, spr] of Object.entries(layers)) {
         const isWeapon = name === 'wb' || name === 'wf';
-        const isLeg = name === 'legs' || name === 'feet';
-        if (isLeg) {
-          // perna visível só nas montarias IA (camada única) e não de costas (vista n)
-          const ltex = texFor(name, 'walk');
-          if (!ai || d4 === 'n' || !this.textures.exists(ltex)) { spr.setVisible(false); continue; }
-          spr.setVisible(true);
-          spr.anims.stop();
-          spr.setTexture(ltex, row * COLS.walk);
-          spr.setOrigin(0.5, 0.95);
-          spr.setCrop(0, 96, 128, 32);
-          continue;
-        }
+        if (name === 'legs' || name === 'feet') { spr.setVisible(false); continue; } // a perna dedicada substitui
         const tex = texFor(name, anim);
         if ((isWeapon && !attacking) || !this.textures.exists(tex)) { spr.setVisible(false); continue; }
         spr.setVisible(true);
