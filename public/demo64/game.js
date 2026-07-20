@@ -563,22 +563,10 @@
     // — API de troca + refresh (HUD é 100% React no DOM: Pergaminho / Cristal) —
     this.huds = {};
     window.__hudData = () => ({ nome: P.nome, hp: P.hp, hpMax: P.hpMax, gold: P.gold, idade: P.idade });
-    window.__hudRefresh = () => {
+    window.__hudRefresh = () => { // HUD único: Pergaminho (React DOM). Avisa o React via evento.
       const f = P.hp / P.hpMax;
       ovBarFill.width = Math.max(1, 50 * f);
       ovBarFill.fillColor = hpColor(f);
-      for (const h of Object.values(this.huds)) if (h.visible) h.refresh();
-      window.dispatchEvent(new CustomEvent('hudchange'));
-    };
-    window.__setHud = (name) => {
-      const isCanvas = !!this.huds[name]; // 'kenney' vive no canvas; o resto é React DOM
-      for (const [k, h] of Object.entries(this.huds)) h.setVisible(k === name);
-      const dom = document.getElementById('hudReact');
-      if (dom) dom.style.display = isCanvas ? 'none' : 'block';
-      if (!isCanvas) window.__hudTheme = name; // pergaminho | orbe | cristal
-      if (this.huds[name]) this.huds[name].refresh();
-      try { localStorage.setItem('hud', name); } catch (e) {}
-      window.__markHud && window.__markHud(name);
       window.dispatchEvent(new CustomEvent('hudchange'));
     };
     this.setHp = (v) => {
@@ -588,9 +576,7 @@
     this.time.addEvent({ delay: 1000, loop: true, callback: () => { // regen lenta
       if (P.hp < P.hpMax) this.setHp(P.hp + 2);
     } });
-    // ?hud=react|pixellab|kenney e ?hp=NN na URL sobrescrevem (QA/compartilhamento)
-    const qs = new URLSearchParams(location.search);
-    window.__setHud(qs.get('hud') || localStorage.getItem('hud') || 'pergaminho');
+    const qs = new URLSearchParams(location.search); // ?hp=NN sobrescreve (QA)
     if (qs.get('hp')) this.setHp(parseInt(qs.get('hp'), 10));
     window.__hudRefresh();
 
