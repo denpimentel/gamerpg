@@ -17,9 +17,9 @@
 #hudReact .av img { width: 100%; height: 100%; object-fit: cover; }
 #hudReact .row { display: flex; align-items: center; }
 
-/* --- Tema 1: PERGAMINHO (corações, madeira/pergaminho) --- */
+/* --- Tema 1: PERGAMINHO (madeira/pergaminho, barra contínua, sem avatar) --- */
 #hudReact[data-theme="pergaminho"] .card {
-  width: 250px; padding: 10px 12px;
+  width: 232px; padding: 9px 12px;
   background:
     repeating-linear-gradient(0deg, rgba(120,80,30,.05) 0 3px, transparent 3px 6px),
     linear-gradient(145deg, #efe0bb, #d8c48c);
@@ -27,50 +27,22 @@
   box-shadow: inset 0 0 0 2px #c79a52, inset 0 0 18px rgba(120,70,20,.35);
   color: #4a2c10; font-family: 'VT323', monospace;
 }
-#hudReact[data-theme="pergaminho"] .av {
-  width: 46px; height: 46px; margin-right: 10px; flex: none;
-  border: 3px solid #7a4a1e; outline: 2px solid #2c1608; background: #b98a4a;
+#hudReact[data-theme="pergaminho"] .nome { font-size: 22px; line-height: 1.1; color: #5a2f10; }
+#hudReact[data-theme="pergaminho"] .hpTrack {
+  height: 15px; margin: 7px 0; position: relative;
+  background: #6a4a22; border: 2px solid #3a2208; box-shadow: inset 1px 1px 0 #2c1808;
 }
-#hudReact[data-theme="pergaminho"] .nome { font-size: 22px; line-height: 1; color: #5a2f10; }
-#hudReact[data-theme="pergaminho"] .sub { font-size: 15px; color: #8a5a28; line-height: 1; }
-#hudReact[data-theme="pergaminho"] .hearts { display: flex; gap: 1px; margin: 8px 0 6px; }
-#hudReact[data-theme="pergaminho"] .hearts img { width: 17px; height: 15px; }
-#hudReact[data-theme="pergaminho"] .stat { font-size: 19px; display: flex; align-items: center; gap: 5px; }
-#hudReact[data-theme="pergaminho"] .stat img { width: 18px; height: 18px; }
-#hudReact[data-theme="pergaminho"] .stats { display: flex; gap: 16px; }
-
-/* --- Tema 2: ORBE (dark fantasy, orbe de HP circular) --- */
-#hudReact[data-theme="orbe"] .card {
-  width: 250px; padding: 12px 14px; display: flex; gap: 12px; align-items: center;
-  background: linear-gradient(160deg, #232b3d, #141826);
-  border: 3px solid #c9a24a; outline: 3px solid #0a0d15;
-  box-shadow: inset 0 0 0 1px #6b5320, 0 6px 20px rgba(0,0,0,.5);
-  color: #e8dcc0; font-family: 'VT323', monospace;
-}
-#hudReact[data-theme="orbe"] .orb {
-  width: 62px; height: 62px; flex: none; position: relative; border-radius: 50%;
-  background: #0c0a10; border: 3px solid #c9a24a; overflow: hidden;
-  box-shadow: inset 0 0 8px #000, 0 0 6px rgba(201,162,74,.4);
-}
-#hudReact[data-theme="orbe"] .orb .liq {
-  position: absolute; left: 0; right: 0; bottom: 0;
-  background: linear-gradient(180deg, #ff5a4a, #b01818);
-}
-#hudReact[data-theme="orbe"] .orb .gloss {
-  position: absolute; top: 6px; left: 10px; width: 22px; height: 12px; border-radius: 50%;
-  background: rgba(255,255,255,.28);
-}
-#hudReact[data-theme="orbe"] .orb .n {
+#hudReact[data-theme="pergaminho"] .hpFill { height: 100%; background: #c0392b; transition: width .2s; }
+#hudReact[data-theme="pergaminho"] .hpFill.mid { background: #d98a1e; }
+#hudReact[data-theme="pergaminho"] .hpNum {
   position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
-  font-size: 20px; color: #fff; text-shadow: 1px 1px 0 #000, 0 0 4px #000;
+  font-size: 15px; color: #fff; text-shadow: 1px 1px 0 #000;
 }
-#hudReact[data-theme="orbe"] .nome { font-family: 'Silkscreen', monospace; font-size: 13px; color: #ffd76a; text-shadow: 1px 1px 0 #000; }
-#hudReact[data-theme="orbe"] .sub { font-size: 16px; color: #9aa6c0; margin: 2px 0 6px; }
-#hudReact[data-theme="orbe"] .stat { font-size: 20px; display: flex; align-items: center; gap: 6px; color: #ffe6a8; }
-#hudReact[data-theme="orbe"] .stat.age { color: #bfe3ff; }
-#hudReact[data-theme="orbe"] .stat img { width: 18px; height: 18px; }
+#hudReact[data-theme="pergaminho"] .stats { display: flex; gap: 18px; }
+#hudReact[data-theme="pergaminho"] .stat { font-size: 19px; display: flex; align-items: center; gap: 5px; white-space: nowrap; }
+#hudReact[data-theme="pergaminho"] .stat img { width: 18px; height: 18px; }
 
-/* --- Tema 3: CRISTAL (limpo, barra segmentada) --- */
+/* --- Tema 2: CRISTAL (limpo, barra segmentada) --- */
 #hudReact[data-theme="cristal"] .card {
   width: 256px; padding: 11px 13px;
   background: linear-gradient(160deg, rgba(20,26,38,.96), rgba(12,16,24,.96));
@@ -84,20 +56,25 @@
 }
 #hudReact[data-theme="cristal"] .nome { font-family: 'Silkscreen', monospace; font-size: 12px; color: #eafffb; letter-spacing: .5px; }
 #hudReact[data-theme="cristal"] .sub { font-size: 15px; color: #6fd8c8; }
-#hudReact[data-theme="cristal"] .seg { display: flex; gap: 2px; margin: 9px 0 7px; }
-#hudReact[data-theme="cristal"] .seg i {
-  flex: 1; height: 12px; background: #0b1a1e; border: 1px solid #103038;
+#hudReact[data-theme="cristal"] .hpTrack {
+  height: 14px; margin: 9px 0 7px; position: relative;
+  background: #0b1a1e; border: 1px solid #103038; box-shadow: inset 0 0 4px #000;
 }
-#hudReact[data-theme="cristal"] .seg i.on { background: linear-gradient(180deg, #5cf0a0, #22c55e); border-color: #0a3a1e; }
-#hudReact[data-theme="cristal"] .seg i.on.mid { background: linear-gradient(180deg, #ffe066, #f59e0b); }
-#hudReact[data-theme="cristal"] .seg i.on.low { background: linear-gradient(180deg, #ff9a9a, #ef4444); }
-#hudReact[data-theme="cristal"] .hpn { font-size: 18px; color: #eafffb; margin-bottom: 6px; }
-#hudReact[data-theme="cristal"] .stats { display: flex; gap: 8px; }
-#hudReact[data-theme="cristal"] .stat {
-  flex: 1; display: flex; align-items: center; gap: 6px; justify-content: center;
-  font-size: 18px; background: rgba(45,225,194,.06); border: 1px solid rgba(45,225,194,.2);
-  padding: 4px 6px; color: #ffe6a8;
+#hudReact[data-theme="cristal"] .hpFill {
+  height: 100%; background: linear-gradient(180deg, #5cf0a0, #22c55e);
+  box-shadow: 0 0 6px rgba(92,240,160,.5); transition: width .2s;
 }
+#hudReact[data-theme="cristal"] .hpFill.mid { background: linear-gradient(180deg, #ffe066, #f59e0b); }
+#hudReact[data-theme="cristal"] .hpFill.low { background: linear-gradient(180deg, #ff9a9a, #ef4444); }
+#hudReact[data-theme="cristal"] .hpn {
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; color: #eafffb; text-shadow: 1px 1px 0 #000;
+}
+#hudReact[data-theme="cristal"] .stats {
+  display: flex; align-items: center; gap: 16px;
+  background: rgba(45,225,194,.06); border: 1px solid rgba(45,225,194,.2); padding: 5px 10px;
+}
+#hudReact[data-theme="cristal"] .stat { display: flex; align-items: center; gap: 6px; font-size: 18px; color: #ffe6a8; white-space: nowrap; }
 #hudReact[data-theme="cristal"] .stat.age { color: #bfe3ff; }
 #hudReact[data-theme="cristal"] .stat img { width: 16px; height: 16px; }
 /* --- seletor de HUD --- */
@@ -162,9 +139,7 @@
 <div id="hudReact"></div>
 <div id="hudSwitch">
   <button data-h="pergaminho">Pergaminho</button>
-  <button data-h="orbe">Orbe</button>
   <button data-h="cristal">Cristal</button>
-  <button data-h="kenney">Kenney</button>
 </div>
 <div id="game"></div>
 <script src="../vendor/react.production.min.js"></script>
@@ -178,50 +153,32 @@
   const img = (src, cls) => e('img', { src: PX + src, className: cls, alt: '' });
   const avatar = (cls) => e('div', { className: cls }, e('img', { src: AV, alt: '' }));
 
+  const hpLvl = (f) => (f <= 0.25 ? ' low' : f <= 0.5 ? ' mid' : '');
   function Pergaminho(d) {
-    const hearts = [];
-    for (let i = 0; i < 10; i++)
-      hearts.push(img((d.hp > i * 10 ? 'heart_full' : 'heart_empty') + '.png'));
+    const f = d.hp / d.hpMax;
     return e('div', { className: 'card' },
-      e('div', { className: 'row' }, avatar('av'),
-        e('div', null,
-          e('div', { className: 'nome' }, d.nome),
-          e('div', { className: 'sub' }, 'Aventureiro de Elmsong'))),
-      e('div', { className: 'hearts' }, ...hearts),
+      e('div', { className: 'nome' }, d.nome),
+      e('div', { className: 'hpTrack' },
+        e('div', { className: 'hpFill' + hpLvl(f), style: { width: (f * 100) + '%' } }),
+        e('div', { className: 'hpNum' }, d.hp + ' / ' + d.hpMax)),
       e('div', { className: 'stats' },
         e('div', { className: 'stat' }, img('coin.png'), d.gold),
         e('div', { className: 'stat' }, img('gem.png'), 'Idade ' + d.idade)));
   }
-  function Orbe(d) {
+  function Cristal(d) {
     const f = d.hp / d.hpMax;
     return e('div', { className: 'card' },
-      e('div', { className: 'orb' },
-        e('div', { className: 'liq', style: { height: (f * 100) + '%' } }),
-        e('div', { className: 'gloss' }),
-        e('div', { className: 'n' }, d.hp)),
       e('div', null,
         e('div', { className: 'nome' }, d.nome.toUpperCase()),
-        e('div', { className: 'sub' }, 'HP ' + d.hp + ' / ' + d.hpMax),
-        e('div', { className: 'stat' }, img('coin.png'), d.gold + ' ouro'),
-        e('div', { className: 'stat age' }, img('gem.png'), 'Idade ' + d.idade)));
-  }
-  function Cristal(d) {
-    const f = d.hp / d.hpMax, N = 20, on = Math.round(f * N);
-    const lvl = f <= 0.25 ? ' low' : f <= 0.5 ? ' mid' : '';
-    const segs = [];
-    for (let i = 0; i < N; i++) segs.push(e('i', { className: i < on ? 'on' + lvl : '' }));
-    return e('div', { className: 'card' },
-      e('div', { className: 'row' }, avatar('av'),
-        e('div', null,
-          e('div', { className: 'nome' }, d.nome.toUpperCase()),
-          e('div', { className: 'sub' }, 'Elmsong'))),
-      e('div', { className: 'hpn' }, 'HP ' + d.hp + '/' + d.hpMax),
-      e('div', { className: 'seg' }, ...segs),
+        e('div', { className: 'sub' }, 'Elmsong')),
+      e('div', { className: 'hpTrack' },
+        e('div', { className: 'hpFill' + hpLvl(f), style: { width: (f * 100) + '%' } }),
+        e('div', { className: 'hpn' }, 'HP ' + d.hp + ' / ' + d.hpMax)),
       e('div', { className: 'stats' },
         e('div', { className: 'stat' }, img('coin.png'), d.gold),
         e('div', { className: 'stat age' }, img('gem.png'), 'Idade ' + d.idade)));
   }
-  const THEMES = { pergaminho: Pergaminho, orbe: Orbe, cristal: Cristal };
+  const THEMES = { pergaminho: Pergaminho, cristal: Cristal };
 
   function Hud() {
     const [d, setD] = React.useState({ nome: 'Calney', hp: 100, hpMax: 100, gold: 125, idade: 10 });
@@ -250,7 +207,7 @@ document.querySelectorAll('#hudSwitch button').forEach(b =>
   b.onclick = () => window.__setHud && window.__setHud(b.dataset.h));
 </script>
 <script src="../vendor/phaser.min.js"></script>
-<script src="../shared/engine.js?v=hud3b"></script>
+<script src="../shared/engine.js?v=hud2b"></script>
 <script>
 // inventário DOM — conversa com o jogo via window.__equip
 const WEAPONS_UI = [
@@ -296,6 +253,6 @@ addEventListener('keydown', e => {
   if (e.key === 'i' || e.key === 'I') document.getElementById('inv').classList.toggle('open');
 });
 </script>
-<script src="game.js?v=hud3b"></script>
+<script src="game.js?v=hud2b"></script>
 </body>
 </html>

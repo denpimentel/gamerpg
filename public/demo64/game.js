@@ -144,10 +144,6 @@
     }
     this.load.spritesheet('aihero-idle', A + 'player/hero_ia/idle.png', { frameWidth: 92, frameHeight: 92 });
     this.load.spritesheet('aihero-walk', A + 'player/hero_ia/walk.png', { frameWidth: 92, frameHeight: 92 });
-    // --- ui/ (HUD Kenney CC0, pré-pixelado em escala 3 via downscale→upscale nearest) ---
-    this.load.image('ken-panel', A + 'ui/kenney/panel_px.png');
-    this.load.image('ken-barback', A + 'ui/kenney/barback_px.png');
-    this.load.image('ken-barred', A + 'ui/kenney/barred_px.png');
   }
 
   function paintRect(scene, rect, base, depth, tex = 'flat') {
@@ -562,33 +558,10 @@
     doll.add([ovName, ovBarBg, ovBarFill]);
 
     // ------- HUDs chaveáveis (React no DOM; Kenney pixelado no canvas) -------
-    const hudY = 64;
     const hpColor = (f) => (f > 0.5 ? 0x4ade80 : f > 0.25 ? 0xfbbf24 : 0xef4444);
-    const PXF = { fontFamily: '"Press Start 2P", monospace' };
 
-    // — HUD Kenney CC0 (pré-pixelado escala 3 + fonte pixel) —
-    const hudKen = this.add.container(12, hudY).setScrollFactor(0).setDepth(1e6).setVisible(false);
-    {
-      const panel = this.add.image(0, 0, 'ken-panel').setOrigin(0);
-      const nome = this.add.text(18, 21, P.nome, { ...PXF, fontSize: '11px', color: '#5a3a1a' }).setOrigin(0, 0.5);
-      const barBack = this.add.image(18, 44, 'ken-barback').setOrigin(0, 0.5);
-      const barRed = this.add.image(18, 44, 'ken-barred').setOrigin(0, 0.5);
-      const BARW = barRed.width;
-      const hpTxt = this.add.text(18 + BARW / 2, 45, '', { ...PXF, fontSize: '8px', color: '#fff', stroke: '#7a2a1a', strokeThickness: 3 }).setOrigin(0.5);
-      const goldTxt = this.add.text(18, 74, '', { ...PXF, fontSize: '9px', color: '#8a6d1a' }).setOrigin(0, 0.5);
-      const idadeTxt = this.add.text(146, 74, '', { ...PXF, fontSize: '9px', color: '#4a5a8a' }).setOrigin(0, 0.5);
-      hudKen.add([panel, nome, barBack, barRed, hpTxt, goldTxt, idadeTxt]);
-      hudKen.refresh = () => {
-        const f = P.hp / P.hpMax;
-        barRed.setCrop(0, 0, Math.max(3, BARW * f), barRed.height);
-        hpTxt.setText(`${P.hp}/${P.hpMax}`);
-        goldTxt.setText(`$ ${P.gold}`);
-        idadeTxt.setText(`IDADE ${P.idade}`);
-      };
-    }
-
-    // — API de troca + refresh (o HUD React vive no DOM, ver index.html) —
-    this.huds = { kenney: hudKen };
+    // — API de troca + refresh (HUD é 100% React no DOM: Pergaminho / Cristal) —
+    this.huds = {};
     window.__hudData = () => ({ nome: P.nome, hp: P.hp, hpMax: P.hpMax, gold: P.gold, idade: P.idade });
     window.__hudRefresh = () => {
       const f = P.hp / P.hpMax;
