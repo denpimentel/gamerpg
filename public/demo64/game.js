@@ -39,61 +39,65 @@
   };
   const ATTACK_ANIM = { longsword: 'slash', dagger: 'slash', mace: 'slash', waraxe: 'slash', spear: 'thrust' };
 
-  // --- monstros: [nome, pasta, arqIdle, fw, fh, arqWalk?, bioma, célula] ---
+  // --- monstros Pixel Adventure (upscalados 2x → frame nativo × 2 no load): ---
+  //     [nome, 'bioma/pasta', fwNativo, fhNativo, temWalk, célula]
   const MOBS = [
-    ['Galinha', 'Chicken', 'Idle (32x34).png', 32, 34, 'Run (32x34).png', 'campo', [4, 6]],
-    ['Coelho', 'Bunny', 'Idle (34x44).png', 34, 44, 'Run (34x44).png', 'campo', [8, 4]],
-    ['Abelha', 'Bee', 'Idle (36x34).png', 36, 34, null, 'campo', [6, 9]],
-    ['Slime', 'Slime', 'Idle-Run (44x30).png', 44, 30, null, 'campo', [9, 8]],
-    ['Caracol', 'Snail', 'Idle (38x24).png', 38, 24, 'Walk (38x24).png', 'deserto', [17, 5]],
-    ['Rino', 'Rino', 'Idle (52x34).png', 52, 34, 'Run (52x34).png', 'deserto', [20, 6]],
-    ['Javali', 'AngryPig', 'Idle (36x30).png', 36, 30, 'Walk (36x30).png', 'deserto', [22, 9]],
-    ['Tronco', 'Trunk', 'Idle (64x32).png', 64, 32, 'Run (64x32).png', 'deserto', [17, 10]],
-    ['Morcego', 'Bat', 'Idle (46x30).png', 46, 30, 'Flying (46x30).png', 'pedra', [30, 5]],
-    ['Fantasma', 'Ghost', 'Idle (44x30).png', 44, 30, null, 'pedra', [33, 4]],
-    ['Cogumelo', 'Mushroom', 'Idle (32x32).png', 32, 32, 'Run (32x32).png', 'pedra', [35, 8]],
-    ['Rabanete', 'Radish', 'Idle 1 (30x38).png', 30, 38, 'Run (30x38).png', 'pedra', [31, 10]],
+    ['Galinha', 'campo/chicken', 32, 34, true, [4, 6]],
+    ['Coelho', 'campo/bunny', 34, 44, true, [8, 4]],
+    ['Abelha', 'campo/bee', 36, 34, false, [6, 9]],
+    ['Slime', 'campo/slime', 44, 30, false, [9, 8]],
+    ['Caracol', 'deserto/snail', 38, 24, true, [17, 5]],
+    ['Rino', 'deserto/rino', 52, 34, true, [20, 6]],
+    ['Javali', 'deserto/angrypig', 36, 30, true, [22, 9]],
+    ['Tronco', 'deserto/trunk', 64, 32, true, [17, 10]],
+    ['Morcego', 'pedra/bat', 46, 30, true, [30, 5]],
+    ['Fantasma', 'pedra/ghost', 44, 30, false, [33, 4]],
+    ['Cogumelo', 'pedra/mushroom', 32, 32, true, [35, 8]],
+    ['Rabanete', 'pedra/radish', 30, 38, true, [31, 10]],
   ];
 
   function preload() {
     const A = '../assets/64/';
-    this.load.image('water', A + 'Water.png');
-    this.load.spritesheet('flat', A + 'Tilemap_Flat.png', { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet('elev', A + 'Tilemap_Elevation.png', { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet('bridge', A + 'Bridge_All.png', { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet('foam', A + 'Foam.png', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('tree', A + 'Tree.png', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('goblin', A + 'Torch_Red.png', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('tnt', A + 'TNT_Red.png', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('sheep', A + 'HappySheep_Idle.png', { frameWidth: 64, frameHeight: 64 });
-    this.load.spritesheet('rocks1', A + 'Rocks_01.png', { frameWidth: 64, frameHeight: 64 });
+    // --- terrain/ (atlases de chão e água, compartilhados) ---
+    this.load.image('water', A + 'terrain/water.png');
+    this.load.spritesheet('flat', A + 'terrain/campo_deserto.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('elev', A + 'terrain/pedra.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('snowflat', A + 'terrain/neve.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('bridge', A + 'terrain/bridge.png', { frameWidth: 64, frameHeight: 64 });
+    this.load.spritesheet('foam', A + 'terrain/foam.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('rocks1', A + 'terrain/rocks_01.png', { frameWidth: 64, frameHeight: 64 });
+    // --- props/ (árvores + decoração, por bioma) ---
+    this.load.spritesheet('tree', A + 'props/tree_campo.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('aitree', A + 'props/tree_neve.png');
     for (let i = 1; i <= 18; i++) {
       const n = String(i).padStart(2, '0');
-      this.load.image('deco' + n, A + 'deco/' + n + '.png');
+      this.load.image('deco' + n, A + 'props/deco/' + n + '.png');
     }
-    // remake: Tilemap_Flat recolorido para neve (mesma estrutura de blocos 3×3)
-    this.load.spritesheet('snowflat', A + 'ai/Tilemap_Snow.png', { frameWidth: 64, frameHeight: 64 });
-    this.load.image('aitree', A + 'ai/tree.png');
-    // personagens IA (PixelLab): frames 92px, idle 1 col, walk 6 cols, linhas n/w/s/e
-    for (const n of ['hero', 'yeti', 'golem', 'wolf']) {
-      this.load.spritesheet('ai' + n + '-idle', A + 'ai/' + n + '_idle.png', { frameWidth: 92, frameHeight: 92 });
-      this.load.spritesheet('ai' + n + '-walk', A + 'ai/' + n + '_walk.png', { frameWidth: 92, frameHeight: 92 });
+    // --- creatures/ ---
+    this.load.spritesheet('goblin', A + 'creatures/pedra/goblin_tocha/sheet.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('tnt', A + 'creatures/deserto/goblin_tnt/sheet.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('sheep', A + 'creatures/common/sheep/idle.png', { frameWidth: 64, frameHeight: 64 });
+    for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
+      this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
+      this.load.spritesheet('ai' + n + '-walk', A + 'creatures/neve/' + n + '/walk.png', { frameWidth: 92, frameHeight: 92 });
     }
-    // camadas LPC upscaladas 2x via Scale2x (128px por frame; render a 0.8x = menos pixelado)
+    for (const [, path, fw, fh, hasWalk] of MOBS) { // Pixel Adventure upscalado 2x → frame nativo × 2
+      this.load.spritesheet(`en-${path}-idle`, `${A}creatures/${path}/idle.png`, { frameWidth: fw * 2, frameHeight: fh * 2 });
+      if (hasWalk) this.load.spritesheet(`en-${path}-walk`, `${A}creatures/${path}/walk.png`, { frameWidth: fw * 2, frameHeight: fh * 2 });
+    }
+    // --- player/ (paper doll LPC upscalado 2x + herói IA) ---
     for (const c of [...CLOTH, ...Object.values(TORSOS)]) {
       for (const anim of ['walk', 'slash', 'thrust']) {
-        this.load.spritesheet(`${c}-${anim}`, `${A}lpc2x/${c}/${anim}.png`, { frameWidth: 128, frameHeight: 128 });
+        this.load.spritesheet(`${c}-${anim}`, `${A}player/equip/${c}/${anim}.png`, { frameWidth: 128, frameHeight: 128 });
       }
     }
     for (const [w, files] of Object.entries(WEAPON_FILES)) {
       for (const [anim, , fs] of files) {
-        this.load.spritesheet(`w-${w}-${anim}`, `${A}lpc2x/weapon_${w}/${anim}.png`, { frameWidth: fs * 2, frameHeight: fs * 2 });
+        this.load.spritesheet(`w-${w}-${anim}`, `${A}player/equip/weapon_${w}/${anim}.png`, { frameWidth: fs * 2, frameHeight: fs * 2 });
       }
     }
-    for (const [, dir, idle, fw, fh, walk] of MOBS) {
-      this.load.spritesheet(`en-${dir}-idle`, `${A}enemies/${dir}/${idle}`, { frameWidth: fw, frameHeight: fh });
-      if (walk) this.load.spritesheet(`en-${dir}-walk`, `${A}enemies/${dir}/${walk}`, { frameWidth: fw, frameHeight: fh });
-    }
+    this.load.spritesheet('aihero-idle', A + 'player/hero_ia/idle.png', { frameWidth: 92, frameHeight: 92 });
+    this.load.spritesheet('aihero-walk', A + 'player/hero_ia/walk.png', { frameWidth: 92, frameHeight: 92 });
   }
 
   function paintRect(scene, rect, base, depth, tex = 'flat') {
@@ -194,7 +198,7 @@
     this.mobs = [];
     const spawnMob = (nome, texIdle, texWalk, cell, zone, opts = {}) => {
       const cont = this.add.container(0, 0);
-      const spr = this.add.sprite(0, opts.dy ?? 26, texIdle, 0).setOrigin(0.5, 1).setScale(opts.scale ?? SCALE.mob);
+      const spr = this.add.sprite(0, opts.dy ?? 26, texIdle, 0).setOrigin(0.5, 1).setScale(opts.scale ?? SCALE.mob / 2);
       const lbl = this.add.text(0, opts.ly ?? -48, nome, {
         fontFamily: 'sans-serif', fontSize: '12px', color: '#fff',
         stroke: '#000', strokeThickness: 3,
@@ -214,8 +218,9 @@
       });
       this.mobs.push(new HomeWanderer(this, walker, { radius: opts.radius ?? 150 }));
     };
-    for (const [nome, dir, , , , walk, isle, cell] of MOBS) {
-      spawnMob(nome, `en-${dir}-idle`, walk ? `en-${dir}-walk` : null, cell, ISLES[isle]);
+    for (const [nome, path, , , hasWalk, cell] of MOBS) {
+      const biome = path.split('/')[0];
+      spawnMob(nome, `en-${path}-idle`, hasWalk ? `en-${path}-walk` : null, cell, ISLES[biome]);
     }
     // goblins Tiny Swords (192px, sheets grandes)
     mk('gob-idle', 'goblin', 0, 6, 8, -1); mk('gob-walk', 'goblin', 7, 12, 10, -1);

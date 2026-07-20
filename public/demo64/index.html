@@ -54,7 +54,7 @@
 </div>
 <div id="game"></div>
 <script src="../vendor/phaser.min.js"></script>
-<script src="../shared/engine.js?v=home"></script>
+<script src="../shared/engine.js?v=reorg"></script>
 <script>
 // inventário DOM — conversa com o jogo via window.__equip
 const WEAPONS_UI = [
@@ -71,7 +71,7 @@ function buildSlots(elId, items, kind) {
     const b = document.createElement('div');
     b.className = 'slot';
     b.dataset.id = id;
-    b.innerHTML = `<img src="../assets/64/icons/${id}.png" alt=""><span>${label}</span>`;
+    b.innerHTML = `<img src="../assets/64/ui/icons/${id}.png" alt=""><span>${label}</span>`;
     b.onclick = () => {
       window.__equip && window.__equip(kind, id);
       el.querySelectorAll('.slot').forEach(s => s.classList.toggle('sel', s === b));
@@ -92,6 +92,6 @@ addEventListener('keydown', e => {
   if (e.key === 'i' || e.key === 'I') document.getElementById('inv').classList.toggle('open');
 });
 </script>
-<script src="game.js?v=home"></script>
+<script src="game.js?v=reorg"></script>
 </body>
 </html>

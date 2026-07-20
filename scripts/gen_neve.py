@@ -13,7 +13,7 @@ import urllib.request
 import zipfile
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-AI = os.path.join(ROOT, 'public/assets/64/ai')
+AI = os.path.join(ROOT, 'public/assets/64/_source/ai_gen')
 RAW = os.path.join(ROOT, '.ai_raw')  # dumps de debug (gitignored via .ai_raw)
 STATE_F = os.path.join(AI, 'state.json')
 API = 'https://api.pixellab.ai/v2'

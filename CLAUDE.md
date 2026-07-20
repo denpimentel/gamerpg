@@ -30,15 +30,31 @@ Hub em `public/index.html`. Licenças em `CREDITS.md` (monstros CC0; LPC é CC-B
 
 ## Arquitetura
 
+**Documentação completa da stack, motor e pipeline de mapas: `docs/FRONTEND.md`.**
+
 ```
 public/            → raiz servida (estático puro, sem build)
   vendor/phaser.min.js   → Phaser 4.2.1 vendorizado (sem CDN)
-  shared/engine.js       → RPGLab: GridWalker (movimento em grid com tween, estilo Tibia),
-                           Wanderer (NPC), Joystick virtual, ActionButton, parseMap
-  demo{32,64,128}/       → index.html + game.js por demo (autocontidos)
-  assets/{32,64,128}/    → PNGs processados (só o que os demos usam)
+  shared/engine.js       → RPGLab: FreeWalker (movimento livre), HomeWanderer (IA coleira),
+                           GridWalker (grid/Tibia), Joystick virtual, ActionButton, parseMap
+  demo64/                → index.html + game.js (Ilha de Elmsong, autocontido)
+  assets/64/             → PNGs organizados POR BIOMA (ver abaixo)
 assets/            → downloads brutos (zips, BMPs Reiner, mirror Tiny Swords) — fora da web
 ```
+
+Assets organizados por bioma/tipo (`public/assets/64/`, tudo em escala 64px):
+```
+terrain/    atlases de chão/água compartilhados (campo_deserto, pedra, neve, water, foam, bridge)
+props/      árvores (tree_campo, tree_neve) + deco/
+creatures/{campo,deserto,pedra,neve,common}/<nome>/{idle,walk}.png
+player/     equip/ (paper doll LPC 2×) + hero_ia/ (skin Cavaleiro de Gelo IA)
+ui/icons/   ícones do inventário
+_source/    NÃO runtime: lpc_64/ (originais) + ai_gen/ (pipeline PixelLab, state.json)
+```
+- Monstros Pixel Adventure e paper doll LPC são **upscalados 2× via Scale2x** (arquivo
+  frame×2, render scale/2 → mesmo tamanho na tela, menos serrilhado). IA (92px), goblins
+  Tiny Swords (192px) e terreno (64px) não sofrem upscale. Scripts: `upscale_lpc.py`,
+  `reorg_assets.py`.
 
 ## Pipeline de assets (aprendizados que valem repetir)
 
