@@ -96,6 +96,11 @@ assets/            → downloads brutos (zips, BMPs Reiner, mirror Tiny Swords) 
   `update(vec, dt)` + `setAnim(state, dir)`; trocar é só instanciar o outro. A colisão
   do FreeWalker usa `walkablePx(px,py)` (converte pixel→tile) em vez de `walkable(tx,ty)`.
   `Wanderer.update(dt)` repassa o delta. O loop principal é `update(time, delta)`.
+- NPCs usam **`HomeWanderer`**: vagam num raio (px) do ponto de nascença com atração
+  elástica de volta — a cada passeio mistura direção aleatória com o vetor pro "home",
+  peso `pull²` (0 no centro, 1 na borda), então nunca escapam nem ficam presos batendo
+  na parede. Raios: mobs comuns/goblins 150, IA 165, ovelhas 120. `walkablePxZone` fica
+  como trava dura de segurança (não cruzam pontes).
 - Profundidade: `sprite.setDepth(sprite.y)` para sobreposição correta; chão em depth negativo.
 - Touch: joystick virtual (lado esquerdo da tela) + botão de ação (direita); teclado
   WASD/setas + espaço. Testar sempre nos dois.

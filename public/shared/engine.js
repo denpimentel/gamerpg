@@ -148,6 +148,46 @@ window.RPGLab = (function () {
     update(dt) { this.walker.update(this.vec, dt); }
   }
 
+  // Vagueia dentro de um raio do ponto de nascença, com atração elástica de volta:
+  // quanto mais longe do "home", mais o próximo passeio puxa na direção do spot.
+  class HomeWanderer {
+    /** opts: { radius (px), moveMin, moveMax, pauseMin, pauseMax, pauseChance } */
+    constructor(scene, walker, opts = {}) {
+      this.scene = scene;
+      this.walker = walker;
+      this.home = { x: walker.x, y: walker.y };
+      this.radius = opts.radius || 150;
+      this.moveMin = opts.moveMin || 600;
+      this.moveMax = opts.moveMax || 1500;
+      this.pauseMin = opts.pauseMin || 500;
+      this.pauseMax = opts.pauseMax || 1500;
+      this.pauseChance = opts.pauseChance != null ? opts.pauseChance : 0.28;
+      this.vec = null;
+      this.next();
+    }
+    next() {
+      if (Math.random() < this.pauseChance) {
+        this.vec = null;
+        const d = this.pauseMin + Math.random() * (this.pauseMax - this.pauseMin);
+        this.scene.time.delayedCall(d, () => this.next());
+        return;
+      }
+      // vetor até o spot de nascença
+      const hx = this.home.x - this.walker.x, hy = this.home.y - this.walker.y;
+      const dist = Math.hypot(hx, hy) || 1;
+      const pull = Math.min(dist / this.radius, 1); // 0 no centro, 1 na borda
+      const k = pull * pull;                        // acentua o retorno perto da borda
+      const a = Math.random() * Math.PI * 2;
+      let vx = Math.cos(a) * (1 - k) + (hx / dist) * k * 1.6;
+      let vy = Math.sin(a) * (1 - k) + (hy / dist) * k * 1.6;
+      const l = Math.hypot(vx, vy) || 1;
+      this.vec = { x: vx / l, y: vy / l };
+      const d = this.moveMin + Math.random() * (this.moveMax - this.moveMin);
+      this.scene.time.delayedCall(d, () => this.next());
+    }
+    update(dt) { this.walker.update(this.vec, dt); }
+  }
+
   class Joystick {
     constructor(scene) {
       this.scene = scene;
@@ -232,5 +272,5 @@ window.RPGLab = (function () {
     };
   }
 
-  return { GridWalker, FreeWalker, Wanderer, Joystick, ActionButton, keyboardVec, makeKeys, parseMap, quantize };
+  return { GridWalker, FreeWalker, Wanderer, HomeWanderer, Joystick, ActionButton, keyboardVec, makeKeys, parseMap, quantize };
 })();

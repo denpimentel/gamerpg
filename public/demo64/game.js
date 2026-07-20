@@ -1,6 +1,6 @@
 /* Ilha de Elmsong 2.0 — 3 biomas, 15 monstros (CC0), paper doll LPC com inventário */
 (function () {
-  const { FreeWalker, Wanderer, Joystick, ActionButton, keyboardVec, makeKeys } = RPGLab;
+  const { FreeWalker, HomeWanderer, Joystick, ActionButton, keyboardVec, makeKeys } = RPGLab;
   const TILE = 64, WORLD_W = 55, WORLD_H = 15;
 
   // --- mundo: 4 ilhas + pontes ---
@@ -212,7 +212,7 @@
           cont.setDepth(cont.y);
         },
       });
-      this.mobs.push(new Wanderer(this, walker, { pauseMin: 1200, pauseMax: 3800 }));
+      this.mobs.push(new HomeWanderer(this, walker, { radius: opts.radius ?? 150 }));
     };
     for (const [nome, dir, , , , walk, isle, cell] of MOBS) {
       spawnMob(nome, `en-${dir}-idle`, walk ? `en-${dir}-walk` : null, cell, ISLES[isle]);
@@ -237,7 +237,7 @@
           cont.setDepth(cont.y);
         },
       });
-      this.mobs.push(new Wanderer(this, walker));
+      this.mobs.push(new HomeWanderer(this, walker, { radius: 150 }));
     };
     spawnGoblin('Goblin Tocha', 'goblin', [36, 6], ISLES.pedra);
     spawnGoblin('Goblin TNT', 'tnt', [23, 4], ISLES.deserto);
@@ -260,7 +260,7 @@
           cont.setDepth(cont.y);
         },
       });
-      this.mobs.push(new Wanderer(this, walker, { pauseMin: 1400, pauseMax: 4200 }));
+      this.mobs.push(new HomeWanderer(this, walker, { radius: 165 }));
     };
     spawnAIMob('Yeti ✦IA', 'aiyeti', [43, 6], ISLES.neve);
     spawnAIMob('Golem de Gelo ✦IA', 'aigolem', [47, 9], ISLES.neve);
@@ -278,7 +278,7 @@
           s.play('sheep-idle', true); s.setDepth(s.y);
         },
       });
-      this.mobs.push(new Wanderer(this, w, { pauseMin: 1800, pauseMax: 5200 }));
+      this.mobs.push(new HomeWanderer(this, w, { radius: 120, pauseChance: 0.4 }));
     });
 
     // ------- player paper doll -------
