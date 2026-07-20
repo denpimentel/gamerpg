@@ -1,0 +1,36 @@
+- generic [active] [ref=f100e1]:
+  - heading "GameRPG Lab" [level=1] [ref=f100e2]
+  - paragraph [ref=f100e3]: "Três mini-mundos RPG top-down, cada um com uma resolução de arte diferente. Ande com o personagem (teclado ou toque) e compare a qualidade visual: 32, 64 e 128 pixels por tile."
+  - generic [ref=f100e4]:
+    - 'link "32×32 px Soldado LPC Vila de Camwood Retrô clássico, era Tibia/SNES. Pixels grandes e legíveis, 4 direções, vila com lagoa, trilha e um slime curioso. Assets: Liberated Pixel Cup (CC-BY-SA 3.0)" [ref=f100e5] [cursor=pointer]':
+      - /url: demo32/
+      - generic [ref=f100e6]:
+        - generic [ref=f100e7]: 32×32 px
+        - img "Soldado LPC" [ref=f100e8]
+      - generic [ref=f100e9]:
+        - heading "Vila de Camwood" [level=2] [ref=f100e10]
+        - paragraph [ref=f100e11]: Retrô clássico, era Tibia/SNES. Pixels grandes e legíveis, 4 direções, vila com lagoa, trilha e um slime curioso.
+        - generic [ref=f100e12]: "Assets: Liberated Pixel Cup (CC-BY-SA 3.0)"
+    - 'link "64×64 px Guerreiro Tiny Swords Ilha de Elmsong Pixel art moderno \"chunky\". Ilha cercada de espuma animada, árvores que balançam, ovelhas e um goblin de tocha. Assets: Tiny Swords, Pixel Frog (CC0)" [ref=f100e13] [cursor=pointer]':
+      - /url: demo64/
+      - generic [ref=f100e14]:
+        - generic [ref=f100e15]: 64×64 px
+        - img "Guerreiro Tiny Swords" [ref=f100e16]
+      - generic [ref=f100e17]:
+        - heading "Ilha de Elmsong" [level=2] [ref=f100e18]
+        - paragraph [ref=f100e19]: Pixel art moderno "chunky". Ilha cercada de espuma animada, árvores que balançam, ovelhas e um goblin de tocha.
+        - generic [ref=f100e20]: "Assets: Tiny Swords, Pixel Frog (CC0)"
+    - 'link "128×128 px Freya Clareira de Ravenwood Alta resolução prerendered, estilo Diablo 1. Freya explora uma clareira sombria com lanternas e um esqueleto de patrulha — 8 direções. Assets: Reiner''s Tilesets (uso livre)" [ref=f100e21] [cursor=pointer]':
+      - /url: demo128/
+      - generic [ref=f100e22]:
+        - generic [ref=f100e23]: 128×128 px
+        - img "Freya" [ref=f100e24]
+      - generic [ref=f100e25]:
+        - heading "Clareira de Ravenwood" [level=2] [ref=f100e26]
+        - paragraph [ref=f100e27]: Alta resolução prerendered, estilo Diablo 1. Freya explora uma clareira sombria com lanternas e um esqueleto de patrulha — 8 direções.
+        - generic [ref=f100e28]: "Assets: Reiner's Tilesets (uso livre)"
+  - contentinfo [ref=f100e29]:
+    - text: "Bancada de testes visuais — Phaser 4 · sem backend, tudo estático. Obs.: pixel art puro em 128px/tile praticamente não existe no mercado de assets gratuitos; o terceiro demo usa arte prerendered (o visual que jogos \"HD 2D\" dessa densidade realmente têm). Créditos completos em"
+    - link "CREDITS.md" [ref=f100e30] [cursor=pointer]:
+      - /url: https://github.com/
+    - text: no repositório.

@@ -1,0 +1,6 @@
+- generic [active] [ref=f107e1]:
+  - generic:
+    - link "← Hub" [ref=f107e2] [cursor=pointer]:
+      - /url: ../
+    - generic: 128×128 px · Reiner's (prerendered) · zoom 1×
+    - generic: "WASD/setas · espaço ataca · celular: joystick + botão"

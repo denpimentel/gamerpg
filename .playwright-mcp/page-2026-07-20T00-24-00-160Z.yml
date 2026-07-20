@@ -1,0 +1,6 @@
+- generic [active] [ref=f101e1]:
+  - generic:
+    - link "← Hub" [ref=f101e2] [cursor=pointer]:
+      - /url: ../
+    - generic: 32×32 px · LPC · zoom 2×
+    - generic: "WASD/setas para andar · no celular: arraste o polegar"

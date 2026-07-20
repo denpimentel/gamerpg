@@ -1,0 +1,30 @@
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; background: #0d0f14; color: #e8e6e0; font-family: system-ui, sans-serif; }
+body { overflow: hidden; }
+#game { position: fixed; inset: 0; }
+canvas { display: block; }
+
+.hud {
+  position: fixed; top: 0; left: 0; right: 0;
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  pointer-events: none;
+  z-index: 10;
+  background: linear-gradient(to bottom, rgba(0,0,0,.55), transparent);
+}
+.hud a {
+  pointer-events: auto;
+  color: #fff; text-decoration: none;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  padding: 6px 12px; border-radius: 20px; font-size: 14px;
+}
+.hud .chip {
+  background: rgba(0,0,0,.45);
+  border: 1px solid rgba(255,255,255,.18);
+  padding: 6px 12px; border-radius: 20px; font-size: 13px;
+  white-space: nowrap;
+}
+.hud .chip b { color: #ffd76a; }
+.hud .hint { margin-left: auto; font-size: 12px; opacity: .75; }
+@media (max-width: 640px) { .hud .hint { display: none; } }

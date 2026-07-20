@@ -1,0 +1,6 @@
+- generic [active] [ref=f103e1]:
+  - generic:
+    - link "← Hub" [ref=f103e2] [cursor=pointer]:
+      - /url: ../
+    - generic: 64×64 px · Tiny Swords · zoom 1×
+    - generic: "WASD/setas · espaço ataca · celular: joystick + botão"

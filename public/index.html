@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GameRPG Lab — comparação 32 / 64 / 128 px</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  min-height: 100vh; background: #0d0f14; color: #e8e6e0;
+  font-family: system-ui, sans-serif;
+  display: flex; flex-direction: column; align-items: center;
+  padding: 40px 16px 24px;
+  background-image: radial-gradient(circle at 20% 10%, #16202b 0%, transparent 50%),
+                    radial-gradient(circle at 80% 90%, #1a1420 0%, transparent 50%);
+}
+h1 { font-size: clamp(26px, 5vw, 40px); letter-spacing: -.5px; }
+h1 span { color: #ffd76a; }
+p.sub { opacity: .7; margin: 10px 0 34px; text-align: center; max-width: 560px; line-height: 1.5; }
+.cards { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; max-width: 1080px; }
+.card {
+  width: 300px; border-radius: 18px; overflow: hidden; text-decoration: none; color: inherit;
+  background: #161a22; border: 1px solid #2a3040;
+  transition: transform .15s, border-color .15s;
+}
+.card:hover { transform: translateY(-4px); border-color: #ffd76a66; }
+.card .art {
+  height: 200px; display: flex; align-items: center; justify-content: center;
+  position: relative;
+}
+.card.g32 .art  { background: linear-gradient(160deg, #1d3a1d, #0f1e10); }
+.card.g64 .art  { background: linear-gradient(160deg, #1d3a52, #0e1c28); }
+.card.g128 .art { background: linear-gradient(160deg, #3a2d1d, #1e150e); }
+.card .art img { height: 150px; image-rendering: auto; }
+.card.g32 .art img, .card.g64 .art img { image-rendering: pixelated; }
+.badge {
+  position: absolute; top: 12px; left: 12px;
+  background: rgba(0,0,0,.55); border: 1px solid rgba(255,255,255,.2);
+  padding: 4px 10px; border-radius: 14px; font-size: 13px; font-weight: 600; color: #ffd76a;
+}
+.card .body { padding: 16px 18px 18px; }
+.card h2 { font-size: 18px; margin-bottom: 6px; }
+.card p { font-size: 13.5px; opacity: .75; line-height: 1.45; }
+.meta { margin-top: 10px; font-size: 12px; opacity: .55; }
+footer { margin-top: 40px; font-size: 12px; opacity: .5; text-align: center; line-height: 1.7; max-width: 640px; }
+footer a { color: #9fc3ff; }
+</style>
+</head>
+<body>
+<h1>GameRPG <span>Lab</span></h1>
+<p class="sub">Três mini-mundos RPG top-down, cada um com uma resolução de arte diferente.
+Ande com o personagem (teclado ou toque) e compare a qualidade visual: 32, 64 e 128 pixels por tile.</p>
+
+<div class="cards">
+  <a class="card g32" href="demo32/">
+    <div class="art"><span class="badge">32×32 px</span><img src="img/prev32.png" alt="Soldado LPC"></div>
+    <div class="body">
+      <h2>Vila de Camwood</h2>
+      <p>Retrô clássico, era Tibia/SNES. Pixels grandes e legíveis, 4 direções, vila com lagoa, trilha e um slime curioso.</p>
+      <div class="meta">Assets: Liberated Pixel Cup (CC-BY-SA 3.0)</div>
+    </div>
+  </a>
+  <a class="card g64" href="demo64/">
+    <div class="art"><span class="badge">64×64 px</span><img src="img/prev64.png" alt="Guerreiro Tiny Swords"></div>
+    <div class="body">
+      <h2>Ilha de Elmsong</h2>
+      <p>Pixel art moderno "chunky". Ilha cercada de espuma animada, árvores que balançam, ovelhas e um goblin de tocha.</p>
+      <div class="meta">Assets: Tiny Swords, Pixel Frog (CC0)</div>
+    </div>
+  </a>
+  <a class="card g128" href="demo128/">
+    <div class="art"><span class="badge">128×128 px</span><img src="img/prev128.png" alt="Freya"></div>
+    <div class="body">
+      <h2>Clareira de Ravenwood</h2>
+      <p>Alta resolução prerendered, estilo Diablo 1. Freya explora uma clareira sombria com lanternas e um esqueleto de patrulha — 8 direções.</p>
+      <div class="meta">Assets: Reiner's Tilesets (uso livre)</div>
+    </div>
+  </a>
+</div>
+
+<footer>
+  Bancada de testes visuais — Phaser 4 · sem backend, tudo estático.<br>
+  Obs.: pixel art puro em 128px/tile praticamente não existe no mercado de assets gratuitos; o
+  terceiro demo usa arte prerendered (o visual que jogos "HD 2D" dessa densidade realmente têm).
+  Créditos completos em <a href="https://github.com/">CREDITS.md</a> no repositório.
+</footer>
+</body>
+</html>

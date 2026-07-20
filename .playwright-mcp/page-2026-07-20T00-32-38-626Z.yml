@@ -1,0 +1,5 @@
+- generic [active] [ref=f110e1]:
+  - generic:
+    - link "← Hub" [ref=f110e2] [cursor=pointer]:
+      - /url: ../
+    - generic: 32×32 px · LPC · zoom 2×

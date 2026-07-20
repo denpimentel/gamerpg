@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Clareira de Ravenwood — 128×128 (Reiner prerendered)</title>
+<link rel="stylesheet" href="../shared/style.css">
+<style>
+.vignette { position: fixed; inset: 0; pointer-events: none; z-index: 5;
+  background: radial-gradient(ellipse at center, transparent 52%, rgba(10,8,14,.45) 100%); }
+</style>
+</head>
+<body>
+<div class="hud">
+  <a href="../">← Hub</a>
+  <span class="chip"><b>128×128 px</b> · Reiner's (prerendered) · zoom 1×</span>
+  <span class="hint">WASD/setas · espaço ataca · celular: joystick + botão</span>
+</div>
+<div class="vignette"></div>
+<div id="game"></div>
+<script src="../vendor/phaser.min.js"></script>
+<script src="../shared/engine.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
