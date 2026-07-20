@@ -106,6 +106,16 @@ _source/    NÃO runtime: lpc_64/ (originais) + ai_gen/ (pipeline PixelLab, stat
   servidor (a direção nunca aparece em `animations[].directions` — 20min+ sem mudar):
   o script segue com n/s + um lado e ESPELHA o lado faltante (flip horizontal, custo
   zero). Rotação "north" de quadrúpede IA sai meio 3/4, não rear-view limpa.
+- **Montarias a partir de BICHOS do jogo ("domar")** — pipeline `scripts/gen_montaria.py`:
+  `python3 scripts/gen_montaria.py <nome> --desc "..." --ref <sheet idle> --ref-fw N --ref-fh N
+  --anim-desc "..."`. Usa o sprite original como referência `directions.south` + `color_image`
+  com `force_colors` (identidade visual preservada), gera 4 rotações + walk **mode v3**
+  (anim custom no estilo da criatura, ex. squish do slime). Sai em `player/mount/<nome>/`
+  no formato AI_MOUNTS + ícone. ⚠ v3 processa UMA direção por request — pedir as outras
+  com `directions: ['north','west','east']`; jobs podem morrer na fila (re-pedir a direção
+  faltante). `rotation_urls` aparece ANTES das imagens existirem no CDN (poll baixando a
+  south). O `bob` do galope é MEDIDO dos frames (topo do corpo por frame → /1.6) — fit
+  matemático, não chute. Calibrar `offs.my` visualmente (cavaleiro afunda ~6px na "sela").
 - **PixelLab API** (api.pixellab.ai/v2, keys em `.env`, roteador `scripts/pixellab-route.py`,
   pipeline idempotente `scripts/gen_neve.py` com estado em `public/assets/64/ai/state.json`):
   - POSTs async retornam **202** com `*_id`; poll em `GET /tilesets/{id}`, `/characters/{id}`,

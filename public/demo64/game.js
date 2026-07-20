@@ -89,6 +89,11 @@
              bob: [0, -2, -4, -2, 0, -1],
              // w espelhado do east: corpo do porco é off-center, sela cai +4px à direita
              offs: { n: [0, -13], w: [4, -13], s: [0, -14], e: [0, -13] } },
+    // slime domado (gen_montaria.py, ref = slime do campo). bob MEDIDO dos frames:
+    // topo do corpo por frame do hop [+1,-2,-4,-6,-5,-2]px/1.6 — o cavaleiro acompanha o squish
+    slime: { frame: 92, walkCols: 6, speed: 200, dy: 40, rate: 12,
+             bob: [1, -1, -3, -4, -3, -1],
+             offs: { n: [0, -12], w: [0, -12], s: [0, -12], e: [0, -12] } },
   };
 
   // --- monstros Pixel Adventure (upscalados 2x → frame nativo × 2 no load): ---
@@ -499,6 +504,7 @@
       P.dir = dir;
       const d4 = toCardinal(dir);
       const row = ROWS[d4];
+      if (this.ovName) this.ovName.setY(P.mount && P.skin !== 'ai' ? -84 : -52); // montado = mais alto
       if (P.skin === 'ai') {
         Object.values(layers).forEach(l => l.setVisible(false));
         aiSpr.setVisible(true);
@@ -600,6 +606,7 @@
       color: '#ffe08a', stroke: '#000', strokeThickness: 4,
     }).setOrigin(0.5);
     doll.add([ovName]);
+    this.ovName = ovName;
 
     // — retrato do herói: recorta o busto do frame parado-sul das camadas do paper doll —
     const buildPortrait = () => {
@@ -607,15 +614,15 @@
       cv.width = 64; cv.height = 64;
       const ctx = cv.getContext('2d');
       ctx.imageSmoothingEnabled = false;
+      // fundo transparente: a moldura de retrato (Tiny Swords) já tem o interior azul
       if (P.skin === 'ai') {
-        ctx.drawImage(this.textures.get('aihero-idle').getSourceImage(), 20, 10, 52, 52, 0, 0, 64, 64);
+        ctx.drawImage(this.textures.get('aihero-idle').getSourceImage(), 20, 14, 60, 60, 0, 0, 64, 64);
       } else {
-        const sy = 2 * 128;                          // frame 128, linha sul (parado)
-        const cx = 34, cy = 16, cw = 60, ch = 60;    // recorte do busto (cabeça+ombros)
+        const sy = 2 * 128, cx = 34, cy = 16;        // frame 128, linha sul (parado), busto
         for (const c of ['body', 'legs', TORSOS[P.armor], 'head', 'hair']) {
           const key = c + '-walk';
           if (!this.textures.exists(key)) continue;
-          ctx.drawImage(this.textures.get(key).getSourceImage(), cx, sy + cy, cw, ch, 0, 0, 64, 64);
+          ctx.drawImage(this.textures.get(key).getSourceImage(), cx, sy + cy, 58, 58, 0, 0, 64, 64);
         }
       }
       return cv.toDataURL();

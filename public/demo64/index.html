@@ -40,37 +40,39 @@
 #hudReact[data-theme="pergaminho"] .stat { display: flex; align-items: center; gap: 5px; white-space: nowrap; }
 #hudReact[data-theme="pergaminho"] .stat img { width: 18px; height: 18px; }
 
-/* --- Tema 2: PAINEL (escuro estilo LootHunter: retrato + nível + 3 barras) --- */
-#hudReact[data-theme="painel"] .card {
-  width: 250px; padding: 8px 10px; display: flex; gap: 9px; align-items: center;
-  background: linear-gradient(160deg, #2a2018, #17110c);
-  border: 3px solid #b8862f; outline: 2px solid #120c07;
-  box-shadow: inset 0 0 0 2px #6b4f20, 0 3px 8px rgba(0,0,0,.5);
-  color: #e8dcc0; font-family: 'VT323', monospace;
+/* --- Tema TINY: pack UI oficial Tiny Swords (barras base+fill 3-slice + retrato) --- */
+#hudReact[data-theme="tiny"] .card { position: relative; width: 366px; height: 138px; }
+#hudReact[data-theme="tiny"] .port {
+  position: absolute; left: 2px; top: 28px; width: 104px; height: 104px;
+  background: url('../assets/64/ui/tiny/portrait_frame.png') no-repeat; background-size: 104px 104px;
 }
-#hudReact[data-theme="painel"] .av {
-  position: relative; width: 56px; height: 56px; flex: 0 0 56px;
-  border: 2px solid #b8862f; outline: 2px solid #120c07;
-  background: linear-gradient(160deg, #3a4a5a, #1a2530); box-shadow: inset 0 0 0 1px #6b4f20;
+#hudReact[data-theme="tiny"] .port .hero {
+  position: absolute; left: 15px; top: 15px; width: 74px; height: 74px; image-rendering: pixelated;
 }
-#hudReact[data-theme="painel"] .av img { width: 100%; height: 100%; object-fit: cover; }
-#hudReact[data-theme="painel"] .lvl {
-  position: absolute; left: -7px; bottom: -7px; min-width: 20px; height: 20px; padding: 0 3px;
+#hudReact[data-theme="tiny"] .lvlBadge {
+  position: absolute; left: 0px; top: 100px; min-width: 30px; height: 26px; padding: 0 4px;
+  display: flex; align-items: center; justify-content: center;
   background: radial-gradient(circle at 40% 35%, #f4d47a, #b8862f);
-  border: 2px solid #120c07; border-radius: 50%;
-  display: flex; align-items: center; justify-content: center;
+  border: 2px solid #2a1a06; border-radius: 6px;
 }
-#hudReact[data-theme="painel"] .col { flex: 1; min-width: 0; }
-#hudReact[data-theme="painel"] .bar {
-  height: 13px; margin-top: 3px; position: relative;
-  background: #0e0a06; border: 1px solid #000; box-shadow: inset 0 0 0 1px #4a3818;
-  display: flex; align-items: center; justify-content: center;
+#hudReact[data-theme="tiny"] .nm { position: absolute; left: 104px; top: 4px; }
+#hudReact[data-theme="tiny"] .bar {
+  position: absolute; left: 100px; width: 260px; height: 64px;
+  background: url('../assets/64/ui/tiny/bar_frame.png') no-repeat; background-size: 260px 64px;
 }
-#hudReact[data-theme="painel"] .fill { position: absolute; left: 0; top: 0; height: 100%; transition: width .25s; }
-#hudReact[data-theme="painel"] .fill.hp { background: linear-gradient(#e05a48, #b0271a); }
-#hudReact[data-theme="painel"] .fill.en { background: linear-gradient(#d9a92a, #9c7310); }
-#hudReact[data-theme="painel"] .fill.xp { background: linear-gradient(#66c24a, #3d8a2b); }
-#hudReact[data-theme="painel"] .barTxt { position: relative; z-index: 1; }
+#hudReact[data-theme="tiny"] .bar.hp { top: 48px; }
+#hudReact[data-theme="tiny"] .barInner {
+  position: absolute; left: 15px; top: 21px; width: 230px; height: 22px; overflow: hidden;
+}
+#hudReact[data-theme="tiny"] .fill {
+  height: 100%; background-repeat: no-repeat; background-size: 230px 22px;
+  image-rendering: pixelated; transition: width .25s;
+}
+#hudReact[data-theme="tiny"] .fill.hp { background-image: url('../assets/64/ui/tiny/fill_hp.png'); }
+#hudReact[data-theme="tiny"] .barTxt {
+  position: absolute; left: 15px; width: 230px; top: 20px; height: 24px;
+  display: flex; align-items: center; justify-content: center; z-index: 2;
+}
 
 #invToggle {
   position: fixed; top: 54px; right: 12px; z-index: 20;
@@ -196,22 +198,20 @@
         e('div', { className: 'stat' }, img('gem.png'), px('IDADE ' + d.idade, '#2c4a6a', 18))));
   }
 
-  // Painel escuro estilo LootHunter: retrato (sprite real) + badge de nível + 3 barras.
-  function Painel(d) {
+  // Card Tiny Swords: moldura de barra 3-slice (base+fill do pack) + retrato do herói.
+  function Tiny(d) {
     const bar = (cls, val, max) =>
-      e('div', { className: 'bar' },
-        e('div', { className: 'fill ' + cls,
-          style: { width: Math.max(0, Math.min(1, val / max)) * 100 + '%' } }),
-        e('div', { className: 'barTxt' }, px(val + '/' + max, '#fff', 13)));
+      e('div', { className: 'bar ' + cls },
+        e('div', { className: 'barInner' },
+          e('div', { className: 'fill ' + cls,
+            style: { width: Math.max(0, Math.min(1, val / max)) * 100 + '%' } })),
+        e('div', { className: 'barTxt' }, px(val + '/' + max, '#ffffff', 14)));
     return e('div', { className: 'card' },
-      e('div', { className: 'av' },
-        d.portrait ? e('img', { src: d.portrait, alt: '' }) : null,
-        e('div', { className: 'lvl' }, px('' + d.nivel, '#2a1a06', 12))),
-      e('div', { className: 'col' },
-        px(d.nome, '#ffe08a', 18),
-        bar('hp', d.hp, d.hpMax),
-        bar('en', d.energia, d.energiaMax),
-        bar('xp', d.xp, d.xpMax)));
+      e('div', { className: 'port' },
+        d.portrait ? e('img', { className: 'hero', src: d.portrait, alt: '' }) : null),
+      e('div', { className: 'lvlBadge' }, px('' + d.nivel, '#2a1a06', 15)),
+      e('div', { className: 'nm' }, px(d.nome, '#f5d27a', 22)),
+      bar('hp', d.hp, d.hpMax));
   }
 
   function Hud() {
@@ -224,8 +224,8 @@
       return () => window.removeEventListener('hudchange', sync);
     }, []);
     const root = document.getElementById('hudReact');
-    if (root) root.dataset.theme = 'painel';
-    return Painel(d);
+    if (root) root.dataset.theme = 'tiny';
+    return Tiny(d);
   }
   // espera a fonte pixel antes de renderizar (senão o canvas mede errado)
   document.fonts.load('700 20px "Pixelify Sans"').then(() => {
@@ -250,6 +250,7 @@ const MOUNTS_UI = [
   ['marrom', 'Marrom', 'horse_marrom'], ['preto', 'Preto', 'horse_preto'],
   ['cinza', 'Cinza', 'horse_cinza'], ['dourado', 'Dourado', 'horse_dourado'],
   ['branco', 'Branco', 'horse_branco'], ['porco', 'Porco Rosa ✦', 'mount_porco'],
+  ['slime', 'Slime ✦', 'mount_slime'],
 ];
 function buildSlots(elId, items, kind) {
   const el = document.getElementById(elId);
@@ -280,6 +281,6 @@ addEventListener('keydown', e => {
   if (e.key === 'i' || e.key === 'I') document.getElementById('inv').classList.toggle('open');
 });
 </script>
-<script src="game.js?v=castelo"></script>
+<script src="game.js?v=slime2"></script>
 </body>
 </html>

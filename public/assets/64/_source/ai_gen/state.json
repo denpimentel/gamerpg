@@ -35,5 +35,10 @@
   "key": "Benjamin",
   "character_id": "d9466590-f530-41ca-8793-ffc3c2ef2f57",
   "walk_requested": true
+ },
+ "mount_slime": {
+  "key": "Lock",
+  "character_id": "e33233e3-abf7-4357-9709-6033a098ca80",
+  "walk_requested": true
  }
 }
