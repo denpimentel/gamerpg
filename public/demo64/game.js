@@ -19,10 +19,13 @@
     BRIDGES.some(([bx, by]) => bx === tx && by === ty);
   const blocked = new Set(TREES.map(([x, y]) => x + ',' + y));
 
+  // --- escalas (ajuste fino de proporção vs cenário) ---
+  const SCALE = { player: 1.6, mob: 1.6, goblin: 0.8, sheep: 0.85 };
+
   // --- paper doll ---
   const ROWS = { n: 0, w: 1, s: 2, e: 3 };
   const COLS = { walk: 9, slash: 6, thrust: 8 };
-  const CLOTH = ['body', 'feet', 'legs', 'head'];
+  const CLOTH = ['body', 'feet', 'legs', 'head', 'hair'];
   const TORSOS = { shirt: 'torso_shirt', leather: 'torso_leather', chain: 'torso_chain', legion: 'torso_legion', plate: 'torso_plate' };
   // arquivos por arma: [anim, sufixo, tamanhoFrame]
   const WEAPON_FILES = {
@@ -168,8 +171,8 @@
     this.mobs = [];
     const spawnMob = (nome, texIdle, texWalk, cell, zone, opts = {}) => {
       const cont = this.add.container(0, 0);
-      const spr = this.add.sprite(0, opts.dy ?? 26, texIdle, 0).setOrigin(0.5, 1).setScale(opts.scale ?? 2);
-      const lbl = this.add.text(0, opts.ly ?? -58, nome, {
+      const spr = this.add.sprite(0, opts.dy ?? 26, texIdle, 0).setOrigin(0.5, 1).setScale(opts.scale ?? SCALE.mob);
+      const lbl = this.add.text(0, opts.ly ?? -48, nome, {
         fontFamily: 'sans-serif', fontSize: '12px', color: '#fff',
         stroke: '#000', strokeThickness: 3,
       }).setOrigin(0.5);
@@ -196,8 +199,8 @@
     mk('tnt-idle', 'tnt', 0, 6, 8, -1); mk('tnt-walk', 'tnt', 7, 12, 10, -1);
     const spawnGoblin = (nome, tex, cell, zone) => {
       const cont = this.add.container(0, 0);
-      const spr = this.add.sprite(0, 36, tex, 0).setOrigin(0.5, 0.85);
-      const lbl = this.add.text(0, -66, nome, { fontFamily: 'sans-serif', fontSize: '12px',
+      const spr = this.add.sprite(0, 36, tex, 0).setOrigin(0.5, 0.85).setScale(SCALE.goblin);
+      const lbl = this.add.text(0, -56, nome, { fontFamily: 'sans-serif', fontSize: '12px',
         color: '#ffd76a', stroke: '#000', strokeThickness: 3 }).setOrigin(0.5);
       cont.add([spr, lbl]);
       const walker = new GridWalker(this, cont, {
@@ -218,7 +221,7 @@
     // ovelhas (ambiente)
     mk('sheep-idle', 'sheep', 0, -1, 3, -1);
     [[3, 8], [10, 9], [16, 4]].forEach(([sx, sy], i) => {
-      const s = this.add.sprite(0, 0, 'sheep', 0).setOrigin(0.5, 0.8);
+      const s = this.add.sprite(0, 0, 'sheep', 0).setOrigin(0.5, 0.8).setScale(SCALE.sheep);
       const w = new GridWalker(this, s, {
         tile: TILE, tx: sx, ty: sy, stepMs: 520, mode: 4,
         walkable: (tx, ty) => walkableBase(tx, ty),
@@ -234,10 +237,10 @@
     // ------- player paper doll -------
     const P = this.P = { armor: 'leather', weapon: 'longsword', dir: 's', attacking: false };
     const doll = this.add.container(0, 0);
-    const mkLayer = () => this.add.sprite(0, 24, 'body-walk', 2 * 9).setScale(2);
+    const mkLayer = () => this.add.sprite(0, 24, 'body-walk', 2 * 9).setScale(SCALE.player);
     const layers = this.layers = {
       wb: mkLayer(), body: mkLayer(), feet: mkLayer(), legs: mkLayer(),
-      torso: mkLayer(), head: mkLayer(), wf: mkLayer(),
+      torso: mkLayer(), head: mkLayer(), hair: mkLayer(), wf: mkLayer(),
     };
     doll.add(Object.values(layers));
 

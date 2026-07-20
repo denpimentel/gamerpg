@@ -1,0 +1,7 @@
+- generic [active] [ref=e1]:
+  - generic:
+    - link "← Hub" [ref=e2] [cursor=pointer]:
+      - /url: ../
+    - generic: 64×64 · 3 biomas · 15 monstros · paper doll
+    - generic: WASD/setas · espaço ataca · I abre inventário
+  - button "🎒 Inventário" [ref=e3] [cursor=pointer]
