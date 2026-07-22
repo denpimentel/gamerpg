@@ -26,10 +26,9 @@ tags `<script>`. Para rodar é só servir a pasta `public/` como arquivos estát
 mantém a bancada trivial de hospedar e de jogar pelo celular na rede local.
 
 ```bash
-# servir na LAN (não sobrevive a reboot)
-setsid nohup python3 -m http.server 8310 --bind 0.0.0.0 \
-  --directory /home/calney/Labfy/gamerpg/public &
-# acessar: http://192.168.68.52:8310/demo64/
+# Servir na LAN (ou localmente)
+python3 -m http.server 8310 --directory ./public
+# acessar: http://localhost:8310/demo64/ (ou http://<seu-ip-local>:8310/demo64/)
 ```
 
 > **Cache busting:** os `<script>` usam `?v=<tag>` (ex.: `engine.js?v=reorg`). Ao editar o

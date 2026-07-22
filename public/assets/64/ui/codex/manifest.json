@@ -1,0 +1,140 @@
+{
+  "sources": [
+    "assets/ui_codex_src/ui-kit-codex-chroma.png",
+    "assets/ui_codex_src/hp-kit-codex-chroma.png"
+  ],
+  "scaleFactors": {
+    "controls": 4,
+    "hp": 5
+  },
+  "pixelArt": true,
+  "hpFrameInset": {
+    "x": 7,
+    "y": 7,
+    "width": 260,
+    "height": 20
+  },
+  "assets": {
+    "button-disabled": {
+      "file": "button-disabled.png",
+      "width": 48,
+      "height": 51,
+      "sourceBoundsNative": [
+        336,
+        172,
+        380,
+        219
+      ]
+    },
+    "button-neutral": {
+      "file": "button-neutral.png",
+      "width": 48,
+      "height": 51,
+      "sourceBoundsNative": [
+        203,
+        172,
+        247,
+        219
+      ]
+    },
+    "button-selected": {
+      "file": "button-selected.png",
+      "width": 48,
+      "height": 51,
+      "sourceBoundsNative": [
+        270,
+        172,
+        314,
+        219
+      ]
+    },
+    "hp-fill": {
+      "file": "hp-fill.png",
+      "width": 260,
+      "height": 20,
+      "sourceBoundsNative": [
+        31,
+        131,
+        300,
+        150
+      ]
+    },
+    "hp-frame": {
+      "file": "hp-frame.png",
+      "width": 274,
+      "height": 34,
+      "sourceBoundsNative": [
+        31,
+        31,
+        301,
+        61
+      ]
+    },
+    "hp-track": {
+      "file": "hp-track.png",
+      "width": 260,
+      "height": 20,
+      "sourceBoundsNative": [
+        31,
+        85,
+        300,
+        105
+      ]
+    },
+    "panel": {
+      "file": "panel.png",
+      "width": 156,
+      "height": 102,
+      "sourceBoundsNative": [
+        21,
+        106,
+        173,
+        204
+      ]
+    },
+    "portrait-frame": {
+      "file": "portrait-frame.png",
+      "width": 67,
+      "height": 68,
+      "sourceBoundsNative": [
+        21,
+        20,
+        84,
+        84
+      ]
+    },
+    "slot-disabled": {
+      "file": "slot-disabled.png",
+      "width": 57,
+      "height": 58,
+      "sourceBoundsNative": [
+        334,
+        106,
+        387,
+        160
+      ]
+    },
+    "slot-neutral": {
+      "file": "slot-neutral.png",
+      "width": 57,
+      "height": 58,
+      "sourceBoundsNative": [
+        198,
+        106,
+        251,
+        160
+      ]
+    },
+    "slot-selected": {
+      "file": "slot-selected.png",
+      "width": 57,
+      "height": 58,
+      "sourceBoundsNative": [
+        266,
+        106,
+        318,
+        160
+      ]
+    }
+  }
+}

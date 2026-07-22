@@ -4,3 +4,5 @@ nohup.out
 .env
 .ai_raw/
 .playwright-mcp/
+.plans/
+.codex/

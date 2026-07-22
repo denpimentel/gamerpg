@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Ícones pixel-art da UI, desenhados por código (CC0 próprio). Saída em ui/px/."""
-import os
-from PIL import Image
+from pathlib import Path
 
-OUT = '/home/calney/Labfy/gamerpg/public/assets/64/ui/px'
+BASE = Path(__file__).resolve().parent.parent
+OUT = BASE / 'public/assets/64/ui/px'
 os.makedirs(OUT, exist_ok=True)
 
 

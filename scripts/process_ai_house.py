@@ -7,9 +7,11 @@ import numpy as np
 from PIL import Image
 from collections import deque
 
-SRC = '/home/calney/Labfy/gamerpg/assets/ai_house/house_raw.png'
-OUT_DIR = '/home/calney/Labfy/gamerpg/public/assets/64/buildings'
-SCRATCH = '/tmp/claude-1000/-home-calney-Labfy-gamerpg/05959a59-b521-4885-9897-f924249a1615/scratchpad'
+from pathlib import Path
+
+BASE = Path(__file__).resolve().parent.parent
+SRC = BASE / 'assets/ai_house/house_raw.png'
+OUT_DIR = BASE / 'public/assets/64/buildings'
 
 im = Image.open(SRC).convert('RGBA')
 a = np.array(im)
@@ -73,7 +75,7 @@ sh = sh.filter(ImageFilter.GaussianBlur(6))
 sh.save(f'{OUT_DIR}/casa_azul_shadow.png')
 
 # preview sobre a grama REAL do jogo (Tiny Swords) + sombra
-tile = Image.open('/home/calney/Labfy/gamerpg/public/assets/64/terrain/campo_deserto.png').convert('RGBA').crop((64, 64, 128, 128))
+tile = Image.open(BASE / 'public/assets/64/terrain/campo_deserto.png').convert('RGBA').crop((64, 64, 128, 128))
 bgp = Image.new('RGBA', (res.width + 160, res.height + 120), (0, 0, 0, 0))
 for yy in range(0, bgp.height, 64):
     for xx in range(0, bgp.width, 64):

@@ -8,12 +8,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Objetivo: experimentar visuais, stacks e assets. Gastar energia no visual, não em
 backend/segurança/banco. Tudo estático, sem servidor de jogo.
 
-Hospedagem: sempre no calneyserver, exposto na rede local para jogar pelo celular.
+Hospedagem: servidor HTTP estático, exposto na rede local para jogar pelo celular ou browser desktop.
 
-- **URL LAN:** `http://192.168.68.52:8310` (IP do servidor; `.62` é o desktop CMG)
-- **Servir:** `setsid nohup python3 -m http.server 8310 --bind 0.0.0.0 --directory /home/calney/Labfy/gamerpg/public &`
-  (não sobrevive a reboot; se precisar permanente, criar unit systemd)
-- Porta 8310 registrada em `~/docs/ports.md`. Antes de abrir outra porta: `~/scripts/port-check`.
+- **URL LAN:** `http://<seu-ip-local>:8310` ou `http://localhost:8310`
+- **Servir:** `python3 -m http.server 8310 --bind 0.0.0.0 --directory ./public`
 
 ## Estado atual (2026-07-19, tarde)
 

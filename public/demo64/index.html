@@ -80,28 +80,110 @@
   border: 1px solid rgba(255,255,255,.25); border-radius: 20px;
   padding: 8px 14px; font-size: 14px; cursor: pointer;
 }
+/* --- Inventário estilo Tiny Swords (madeira) --- */
 #inv {
-  position: fixed; top: 100px; right: 12px; z-index: 20; width: 300px;
-  background: rgba(16,19,26,.93); border: 1px solid rgba(255,255,255,.2);
-  border-radius: 14px; padding: 14px; display: none;
+  position: fixed; top: 100px; right: 12px; z-index: 20; width: 300px; display: none;
+  padding: 6px 12px 14px; box-sizing: border-box;
   max-height: calc(100vh - 120px); overflow-y: auto;
+  image-rendering: pixelated;
+  border: 30px solid transparent;
+  border-image: url('../assets/64/ui/tsui/panel.png') 30 fill / 30px stretch;
 }
 #inv.open { display: block; }
 #inv h3 { font-size: 13px; text-transform: uppercase; letter-spacing: .08em;
-  color: #9fb3d0; margin: 10px 0 8px; }
+  color: #5a3410; text-shadow: 0 1px 0 rgba(255,240,200,.4); margin: 8px 0 7px; }
 #inv h3:first-child { margin-top: 0; }
-.slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+.slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
 .slot {
-  background: #232936; border: 2px solid #333c4e; border-radius: 10px;
-  padding: 4px 2px 5px; cursor: pointer; text-align: center;
+  aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
+  background: url('../assets/64/ui/tsui/slot.png') no-repeat center / 100% 100%;
+  image-rendering: pixelated; cursor: pointer;
 }
-.slot:hover { border-color: #5a6b8c; }
-.slot.sel { border-color: #ffd76a; background: #2e3242; }
-.slot img { width: 40px; height: 40px; image-rendering: pixelated; margin-bottom: 2px; }
-.slot span { display: block; font-size: 9.5px; color: #cfd6e4; }
+.slot:hover { filter: brightness(1.12); }
+.slot.sel { filter: drop-shadow(0 0 3px #ffd76a) brightness(1.15); }
+.slot img { width: 62%; height: 62%; object-fit: contain; image-rendering: pixelated; }
+.slot span { display: none; }
+@media (max-width: 640px) { #inv { width: 262px; } }
+
+/* ============ A.I.U.I.Codex — segunda UI, paralela ao HUD atual ============ */
+#codexHud {
+  --codex-gold: #e5b553;
+  --codex-cream: #f1e6ce;
+  --codex-muted: #b9a9bd;
+  position: fixed; top: 208px; left: 50%; z-index: 16;
+  width: 351px; transform: translateX(-50%);
+  image-rendering: pixelated; pointer-events: none;
+  font-family: 'Pixelify Sans', sans-serif;
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,.7));
+}
+#codexHud img { image-rendering: pixelated; }
+.codex-main { display: flex; align-items: center; gap: 10px; height: 68px; }
+.codex-portrait {
+  position: relative; width: 67px; height: 68px; flex: 0 0 auto;
+  border: 0; padding: 0; background: transparent; cursor: pointer; pointer-events: auto;
+}
+.codex-portrait .hero {
+  position: absolute; left: 9px; top: 9px; width: 49px; height: 49px;
+  object-fit: cover; z-index: 2;
+}
+.codex-portrait .frame { position: absolute; inset: 0; width: 67px; height: 68px; z-index: 1; }
+.codex-vitals { width: 274px; min-width: 0; }
+.codex-name {
+  height: 25px; padding-left: 7px; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+  color: var(--codex-gold); font-size: 20px; font-weight: 700;
+  text-shadow: 0 2px 0 #26140b, 2px 0 0 #26140b, -2px 0 0 #26140b;
+}
+.codex-hp { position: relative; width: 274px; height: 34px; }
+.codex-hp .track { position: absolute; left: 7px; top: 7px; width: 260px; height: 20px; }
+.codex-hp .fill-clip {
+  position: absolute; left: 7px; top: 7px; width: 0; height: 20px;
+  overflow: hidden; z-index: 1; transition: width .2s ease-out;
+}
+.codex-hp .fill-clip img { width: 260px; height: 20px; max-width: none; }
+.codex-hp .frame { position: absolute; inset: 0; width: 274px; height: 34px; z-index: 2; pointer-events: none; }
+.codex-hp .value {
+  position: absolute; inset: 6px 7px 8px; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  color: #fff; font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums;
+  text-shadow: 1px 1px 0 #3b0505, -1px 1px 0 #3b0505;
+}
+.codex-actions { display: flex; justify-content: center; gap: 20px; margin-top: 7px; pointer-events: auto; }
+.codex-action {
+  position: relative; width: 88px; min-height: 68px; padding: 0 0 15px;
+  border: 0; background: transparent; color: var(--codex-cream); cursor: pointer;
+  font: 700 13px/1 'Pixelify Sans', sans-serif;
+}
+.codex-action .button-frame { width: 48px; height: 51px; margin: 0 auto; }
+.codex-action .glyph {
+  position: absolute; left: 20px; top: 10px; width: 48px; height: 31px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--codex-gold); font-size: 18px; text-shadow: 1px 1px 0 #1b0c12;
+}
+.codex-action .label { position: absolute; left: 0; right: 0; bottom: 0; }
+.codex-action:focus-visible, .codex-portrait:focus-visible { outline: 2px solid #d25cff; outline-offset: 3px; }
+#codexProfile {
+  position: absolute; top: 143px; left: 50%; width: 312px; height: 204px;
+  transform: translateX(-50%); padding: 28px 30px; pointer-events: auto;
+  background: url('../assets/64/ui/codex/panel.png') no-repeat center / 312px 204px;
+  color: var(--codex-cream);
+}
+#codexProfile[hidden] { display: none; }
+.codex-profile-head { display: flex; align-items: center; gap: 12px; }
+.codex-profile-head .portrait-wrap { position: relative; width: 67px; height: 68px; flex: 0 0 auto; }
+.codex-profile-head .portrait-wrap .hero { position: absolute; left: 9px; top: 9px; width: 49px; height: 49px; object-fit: cover; z-index: 2; }
+.codex-profile-head .portrait-wrap .frame { position: absolute; inset: 0; width: 67px; height: 68px; }
+.codex-profile-title { min-width: 0; }
+.codex-profile-title strong { display: block; color: var(--codex-gold); font-size: 21px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.codex-profile-title span { color: var(--codex-muted); font-size: 14px; }
+.codex-profile-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px;
+  margin-top: 14px; padding-top: 11px; border-top: 1px solid rgba(229,181,83,.25);
+}
+.codex-profile-stat { text-align: center; }
+.codex-profile-stat b { display: block; color: var(--codex-gold); font-size: 17px; font-variant-numeric: tabular-nums; }
+.codex-profile-stat small { color: var(--codex-muted); font-size: 10px; text-transform: uppercase; letter-spacing: .07em; }
 @media (max-width: 640px) {
-  #inv { width: 260px; }
-  .slot img { width: 32px; height: 32px; }
+  #codexHud { top: 204px; }
 }
 </style>
 </head>
@@ -123,6 +205,44 @@
   <div class="slots" id="slotsM"></div>
 </div>
 <div id="hudReact"></div>
+<div id="codexHud" aria-label="Interface A.I.U.I.Codex paralela">
+  <div class="codex-main">
+    <button class="codex-portrait" id="codexPortraitToggle" type="button" aria-label="Abrir perfil" aria-expanded="false">
+      <img class="hero" id="codexPortrait" alt="">
+      <img class="frame" src="../assets/64/ui/codex/portrait-frame.png" alt="">
+    </button>
+    <div class="codex-vitals">
+      <div class="codex-name" id="codexName"></div>
+      <div class="codex-hp" aria-label="Vida do personagem">
+        <img class="track" src="../assets/64/ui/codex/hp-track.png" alt="">
+        <div class="fill-clip" id="codexHpClip"><img src="../assets/64/ui/codex/hp-fill.png" alt=""></div>
+        <img class="frame" src="../assets/64/ui/codex/hp-frame.png" alt="">
+        <span class="value" id="codexHpValue"></span>
+      </div>
+    </div>
+  </div>
+  <div class="codex-actions">
+    <button class="codex-action" id="codexInventoryToggle" type="button" aria-label="Abrir inventário" aria-pressed="false">
+      <img class="button-frame" src="../assets/64/ui/codex/button-neutral.png" alt="">
+      <span class="glyph" aria-hidden="true">I</span><span class="label">Inventário</span>
+    </button>
+    <button class="codex-action" id="codexProfileToggle" type="button" aria-label="Abrir perfil" aria-pressed="false">
+      <img class="button-frame" src="../assets/64/ui/codex/button-neutral.png" alt="">
+      <span class="glyph" aria-hidden="true">P</span><span class="label">Perfil</span>
+    </button>
+  </div>
+  <div id="codexProfile" hidden aria-label="Perfil do personagem">
+    <div class="codex-profile-head">
+      <div class="portrait-wrap"><img class="hero" id="codexProfilePortrait" alt=""><img class="frame" src="../assets/64/ui/codex/portrait-frame.png" alt=""></div>
+      <div class="codex-profile-title"><strong id="codexProfileName"></strong><span id="codexProfileLevel"></span></div>
+    </div>
+    <div class="codex-profile-stats">
+      <div class="codex-profile-stat"><b id="codexProfileGold"></b><small>Ouro</small></div>
+      <div class="codex-profile-stat"><b id="codexProfileAge"></b><small>Idade</small></div>
+      <div class="codex-profile-stat"><b id="codexProfileHp"></b><small>Vida</small></div>
+    </div>
+  </div>
+</div>
 <div id="game"></div>
 <script src="../vendor/react.production.min.js"></script>
 <script src="../vendor/react-dom.production.min.js"></script>
@@ -280,6 +400,74 @@ window.__markEquipped = (kind, id) => {
 addEventListener('keydown', e => {
   if (e.key === 'i' || e.key === 'I') document.getElementById('inv').classList.toggle('open');
 });
+
+// A.I.U.I.Codex paralelo — lê a mesma API do HUD atual; não mantém estado de jogo próprio.
+(function () {
+  const A = '../assets/64/ui/codex/';
+  const inv = document.getElementById('inv');
+  const inventoryButton = document.getElementById('codexInventoryToggle');
+  const profileButton = document.getElementById('codexProfileToggle');
+  const portraitButton = document.getElementById('codexPortraitToggle');
+  const profile = document.getElementById('codexProfile');
+
+  function buttonState(button, selected) {
+    button.setAttribute('aria-pressed', selected ? 'true' : 'false');
+    button.querySelector('.button-frame').src = A + (selected ? 'button-selected.png' : 'button-neutral.png');
+  }
+
+  function closeProfile() {
+    profile.hidden = true;
+    profileButton.setAttribute('aria-expanded', 'false');
+    portraitButton.setAttribute('aria-expanded', 'false');
+    buttonState(profileButton, false);
+  }
+
+  function toggleProfile() {
+    const willOpen = profile.hidden;
+    if (willOpen) inv.classList.remove('open');
+    profile.hidden = !willOpen;
+    profileButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    portraitButton.setAttribute('aria-expanded', willOpen ? 'true' : 'false');
+    buttonState(profileButton, willOpen);
+    buttonState(inventoryButton, false);
+  }
+
+  function toggleInventory() {
+    closeProfile();
+    inv.classList.toggle('open');
+  }
+
+  inventoryButton.onclick = toggleInventory;
+  profileButton.onclick = toggleProfile;
+  portraitButton.onclick = toggleProfile;
+
+  new MutationObserver(() => buttonState(inventoryButton, inv.classList.contains('open')))
+    .observe(inv, { attributes: true, attributeFilter: ['class'] });
+
+  function sync() {
+    if (!window.__hudData) return;
+    const d = window.__hudData();
+    const fraction = Math.max(0, Math.min(1, d.hpMax ? d.hp / d.hpMax : 0));
+    document.getElementById('codexName').textContent = d.nome;
+    document.getElementById('codexHpClip').style.width = (fraction * 260) + 'px';
+    document.getElementById('codexHpValue').textContent = d.hp + '/' + d.hpMax;
+    document.getElementById('codexProfileName').textContent = d.nome;
+    document.getElementById('codexProfileLevel').textContent = 'Nível ' + d.nivel;
+    document.getElementById('codexProfileGold').textContent = d.gold;
+    document.getElementById('codexProfileAge').textContent = d.idade;
+    document.getElementById('codexProfileHp').textContent = d.hp + '/' + d.hpMax;
+    for (const id of ['codexPortrait', 'codexProfilePortrait']) {
+      const image = document.getElementById(id);
+      if (d.portrait) { image.src = d.portrait; image.hidden = false; }
+      else image.hidden = true;
+    }
+  }
+  addEventListener('hudchange', sync);
+  addEventListener('keydown', event => {
+    if (event.key === 'Escape') closeProfile();
+  });
+  sync();
+})();
 </script>
 <script src="game.js?v=perninha6"></script>
 </body>

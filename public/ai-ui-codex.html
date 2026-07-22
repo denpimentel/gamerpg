@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>A.I.U.I.Codex — Loot Hunter</title>
+<style>
+  :root {
+    color-scheme: dark;
+    --page: #120d16;
+    --surface: #1c1420;
+    --surface-2: #261a2a;
+    --line: #3c2941;
+    --gold: #e5b553;
+    --cream: #f1e6ce;
+    --muted: #b8a8bc;
+    --purple: #9e42ce;
+    --magenta: #ff00ff;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(circle at 50% -20%, rgba(116, 54, 128, .2), transparent 42rem),
+      var(--page);
+    color: var(--cream);
+    font: 15px/1.55 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  }
+  img { display: block; image-rendering: pixelated; }
+  button, input { font: inherit; }
+  a { color: var(--gold); }
+  .shell { width: min(920px, calc(100% - 24px)); margin: 0 auto; padding: 18px 0 64px; }
+  .topline { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+  .back { text-decoration: none; }
+  .badge {
+    border: 1px solid #593760;
+    border-radius: 999px;
+    padding: 5px 10px;
+    color: #d7bfdc;
+    background: rgba(72, 42, 79, .45);
+    font-size: 12px;
+    letter-spacing: .04em;
+  }
+  header { padding: 38px 0 28px; max-width: 720px; }
+  h1 { margin: 0 0 10px; font-size: clamp(30px, 6vw, 54px); line-height: .96; letter-spacing: -.045em; }
+  h1 span { color: var(--gold); }
+  header p { margin: 0; color: var(--muted); font-size: 16px; max-width: 62ch; }
+  .principles { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+  .principles span { padding: 6px 9px; background: #211725; border: 1px solid var(--line); border-radius: 6px; font-size: 12px; color: #d8c9da; }
+  section { margin-top: 18px; border: 1px solid var(--line); border-radius: 16px; background: rgba(28, 20, 32, .94); overflow: hidden; }
+  .section-head { padding: 18px 20px 14px; border-bottom: 1px solid var(--line); }
+  h2 { margin: 0 0 4px; color: var(--gold); font-size: 15px; letter-spacing: .08em; text-transform: uppercase; }
+  .section-head p { margin: 0; color: var(--muted); font-size: 13px; }
+  .stage { min-height: 190px; padding: 28px 18px; display: grid; place-items: center; background: #161019; }
+  .hud-preview { display: flex; align-items: center; gap: 10px; max-width: 100%; }
+  .portrait { width: 67px; height: 68px; flex: 0 0 auto; }
+  .bar-stack { width: 274px; height: 34px; position: relative; flex: 0 0 auto; }
+  .bar-stack > img, .fill-window { position: absolute; }
+  .bar-track { left: 7px; top: 7px; width: 260px; height: 20px; }
+  .fill-window { left: 7px; top: 7px; width: 68%; max-width: 260px; height: 20px; overflow: hidden; z-index: 1; }
+  .fill-window img { width: 260px; height: 20px; max-width: none; }
+  .bar-frame { inset: 0; z-index: 2; width: 274px; height: 34px; pointer-events: none; }
+  .calibrator { padding: 14px 20px 18px; display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
+  .calibrator label { white-space: nowrap; }
+  .calibrator input { width: 100%; accent-color: var(--purple); }
+  .component-demo { display: grid; grid-template-columns: minmax(190px, 1fr) minmax(190px, 1fr); gap: 20px; align-items: center; }
+  .panel-layout { width: 312px; height: 204px; position: relative; image-rendering: pixelated; }
+  .panel-layout > .panel { width: 312px; height: 204px; }
+  .slot-grid { position: absolute; inset: 28px 34px; display: grid; grid-template-columns: repeat(2, 114px); align-content: start; gap: 10px 16px; }
+  .slot-grid img { width: 114px; height: 116px; }
+  .state-stack { display: grid; gap: 14px; justify-content: center; }
+  .state-row { display: flex; align-items: center; gap: 12px; }
+  .state-row img { width: 57px; height: 58px; }
+  .state-row.round img { width: 48px; height: 51px; }
+  .state-row small { color: var(--muted); width: 72px; }
+  .plates { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 18px; }
+  .plate { border: 1px solid var(--line); border-radius: 10px; overflow: hidden; background: #100b12; }
+  .plate figcaption { padding: 10px 12px; color: var(--muted); font-size: 12px; border-bottom: 1px solid var(--line); }
+  .plate-view { min-height: 270px; display: grid; place-items: center; overflow: auto; }
+  .plate-view.magenta { background: var(--magenta); }
+  .plate-view.alpha {
+    background-color: #211a24;
+    background-image: linear-gradient(45deg, #2e2532 25%, transparent 25%), linear-gradient(-45deg, #2e2532 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #2e2532 75%), linear-gradient(-45deg, transparent 75%, #2e2532 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 0 8px, 8px -8px, -8px 0;
+  }
+  .plate-view img { width: 414px; height: 250px; max-width: none; }
+  .asset-grid { padding: 18px; display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+  .asset-card { min-height: 150px; padding: 14px; border: 1px solid var(--line); border-radius: 10px; background: #171019; display: grid; grid-template-rows: 1fr auto; gap: 12px; }
+  .asset-preview { display: grid; place-items: center; overflow: auto; min-height: 88px; background-color: #211a24; background-image: linear-gradient(45deg, #2e2532 25%, transparent 25%), linear-gradient(-45deg, #2e2532 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #2e2532 75%), linear-gradient(-45deg, transparent 75%, #2e2532 75%); background-size: 12px 12px; background-position: 0 0, 0 6px, 6px -6px, -6px 0; border-radius: 6px; }
+  .asset-preview img { max-width: none; }
+  .asset-meta { display: flex; justify-content: space-between; gap: 8px; color: var(--muted); font-size: 11px; }
+  .asset-meta code { color: #e7d9e9; overflow-wrap: anywhere; }
+  .error { padding: 18px; color: #ff9e9e; }
+  @media (max-width: 720px) {
+    .stage { display: block; overflow-x: auto; }
+    .hud-preview { width: 351px; margin: 36px auto; }
+    .component-demo { grid-template-columns: 1fr; justify-items: center; }
+    .panel-layout { transform: scale(.9); transform-origin: center; margin: -10px 0; }
+    .plates { grid-template-columns: 1fr; }
+    .plate-view img { width: 100%; height: auto; }
+  }
+</style>
+</head>
+<body>
+<main class="shell">
+  <div class="topline">
+    <a class="back" href="./">← Hub</a>
+    <span class="badge">A.I.U.I.Codex · kit nativo</span>
+  </div>
+
+  <header>
+    <h1>Loot Hunter,<br><span>sem excesso.</span></h1>
+    <p>Uma interface modular para combate e inventário: madeira escura, ouro contido e roxo como estado. Nenhum texto, personagem, item ou valor foi gravado nos sprites.</p>
+    <div class="principles" aria-label="Princípios do kit">
+      <span>HP útil &gt; ornamento</span>
+      <span>camadas independentes</span>
+      <span>pixels em escala nativa</span>
+      <span>estados consistentes</span>
+    </div>
+  </header>
+
+  <section aria-labelledby="hud-title">
+    <div class="section-head">
+      <h2 id="hud-title">HUD modular</h2>
+      <p>Retrato vazio + trilho + líquido recortável + moldura vazada. O controle abaixo altera apenas a máscara de largura.</p>
+    </div>
+    <div class="stage">
+      <div class="hud-preview">
+        <img class="portrait" src="assets/64/ui/codex/portrait-frame.png" alt="Moldura vazia de retrato">
+        <div class="bar-stack" aria-label="Montagem técnica da barra de HP">
+          <img class="bar-track" src="assets/64/ui/codex/hp-track.png" alt="">
+          <div class="fill-window"><img src="assets/64/ui/codex/hp-fill.png" alt=""></div>
+          <img class="bar-frame" src="assets/64/ui/codex/hp-frame.png" alt="Moldura vazada da barra">
+        </div>
+      </div>
+    </div>
+    <div class="calibrator">
+      <label for="fill-range">Teste de recorte</label>
+      <input id="fill-range" type="range" min="0" max="100" value="68">
+    </div>
+  </section>
+
+  <section aria-labelledby="controls-title">
+    <div class="section-head">
+      <h2 id="controls-title">Painel e controles</h2>
+      <p>Composição feita somente com os PNGs exportados. Os centros permanecem vazios para conteúdo real do jogo.</p>
+    </div>
+    <div class="stage component-demo">
+      <div class="panel-layout" aria-label="Painel vazio com slots vazios">
+        <img class="panel" src="assets/64/ui/codex/panel.png" alt="Painel vazio">
+        <div class="slot-grid" aria-hidden="true">
+          <img src="assets/64/ui/codex/slot-neutral.png" alt="">
+          <img src="assets/64/ui/codex/slot-selected.png" alt="">
+        </div>
+      </div>
+      <div class="state-stack">
+        <div class="state-row"><small>slots</small><img src="assets/64/ui/codex/slot-neutral.png" alt="Slot neutro"><img src="assets/64/ui/codex/slot-selected.png" alt="Slot selecionado"><img src="assets/64/ui/codex/slot-disabled.png" alt="Slot desabilitado"></div>
+        <div class="state-row round"><small>botões</small><img src="assets/64/ui/codex/button-neutral.png" alt="Botão neutro"><img src="assets/64/ui/codex/button-selected.png" alt="Botão selecionado"><img src="assets/64/ui/codex/button-disabled.png" alt="Botão desabilitado"></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="plates-title">
+    <div class="section-head">
+      <h2 id="plates-title">Pranchas finais</h2>
+      <p>A mesma seleção em chroma key exato e em transparência real. O rosa não aparece em nenhum arquivo de runtime.</p>
+    </div>
+    <div class="plates">
+      <figure class="plate">
+        <figcaption>Fonte chroma · fundo #ff00ff</figcaption>
+        <div class="plate-view magenta"><img src="assets/64/ui/codex/ui-kit-codex-chroma.png" alt="Prancha dos assets sobre fundo magenta"></div>
+      </figure>
+      <figure class="plate">
+        <figcaption>Atlas alpha · runtime</figcaption>
+        <div class="plate-view alpha"><img src="assets/64/ui/codex/ui-kit-codex-alpha.png" alt="Prancha dos assets com transparência"></div>
+      </figure>
+    </div>
+  </section>
+
+  <section aria-labelledby="exports-title">
+    <div class="section-head">
+      <h2 id="exports-title">Exports individuais</h2>
+      <p>Esta lista é carregada diretamente do manifesto gerado pelo pipeline.</p>
+    </div>
+    <div class="asset-grid" id="asset-grid" aria-live="polite"></div>
+  </section>
+</main>
+<script>
+  const range = document.getElementById('fill-range');
+  const fillWindow = document.querySelector('.fill-window');
+  range.addEventListener('input', () => { fillWindow.style.width = `${range.value * 2.6}px`; });
+
+  const grid = document.getElementById('asset-grid');
+  fetch('assets/64/ui/codex/manifest.json')
+    .then(response => {
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      return response.json();
+    })
+    .then(manifest => {
+      for (const [name, asset] of Object.entries(manifest.assets)) {
+        const card = document.createElement('article');
+        card.className = 'asset-card';
+        card.innerHTML = `
+          <div class="asset-preview"><img src="assets/64/ui/codex/${asset.file}" width="${asset.width}" height="${asset.height}" alt="${name}"></div>
+          <div class="asset-meta"><code>${asset.file}</code><span>${asset.width}×${asset.height}</span></div>`;
+        grid.appendChild(card);
+      }
+    })
+    .catch(error => { grid.innerHTML = `<p class="error">Não foi possível carregar o manifesto: ${error.message}</p>`; });
+</script>
+</body>
+</html>
