@@ -145,10 +145,12 @@
     this.load.spritesheet('goblin', A + 'creatures/pedra/goblin_tocha/sheet.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('tnt', A + 'creatures/deserto/goblin_tnt/sheet.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('sheep', A + 'creatures/common/sheep/idle.png', { frameWidth: 64, frameHeight: 64 });
-    for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
+    for (const n of ['yeti', 'golem', 'wolf', 'ghost_knight']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
       this.load.spritesheet('ai' + n + '-walk', A + 'creatures/neve/' + n + '/walk.png', { frameWidth: 92, frameHeight: 92 });
     }
+    // Ghost Knight attack (spritesheet dedicada)
+    this.load.spritesheet('aighost_knight-attack', A + 'creatures/neve/ghost_knight/attack.png', { frameWidth: 92, frameHeight: 92 });
     for (const [, path, fw, fh, hasWalk] of MOBS) { // Pixel Adventure upscalado 2x → frame nativo × 2
       this.load.spritesheet(`en-${path}-idle`, `${A}creatures/${path}/idle.png`, { frameWidth: fw * 2, frameHeight: fh * 2 });
       if (hasWalk) this.load.spritesheet(`en-${path}-walk`, `${A}creatures/${path}/walk.png`, { frameWidth: fw * 2, frameHeight: fh * 2 });
@@ -422,6 +424,7 @@
     spawnAIMob('Yeti ✦IA', 'aiyeti', [43, 6], ISLES.neve);
     spawnAIMob('Golem de Gelo ✦IA', 'aigolem', [47, 9], ISLES.neve);
     spawnAIMob('Lobo Ártico ✦IA', 'aiwolf', [45, 4], ISLES.neve);
+    spawnAIMob('Cavaleiro Fantasma ✦IA', 'aighost_knight', [46, 7], ISLES.neve);
     // ovelhas (ambiente)
     mk('sheep-idle', 'sheep', 0, -1, 3, -1);
     [[3, 8], [10, 9], [16, 4]].forEach(([sx, sy], i) => {
