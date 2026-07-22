@@ -6,3 +6,4 @@ nohup.out
 .playwright-mcp/
 .plans/
 .codex/
+__pycache__/
