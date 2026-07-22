@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """Ícones pixel-art da UI, desenhados por código (CC0 próprio). Saída em ui/px/."""
+import os
 from pathlib import Path
+from PIL import Image
 
 BASE = Path(__file__).resolve().parent.parent
 OUT = BASE / 'public/assets/64/ui/px'

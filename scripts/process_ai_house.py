@@ -12,6 +12,8 @@ from pathlib import Path
 BASE = Path(__file__).resolve().parent.parent
 SRC = BASE / 'assets/ai_house/house_raw.png'
 OUT_DIR = BASE / 'public/assets/64/buildings'
+SCRATCH = BASE / '.ai_raw'
+os.makedirs(SCRATCH, exist_ok=True)
 
 im = Image.open(SRC).convert('RGBA')
 a = np.array(im)
@@ -82,6 +84,6 @@ for yy in range(0, bgp.height, 64):
         bgp.alpha_composite(tile, (xx, yy))
 bgp.alpha_composite(sh, (80, 40))
 bgp.alpha_composite(res, (80, 40))
-bgp.save(f'{SCRATCH}/house_ongrass.png')
+bgp.save(SCRATCH / 'house_ongrass.png')
 
 print(f'casa final: {res.size}px  =>  {res.width/64:.1f} × {res.height/64:.1f} tiles')
