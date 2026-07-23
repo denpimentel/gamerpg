@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GameRPG Sprite Generator</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <span class="eyebrow">GameRPG Tools</span>
+        <h1>Sprite Generator</h1>
+        <p>Monte sprites em camadas, ajuste o tamanho e exporte o resultado em PNG.</p>
+      </div>
+      <div class="topbar-actions">
+        <button id="resetProject" class="ghost-button">Novo projeto</button>
+        <button id="exportPng" class="primary-button">Exportar PNG</button>
+      </div>
+    </header>
+
+    <section class="workspace">
+      <aside class="panel controls-panel">
+        <section>
+          <div class="section-heading">
+            <h2>Canvas</h2>
+            <span id="dimensionsBadge" class="badge">64 × 64 px</span>
+          </div>
+
+          <div class="field-grid two-columns">
+            <label>
+              Largura base
+              <input id="baseWidth" type="number" min="8" max="1024" step="1" value="64" />
+            </label>
+            <label>
+              Altura base
+              <input id="baseHeight" type="number" min="8" max="1024" step="1" value="64" />
+            </label>
+          </div>
+
+          <label>
+            Escala do personagem
+            <input id="scale" type="range" min="0.25" max="4" step="0.25" value="1" />
+            <output id="scaleValue">1×</output>
+          </label>
+
+          <label>
+            Âncora
+            <select id="anchor">
+              <option value="bottom-center">Centro inferior</option>
+              <option value="center">Centro</option>
+              <option value="top-left">Canto superior esquerdo</option>
+            </select>
+          </label>
+
+          <label>
+            Direção
+            <select id="direction">
+              <option value="south">Sul</option>
+              <option value="west">Oeste</option>
+              <option value="east">Leste</option>
+              <option value="north">Norte</option>
+            </select>
+          </label>
+        </section>
+
+        <section>
+          <div class="section-heading">
+            <h2>Camadas</h2>
+            <button id="clearLayers" class="text-button">Limpar</button>
+          </div>
+
+          <label class="upload-zone" for="layerInput">
+            <strong>Adicionar PNGs</strong>
+            <span>Corpo, armadura, arma, efeitos ou monstro completo</span>
+            <input id="layerInput" type="file" accept="image/png,image/webp" multiple />
+          </label>
+
+          <ol id="layerList" class="layer-list"></ol>
+          <p id="emptyState" class="empty-state">Nenhuma camada adicionada.</p>
+        </section>
+      </aside>
+
+      <section class="panel preview-panel">
+        <div class="preview-header">
+          <div>
+            <span class="eyebrow">Preview</span>
+            <h2 id="previewTitle">Sul</h2>
+          </div>
+          <label class="checker-toggle">
+            <input id="showGrid" type="checkbox" checked />
+            Grade transparente
+          </label>
+        </div>
+
+        <div id="canvasStage" class="canvas-stage checkerboard">
+          <canvas id="preview" width="64" height="64"></canvas>
+          <div id="groundLine" class="ground-line"></div>
+        </div>
+
+        <div class="preview-footer">
+          <span>Use PNGs com fundo transparente.</span>
+          <span>Ordem: primeira camada embaixo, última camada em cima.</span>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script src="./generator.js"></script>
+</body>
+</html>
