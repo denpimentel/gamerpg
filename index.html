@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Ferramentas online para criação de sprites e conteúdo do GameRPG." />
+  <title>GameRPG Studio</title>
+  <style>
+    :root { color-scheme: dark; font-family: Inter, system-ui, sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-height: 100vh; display: grid; place-items: center; background: radial-gradient(circle at top, #202a44, #0b1020 55%); color: #f7f8fc; }
+    main { width: min(920px, calc(100% - 32px)); padding: 48px; border: 1px solid #33415f; border-radius: 24px; background: rgba(13, 20, 38, .88); box-shadow: 0 24px 80px rgba(0,0,0,.35); }
+    .eyebrow { color: #8fb8ff; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+    h1 { margin: 10px 0 12px; font-size: clamp(2.4rem, 7vw, 5.5rem); line-height: .95; }
+    p { color: #bcc7db; font-size: 1.1rem; line-height: 1.65; max-width: 680px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 32px; }
+    .card { display: block; padding: 24px; border: 1px solid #3a4968; border-radius: 18px; background: #141d32; color: inherit; text-decoration: none; transition: transform .18s ease, border-color .18s ease; }
+    .card:hover { transform: translateY(-4px); border-color: #7ca8ff; }
+    .card strong { display: block; font-size: 1.25rem; margin-bottom: 8px; }
+    .card span { color: #aeb9cc; }
+    .soon { opacity: .55; pointer-events: none; }
+    footer { margin-top: 30px; color: #7f8aa2; font-size: .9rem; }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="eyebrow">GameRPG tools</div>
+    <h1>GameRPG Studio</h1>
+    <p>Ferramentas para criar, combinar e exportar sprites do seu jogo diretamente no navegador.</p>
+    <section class="grid" aria-label="Ferramentas disponíveis">
+      <a class="card" href="./tools/sprite-generator/">
+        <strong>Sprite Generator</strong>
+        <span>Camadas, tamanhos personalizados, escala, âncora e exportação PNG.</span>
+      </a>
+      <div class="card soon"><strong>Animation Editor</strong><span>Em desenvolvimento.</span></div>
+      <div class="card soon"><strong>Monster Generator</strong><span>Em desenvolvimento.</span></div>
+    </section>
+    <footer>GameRPG Studio · build inicial</footer>
+  </main>
+</body>
+</html>
