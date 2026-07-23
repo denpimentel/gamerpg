@@ -126,6 +126,9 @@
     this.load.spritesheet('snowflat', A + 'terrain/neve.png', { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet('bridge', A + 'terrain/bridge.png', { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet('vila', A + 'terrain/vila.png', { frameWidth: 64, frameHeight: 64 });
+    // FX de skills (greyscale/branco → tint em runtime; scripts/build_fx.py)
+    for (const fx of ['slash', 'lunge', 'ring', 'orb', 'p_fire', 'p_spark', 'p_ice', 'p_dust'])
+      this.load.image('fx-' + fx.replace('_', '-'), A + 'effects/fx_' + fx + '.png');
     this.load.spritesheet('foam', A + 'terrain/foam.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('rocks1', A + 'terrain/rocks_01.png', { frameWidth: 64, frameHeight: 64 });
     // --- props/ (árvores + decoração, por bioma) ---
@@ -613,11 +616,169 @@
       setAnim: (st, dir) => { if (!P.attacking) setDoll(st, dir); },
     });
 
+    // ------- FX / skills de arma (docs/SKILLS-VFX.md) -------
+    // Tudo greyscale/branco tintado em runtime → escala p/ qualquer arma/skin/montaria.
+    const DIR_ANG = { e: 0, se: 45, s: 90, sw: 135, w: 180, nw: 225, n: 270, ne: 315 };
+    const WEAPON_FX = {
+      longsword: { tint: 0xcfe8ff, heavy: false },
+      dagger: { tint: 0xb0ffb8, heavy: false },
+      mace: { tint: 0xffd27a, heavy: true },
+      waraxe: { tint: 0xffa96b, heavy: true },
+      spear: { tint: 0xe2d0ff, heavy: false, lunge: true },
+    };
+    const ELEMENTS = { none: null,
+      fogo: { tint: 0xff7a2a, p: 'fx-p-fire' },
+      raio: { tint: 0xffe95c, p: 'fx-p-spark' },
+      gelo: { tint: 0x9adcff, p: 'fx-p-ice' } };
+    P.element = 'none';
+    const fxTint = () => ELEMENTS[P.element] ? ELEMENTS[P.element].tint : (WEAPON_FX[P.weapon] || { tint: 0xffffff }).tint;
+    const burst = (tex, x, y, tint, n = 10) => {
+      const em = this.add.particles(x, y, tex, {
+        speed: { min: 30, max: 110 }, lifespan: 380, blendMode: 'NORMAL', tint,
+        scale: { start: 0.8, end: 0 }, emitting: false,
+      }).setDepth(doll.y + 41);
+      em.explode(n);
+      this.time.delayedCall(700, () => em.destroy());
+    };
+
+    // 1) Corte Cromático: arco tintado na direção do golpe (lança usa o lunge)
+    let swingFlip = false;
+    const slashArc = () => {
+      const ang = Phaser.Math.DegToRad(DIR_ANG[P.dir] ?? 90);
+      const wfx = WEAPON_FX[P.weapon] || {};
+      const dx = Math.cos(ang), dy = Math.sin(ang);
+      swingFlip = !swingFlip;
+      // 2 camadas: NORMAL segura a leitura em fundo claro (neve!), ADD dá o glow
+      const tex = wfx.lunge ? 'fx-lunge' : 'fx-slash';
+      const mk = (blend, alpha, scl) => this.add.image(doll.x + dx * 26, doll.y - 14 + dy * 26, tex)
+        .setRotation(ang).setFlipY(swingFlip).setBlendMode(blend)
+        .setTint(fxTint()).setAlpha(alpha).setScale(scl).setDepth(doll.y + 40);
+      const base = mk(Phaser.BlendModes.NORMAL, 0.9, 0.55);
+      const glow = mk(Phaser.BlendModes.ADD, 0.6, 0.62);
+      this.tweens.add({ targets: [base, glow], scale: wfx.lunge ? 0.9 : 1.05, alpha: 0,
+        duration: 190, ease: 'Cubic.easeOut', onComplete: () => { base.destroy(); glow.destroy(); } });
+      const el = ELEMENTS[P.element];
+      if (el) burst(el.p, doll.x + dx * 34, doll.y - 10 + dy * 34, el.tint, 10);
+    };
+
+    // 2) Rastro Espectral: silhueta congelada do doll (camadas visíveis, crop incluso)
+    const ghost = (tint = 0x7ad8ff) => {
+      const g = this.add.container(doll.x, doll.y).setDepth(doll.y - 1).setAlpha(0.4);
+      doll.iterate(ch => {
+        // camadas com crop (cavaleiro cortado na cintura) ficam de fora: setCrop
+        // clonado não se comporta no Phaser 4 — montado, o fantasma é o cavalo
+        if (!ch.visible || !ch.texture || !ch.frame || ch.isCropped) return;
+        if (!(ch instanceof Phaser.GameObjects.Sprite) && !(ch instanceof Phaser.GameObjects.Image)) return;
+        const c = this.add.image(ch.x, ch.y, ch.texture.key, ch.frame.name)
+          .setOrigin(ch.originX, ch.originY).setScale(ch.scaleX, ch.scaleY).setFlip(ch.flipX, ch.flipY);
+        c.setTint(tint).setTintMode(Phaser.TintModes.FILL);
+        g.add(c);
+      });
+      this.tweens.add({ targets: g, alpha: 0, duration: 280, onComplete: () => g.destroy() });
+    };
+    this.fxGhost = ghost;
+
+    // 3) Lâmina Elemental: [E] cicla nenhum→fogo→raio→gelo; aura + burst no golpe
+    let aura = null;
+    const setElement = (el) => {
+      P.element = el;
+      if (aura) { aura.destroy(); aura = null; }
+      const cfg = ELEMENTS[el];
+      if (cfg) {
+        aura = this.add.particles(0, 0, cfg.p, {
+          speed: { min: 5, max: 25 }, lifespan: 500, frequency: 110, quantity: 1,
+          scale: { start: 0.45, end: 0 }, alpha: { start: 0.8, end: 0 },
+          blendMode: 'NORMAL', tint: cfg.tint,
+        }).setDepth(4000);
+        aura.startFollow(doll, 0, 4);
+      }
+      skillTxt();
+    };
+
+    // 4) Onda de Impacto: armas pesadas socam o chão — anel + poeira + shake + knockback
+    const shockwave = () => {
+      const tint = fxTint();
+      const ring = this.add.image(doll.x, doll.y + 6, 'fx-ring').setBlendMode(Phaser.BlendModes.NORMAL)
+        .setTint(tint).setAlpha(0.85).setScale(0.3, 0.17).setDepth(doll.y + 39);
+      this.tweens.add({ targets: ring, scaleX: 1.5, scaleY: 0.85, alpha: 0,
+        duration: 340, ease: 'Cubic.easeOut', onComplete: () => ring.destroy() });
+      burst('fx-p-dust', doll.x, doll.y + 8, 0xcbb489, 8);
+      this.cameras.main.shake(110, 0.004);
+      for (const f of this.foes) {
+        const dx = f.walker.x - this.player.x, dy = f.walker.y - this.player.y;
+        const d = Math.hypot(dx, dy);
+        if (!d || d > COMBAT.range * 2.4) continue;
+        const nx = dx / d, ny = dy / d;
+        const tx = Math.floor((f.walker.x + nx * 30) / TILE), ty = Math.floor((f.walker.y + ny * 30) / TILE);
+        if (walkableBase(tx, ty)) {
+          f.walker.x += nx * 30; f.walker.y += ny * 30;
+          f.walker.sprite.setPosition(Math.round(f.walker.x), Math.round(f.walker.y));
+        }
+        f.spr.setTint(0xffd27a);
+        this.time.delayedCall(150, () => f.spr.clearTint());
+      }
+    };
+
+    // 5) Tempestade de Lâminas: [R] giro 360° — anel + orbitais + arma girando (frame
+    //    idle de QUALQUER sheet de arma), hits em área a cada ~250ms, cooldown 5s
+    let wwCd = 0;
+    const wwHit = () => {
+      for (const f of this.foes) {
+        const d = Math.hypot(f.walker.x - this.player.x, f.walker.y - this.player.y);
+        if (d > COMBAT.range * 1.9) continue;
+        f.spr.setTint(0xff7070);
+        this.time.delayedCall(120, () => f.spr.clearTint());
+      }
+    };
+    const whirlwind = () => {
+      const now = this.time.now;
+      if (now < wwCd || P.skin === 'ai') return;
+      wwCd = now + 5000;
+      const tint = fxTint();
+      const c = this.add.container(doll.x, doll.y - 10);
+      const ring = this.add.image(0, 0, 'fx-ring').setBlendMode(Phaser.BlendModes.NORMAL)
+        .setTint(tint).setAlpha(0.75).setScale(0.9, 0.6);
+      const wtex = `w-${P.weapon}-walk`;
+      const wep = this.textures.exists(wtex)
+        ? this.add.image(0, -6, wtex, 2 * 9).setScale(SCALE.player / 2) : null;
+      const orbs = [0, 1, 2].map(() =>
+        this.add.image(0, 0, 'fx-orb').setBlendMode(Phaser.BlendModes.NORMAL).setTint(tint).setAlpha(0.9));
+      c.add([ring, ...(wep ? [wep] : []), ...orbs]);
+      let hitT = 0;
+      this.tweens.addCounter({ from: 0, to: 1, duration: 900,
+        onUpdate: (t) => {
+          const v = t.getValue(), a = v * Math.PI * 4;
+          c.setPosition(doll.x, doll.y - 10).setDepth(doll.y + 42);
+          ring.setRotation(a);
+          if (wep) wep.setRotation(a * 1.5);
+          orbs.forEach((o, i) => {
+            const oa = a + i * Math.PI * 2 / 3;
+            o.setPosition(Math.cos(oa) * 46, Math.sin(oa) * 30).setRotation(oa + Math.PI / 2);
+          });
+          if (v >= hitT) { hitT += 0.28; wwHit(); }
+        },
+        onComplete: () => c.destroy() });
+      ghost(tint); this.time.delayedCall(300, () => ghost(tint)); this.time.delayedCall(600, () => ghost(tint));
+    };
+
+    // teclas extras + legenda das skills
+    const fxKeys = this.input.keyboard.addKeys('e,r');
+    const EL_ORDER = ['none', 'fogo', 'raio', 'gelo'];
+    fxKeys.e.on('down', () => setElement(EL_ORDER[(EL_ORDER.indexOf(P.element) + 1) % EL_ORDER.length]));
+    fxKeys.r.on('down', () => whirlwind());
+    const skillHint = this.add.text(this.scale.width / 2, this.scale.height - 8, '', {
+      fontFamily: 'sans-serif', fontSize: '13px', color: '#fff', stroke: '#000', strokeThickness: 3,
+    }).setOrigin(0.5, 1).setScrollFactor(0).setDepth(5000).setAlpha(0.8);
+    const skillTxt = () => skillHint.setText(`[E] elemento: ${P.element} · [R] tempestade de lâminas`);
+    skillTxt();
+
     const attack = () => {
       if (P.attacking) return;
+      const wfx = WEAPON_FX[P.weapon] || {};
       if (P.skin === 'ai') {
         // herói IA não tem anim de ataque — investida rápida como feedback
         P.attacking = true;
+        this.time.delayedCall(40, slashArc);
         this.tweens.add({ targets: aiSpr, scaleX: 1.18, scaleY: 0.92,
           duration: 90, yoyo: true, onComplete: () => { P.attacking = false; } });
         return;
@@ -625,6 +786,9 @@
       // a pé OU montado: golpe real do paper doll (montado, renderMounted anima o tronco+arma)
       P.attacking = true;
       setDoll('attack', P.dir);
+      this.time.delayedCall(110, slashArc);
+      this.time.delayedCall(60, () => ghost(fxTint()));
+      if (wfx.heavy) this.time.delayedCall(200, shockwave);
       layers.body.once('animationcomplete', () => {
         P.attacking = false;
         setDoll('idle', P.dir);
@@ -984,6 +1148,11 @@
         alvo.spr.setTint(0xff7070);
         this.time.delayedCall(130, () => alvo.spr.clearTint());
       });
+    }
+    // rastro espectral no galope (skill 2 — clona o frame corrente, qualquer montaria)
+    if (this.P.mount && this.player.moving && time - (this._ghostT || 0) > 95) {
+      this._ghostT = time;
+      this.fxGhost();
     }
     this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
     this.mobs.forEach(m => m.update(delta));

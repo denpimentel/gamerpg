@@ -33,6 +33,17 @@ O usuário escolheu o 64×64 — demos 32/128 foram DELETADOS (zips brutos ainda
   equipáveis no inventário; montado galopa a 260px/s (porco 220, a pé 165), armas se
   recolhem, ataque vira investida. Ver "Montarias LPC" e "Montarias IA" no pipeline.
 
+- **Skills/VFX de arma** (2026-07-22, propostas em `docs/SKILLS-VFX.md`): Corte Cromático
+  (arco por golpe, tint por arma/elemento), Rastro Espectral (clones tint-FILL no swing e
+  galope — camadas com crop ficam de fora, clone de setCrop quebra no Phaser 4), Lâmina
+  Elemental (tecla E: fogo/raio/gelo — aura + burst), Onda de Impacto (armas heavy: anel +
+  shake + knockback empurrando `walker.x/y`), Tempestade de Lâminas (tecla R, cooldown 5s).
+  Assets greyscale/brancos CC0 em `effects/fx_*.png` via `scripts/build_fx.py`.
+  ⚠ Phaser 4: `setTintFill` → `setTint().setTintMode(Phaser.TintModes.FILL)`;
+  `tweens/time.timeScale` não escalam mais; efeito só-ADD some em fundo claro (neve) —
+  sempre camada NORMAL + glow ADD. QA de efeito curto (<300ms): `renderer.snapshot()`
+  agendado dentro da página, nunca screenshot via MCP (round-trip mata o timing).
+
 Hub em `public/index.html`. Licenças em `CREDITS.md` (monstros CC0; LPC é CC-BY-SA!).
 
 ## Arquitetura

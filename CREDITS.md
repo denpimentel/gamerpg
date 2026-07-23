@@ -61,6 +61,13 @@ Este repositório usa apenas assets gratuitos de terceiros. Downloads brutos em 
   confirmar. Original em `assets/vila_calcamento/`; tratamento (chroma key magenta,
   fatiamento 6×6, downscale 64px, grama sintetizada) em `scripts/build_vila_tiles.py`.
 
+### FX de skills de arma (`effects/fx_*.png`)
+- **Slash Effect Collection** (cethiel) — CC0 — https://opengameart.org/content/slash-effect-collection
+  (fx_slash, fx_lunge, fx_ring, fx_orb — greyscale, tintados em runtime).
+- **Kenney Particle Pack** — CC0 — https://kenney.nl/assets/particle-pack
+  (fx_p_fire, fx_p_spark, fx_p_ice, fx_p_dust).
+- Pipeline: `scripts/build_fx.py` (crop bbox + downscale; brutos em `assets/effects_research/`).
+
 ## Engine
 - **Phaser 4.2.1** — MIT — https://phaser.io (vendorizado em `public/vendor/phaser.min.js`)
 
