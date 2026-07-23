@@ -3,110 +3,101 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>GameRPG Sprite Generator</title>
+  <title>GameRPG Studio</title>
   <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <main class="app-shell">
-    <header class="topbar">
-      <div>
-        <span class="eyebrow">GameRPG Tools</span>
-        <h1>Sprite Generator</h1>
-        <p>Monte sprites em camadas, ajuste o tamanho e exporte o resultado em PNG.</p>
-      </div>
-      <div class="topbar-actions">
-        <button id="resetProject" class="ghost-button">Novo projeto</button>
-        <button id="exportPng" class="primary-button">Exportar PNG</button>
-      </div>
-    </header>
+  <header class="topbar">
+    <div class="brand"><strong>⚔️ GameRPG Studio</strong><span>Animation Kit Builder</span></div>
+    <div class="top-actions">
+      <button id="newProject">Novo</button>
+      <button id="playButton">▶ Reproduzir</button>
+      <button id="exportFrame">Exportar frame</button>
+      <button id="exportKit" class="primary">Exportar kit do jogo</button>
+    </div>
+  </header>
 
-    <section class="workspace">
-      <aside class="panel controls-panel">
-        <section>
-          <div class="section-heading">
-            <h2>Canvas</h2>
-            <span id="dimensionsBadge" class="badge">64 × 64 px</span>
-          </div>
+  <main class="studio">
+    <aside class="sidebar left-panel">
+      <h2>1. Importar spritesheet</h2>
+      <label class="drop-zone" id="dropZone" for="sheetInput">
+        <strong>Solte sua imagem aqui</strong>
+        <span>PNG ou WebP, horizontal ou vertical</span>
+        <input id="sheetInput" type="file" accept="image/png,image/webp" />
+      </label>
 
-          <div class="field-grid two-columns">
-            <label>
-              Largura base
-              <input id="baseWidth" type="number" min="8" max="1024" step="1" value="64" />
-            </label>
-            <label>
-              Altura base
-              <input id="baseHeight" type="number" min="8" max="1024" step="1" value="64" />
-            </label>
-          </div>
-
-          <label>
-            Escala do personagem
-            <input id="scale" type="range" min="0.25" max="4" step="0.25" value="1" />
-            <output id="scaleValue">1×</output>
-          </label>
-
-          <label>
-            Âncora
-            <select id="anchor">
-              <option value="bottom-center">Centro inferior</option>
-              <option value="center">Centro</option>
-              <option value="top-left">Canto superior esquerdo</option>
-            </select>
-          </label>
-
-          <label>
-            Direção
-            <select id="direction">
-              <option value="south">Sul</option>
-              <option value="west">Oeste</option>
-              <option value="east">Leste</option>
-              <option value="north">Norte</option>
-            </select>
-          </label>
-        </section>
-
-        <section>
-          <div class="section-heading">
-            <h2>Camadas</h2>
-            <button id="clearLayers" class="text-button">Limpar</button>
-          </div>
-
-          <label class="upload-zone" for="layerInput">
-            <strong>Adicionar PNGs</strong>
-            <span>Corpo, armadura, arma, efeitos ou monstro completo</span>
-            <input id="layerInput" type="file" accept="image/png,image/webp" multiple />
-          </label>
-
-          <ol id="layerList" class="layer-list"></ol>
-          <p id="emptyState" class="empty-state">Nenhuma camada adicionada.</p>
-        </section>
-      </aside>
-
-      <section class="panel preview-panel">
-        <div class="preview-header">
-          <div>
-            <span class="eyebrow">Preview</span>
-            <h2 id="previewTitle">Sul</h2>
-          </div>
-          <label class="checker-toggle">
-            <input id="showGrid" type="checkbox" checked />
-            Grade transparente
-          </label>
-        </div>
-
-        <div id="canvasStage" class="canvas-stage checkerboard">
-          <canvas id="preview" width="64" height="64"></canvas>
-          <div id="groundLine" class="ground-line"></div>
-        </div>
-
-        <div class="preview-footer">
-          <span>Use PNGs com fundo transparente.</span>
-          <span>Ordem: primeira camada embaixo, última camada em cima.</span>
+      <section class="card">
+        <h3>Projeto</h3>
+        <label>Nome do personagem<input id="assetName" value="warrior" /></label>
+        <div class="two-cols">
+          <label>Animação<select id="animationName"><option>idle</option><option selected>run</option><option>walk</option><option>attack</option><option>hurt</option><option>death</option><option>cast</option></select></label>
+          <label>Direção<select id="direction"><option value="south">Sul</option><option value="west">Oeste</option><option value="east">Leste</option><option value="north">Norte</option></select></label>
         </div>
       </section>
+
+      <section class="card">
+        <h3>Recorte automático</h3>
+        <div class="two-cols">
+          <label>Frames<input id="frameCount" type="number" min="1" max="64" value="6" /></label>
+          <label>Layout<select id="layout"><option value="horizontal">Horizontal</option><option value="vertical">Vertical</option></select></label>
+        </div>
+        <div class="two-cols">
+          <label>Largura frame<input id="frameWidth" type="number" min="1" value="64" /></label>
+          <label>Altura frame<input id="frameHeight" type="number" min="1" value="64" /></label>
+        </div>
+        <label>Velocidade <span id="fpsLabel">10 FPS</span><input id="fps" type="range" min="1" max="30" value="10" /></label>
+        <button id="detectButton" class="wide">Detectar novamente</button>
+      </section>
+
+      <section class="card tip">
+        <strong>Destino do kit</strong>
+        <code id="targetPath">public/assets/64/creatures/warrior/</code>
+        <small>O ZIP incluirá a spritesheet, frames separados e o manifest.json.</small>
+      </section>
+    </aside>
+
+    <section class="workspace">
+      <div class="workspace-head">
+        <div><span class="muted">Preview animado</span><h1 id="previewTitle">Warrior · Run · Sul</h1></div>
+        <div class="zoom-controls"><button id="zoomOut">−</button><span id="zoomLabel">400%</span><button id="zoomIn">+</button></div>
+      </div>
+      <div class="canvas-stage checker" id="canvasStage">
+        <canvas id="preview" width="64" height="64"></canvas>
+        <div id="emptyPreview" class="empty-preview"><strong>Importe uma spritesheet</strong><span>Ela será separada em frames e animada automaticamente.</span></div>
+      </div>
+      <div class="timeline-head"><strong>Timeline</strong><span id="sheetInfo">Nenhuma imagem carregada</span></div>
+      <div id="timeline" class="timeline"></div>
     </section>
+
+    <aside class="sidebar right-panel">
+      <h2>2. Ajustar para o jogo</h2>
+      <section class="card">
+        <h3>Canvas final</h3>
+        <div class="two-cols">
+          <label>Largura<input id="outputWidth" type="number" min="8" max="512" value="64" /></label>
+          <label>Altura<input id="outputHeight" type="number" min="8" max="512" value="64" /></label>
+        </div>
+        <label>Âncora<select id="anchor"><option value="bottom-center">Centro inferior</option><option value="center">Centro</option><option value="top-left">Canto superior esquerdo</option></select></label>
+        <label>Escala <span id="scaleLabel">100%</span><input id="spriteScale" type="range" min="10" max="400" value="100" /></label>
+      </section>
+
+      <section class="card">
+        <h3>Fundo</h3>
+        <label class="check"><input id="removeBlack" type="checkbox" /> Remover pixels pretos</label>
+        <label>Tolerância <span id="toleranceLabel">20</span><input id="blackTolerance" type="range" min="0" max="100" value="20" /></label>
+        <small>Útil quando a spritesheet veio com fundo preto em vez de transparência.</small>
+      </section>
+
+      <section class="card export-card">
+        <h3>3. Incorporar no jogo</h3>
+        <p>O kit gerado segue o padrão atual do repositório e inclui instruções prontas para o loader.</p>
+        <button id="exportKitSide" class="primary wide">Baixar kit completo (.zip)</button>
+        <button id="exportManifest" class="wide">Baixar manifest.json</button>
+      </section>
+    </aside>
   </main>
 
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
   <script src="./generator.js"></script>
 </body>
 </html>
