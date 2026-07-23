@@ -8,31 +8,66 @@
 </head>
 <body>
   <header class="topbar">
-    <div class="brand"><strong>⚔️ GameRPG Studio</strong><span>Animation Kit Builder</span></div>
+    <div class="brand">
+      <strong>⚔️ GameRPG Studio</strong>
+      <span>Animation Kit Builder</span>
+    </div>
     <div class="top-actions">
       <button id="newProject">Novo</button>
       <button id="playButton">▶ Reproduzir</button>
       <button id="exportFrame">Exportar frame</button>
-      <button id="exportKit" class="primary">Exportar kit do jogo</button>
+      <button id="exportKit" class="primary">Exportar kit completo</button>
     </div>
   </header>
 
   <main class="studio">
     <aside class="sidebar left-panel">
-      <h2>1. Importar spritesheet</h2>
+      <h2>1. Montar o projeto</h2>
+
       <label class="drop-zone" id="dropZone" for="sheetInput">
-        <strong>Solte sua imagem aqui</strong>
-        <span>PNG ou WebP, horizontal ou vertical</span>
+        <strong>Solte sua spritesheet aqui</strong>
+        <span>Ela será salva no slot animação + direção selecionado.</span>
         <input id="sheetInput" type="file" accept="image/png,image/webp" />
       </label>
 
       <section class="card">
-        <h3>Projeto</h3>
+        <h3>Slot atual</h3>
+        <p class="helper">Importe uma spritesheet por combinação de <strong>ação</strong> e <strong>direção</strong>. O Studio manterá todas no mesmo projeto para exportar o kit completo.</p>
         <label>Nome do personagem<input id="assetName" value="warrior" /></label>
         <div class="two-cols">
-          <label>Animação<select id="animationName"><option>idle</option><option selected>run</option><option>walk</option><option>attack</option><option>hurt</option><option>death</option><option>cast</option></select></label>
-          <label>Direção<select id="direction"><option value="south">Sul</option><option value="west">Oeste</option><option value="east">Leste</option><option value="north">Norte</option></select></label>
+          <label>
+            Ação
+            <select id="animationName">
+              <option>idle</option>
+              <option selected>run</option>
+              <option>walk</option>
+              <option>attack</option>
+              <option>hurt</option>
+              <option>death</option>
+              <option>cast</option>
+            </select>
+          </label>
+          <label>
+            Direção
+            <select id="direction">
+              <option value="south">Sul</option>
+              <option value="west">Oeste</option>
+              <option value="east">Leste</option>
+              <option value="north">Norte</option>
+            </select>
+          </label>
         </div>
+        <div class="inline-actions">
+          <button id="clearCurrentSlot" class="wide">Limpar slot atual</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="section-head">
+          <h3>Variações carregadas</h3>
+          <span id="projectSummary" class="tag">0 slots</span>
+        </div>
+        <div id="clipLibrary" class="clip-library"></div>
       </section>
 
       <section class="card">
@@ -52,20 +87,33 @@
       <section class="card tip">
         <strong>Destino do kit</strong>
         <code id="targetPath">public/assets/64/creatures/warrior/</code>
-        <small>O ZIP incluirá a spritesheet, frames separados e o manifest.json.</small>
+        <small>Ao exportar, o ZIP incluirá todas as spritesheets adicionadas ao projeto e um <code>manifest.json</code> único.</small>
       </section>
     </aside>
 
     <section class="workspace">
       <div class="workspace-head">
-        <div><span class="muted">Preview animado</span><h1 id="previewTitle">Warrior · Run · Sul</h1></div>
-        <div class="zoom-controls"><button id="zoomOut">−</button><span id="zoomLabel">400%</span><button id="zoomIn">+</button></div>
+        <div>
+          <span class="muted">Preview animado</span>
+          <h1 id="previewTitle">Warrior · Run · Sul</h1>
+        </div>
+        <div class="zoom-controls">
+          <button id="zoomOut">−</button>
+          <span id="zoomLabel">400%</span>
+          <button id="zoomIn">+</button>
+        </div>
       </div>
       <div class="canvas-stage checker" id="canvasStage">
         <canvas id="preview" width="64" height="64"></canvas>
-        <div id="emptyPreview" class="empty-preview"><strong>Importe uma spritesheet</strong><span>Ela será separada em frames e animada automaticamente.</span></div>
+        <div id="emptyPreview" class="empty-preview">
+          <strong>Importe uma spritesheet</strong>
+          <span>Ela será separada em frames e animada automaticamente.</span>
+        </div>
       </div>
-      <div class="timeline-head"><strong>Timeline</strong><span id="sheetInfo">Nenhuma imagem carregada</span></div>
+      <div class="timeline-head">
+        <strong>Timeline</strong>
+        <span id="sheetInfo">Nenhuma imagem carregada</span>
+      </div>
       <div id="timeline" class="timeline"></div>
     </section>
 
@@ -82,15 +130,22 @@
       </section>
 
       <section class="card">
-        <h3>Fundo</h3>
+        <h3>Fundo & limpeza</h3>
         <label class="check"><input id="removeBlack" type="checkbox" /> Remover pixels pretos</label>
         <label>Tolerância <span id="toleranceLabel">20</span><input id="blackTolerance" type="range" min="0" max="100" value="20" /></label>
-        <small>Útil quando a spritesheet veio com fundo preto em vez de transparência.</small>
+        <label>
+          Fundo de exportação
+          <select id="backgroundMode">
+            <option value="transparent">Transparente</option>
+            <option value="magenta">Magenta (#FF00FF)</option>
+          </select>
+        </label>
+        <small>Use magenta se o pipeline do jogo ou suas checagens dependerem de chroma key.</small>
       </section>
 
       <section class="card export-card">
         <h3>3. Incorporar no jogo</h3>
-        <p>O kit gerado segue o padrão atual do repositório e inclui instruções prontas para o loader.</p>
+        <p>O kit gerado seguirá o padrão do projeto, criando uma spritesheet por ação e direção já salva no mesmo pacote.</p>
         <button id="exportKitSide" class="primary wide">Baixar kit completo (.zip)</button>
         <button id="exportManifest" class="wide">Baixar manifest.json</button>
       </section>
