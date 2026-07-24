@@ -1,0 +1,19 @@
+{
+  "id": "death_knight",
+  "name": "Cavaleiro da Morte",
+  "type": "boss",
+  "frameWidth": 192,
+  "frameHeight": 192,
+  "baselineY": 184,
+  "hp": 120,
+  "damage": 8,
+  "animations": {
+    "idle": { "file": "idle.png", "frames": 1 },
+    "walk": { "file": "walk.png", "frames": 6, "fps": 10, "loop": true },
+    "attack": { "file": "attack.png", "frames": 6, "fps": 10, "loop": false, "impactFrame": 3 }
+  },
+  "rewards": {
+    "skeletal_horse": 0.01,
+    "skeletal_horse_gold": 0.001
+  }
+}

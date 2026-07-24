@@ -1,17 +1,7 @@
-/* GameRPG loader — Death Knight large-frame test. */
+/* GameRPG loader */
 (function () {
-  const load = (src, done) => {
-    const script = document.createElement('script');
-    script.src = src;
-    script.onload = done || null;
-    script.onerror = () => console.error('[GameRPG] Falha ao carregar:', src);
-    document.head.appendChild(script);
-  };
-
-  load('./death-knight-basic.js?v=3', () => {
-    const ready = window.__deathKnightReady || Promise.resolve();
-    Promise.resolve(ready)
-      .catch(error => console.error('[DeathKnight] Falha no processamento:', error))
-      .finally(() => load('./game-original.js?v=3'));
-  });
+  const script = document.createElement('script');
+  script.src = './game-original.js?v=death-knight-v2';
+  script.onerror = () => console.error('[GameRPG] Falha ao carregar o jogo principal.');
+  document.head.appendChild(script);
 })();
