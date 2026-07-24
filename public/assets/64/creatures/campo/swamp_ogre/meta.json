@@ -1,0 +1,32 @@
+{
+  "id": "swamp_ogre",
+  "name": "Ogro do Pântano",
+  "frameWidth": 192,
+  "frameHeight": 192,
+  "anchor": {
+    "x": 0.5,
+    "baselineY": 184,
+    "originY": 0.9583333333
+  },
+  "animations": {
+    "idle": {
+      "file": "idle.png",
+      "frames": 1
+    },
+    "walk": {
+      "file": "walk.png",
+      "frames": 6,
+      "fps": 10,
+      "loop": true
+    },
+    "attack": {
+      "file": "attack.png",
+      "frames": 6,
+      "fps": 10,
+      "loop": false,
+      "impactFrame": 3
+    }
+  },
+  "direction": "east",
+  "westUsesFlipX": true
+}

@@ -12,6 +12,6 @@
     const ready = window.__deathKnightReady || Promise.resolve();
     Promise.resolve(ready)
       .catch(error => console.error('[DeathKnight] Falha no processamento:', error))
-      .finally(() => load('./game-original.js?v=2'));
+      .finally(() => load('./game-original.js?v=3'));
   });
 })();
