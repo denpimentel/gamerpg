@@ -147,6 +147,9 @@
     // --- creatures/ ---
     this.load.spritesheet('goblin', A + 'creatures/pedra/goblin_tocha/sheet.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('tnt', A + 'creatures/deserto/goblin_tnt/sheet.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('swamp-ogre-idle', A + 'creatures/campo/swamp_ogre/idle.png');
+    this.load.spritesheet('swamp-ogre-walk', A + 'creatures/campo/swamp_ogre/walk.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('swamp-ogre-attack', A + 'creatures/campo/swamp_ogre/attack.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('sheep', A + 'creatures/common/sheep/idle.png', { frameWidth: 64, frameHeight: 64 });
     for (const n of ['yeti', 'golem', 'wolf', 'ghost_knight']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
@@ -401,6 +404,39 @@
     };
     spawnGoblin('Goblin Tocha', 'goblin', [36, 6], ISLES.pedra);
     spawnGoblin('Goblin TNT', 'tnt', [23, 4], ISLES.deserto);
+    // Ogro do Pântano: interpretação original inspirada no Enemy Pack Tiny Swords.
+    // Sheets normalizadas em células 192px, com os pés fixos na baseline y=184.
+    mk('swamp-ogre-walk', 'swamp-ogre-walk', 0, 5, 10, -1);
+    mk('swamp-ogre-attack', 'swamp-ogre-attack', 0, 5, 10, 0);
+    {
+      const cont = this.add.container(0, 0);
+      const spr = this.add.sprite(0, 34, 'swamp-ogre-idle').setOrigin(0.5, 184 / 192).setScale(0.72);
+      const lbl = this.add.text(0, -104, 'Ogro do Pântano', {
+        fontFamily: 'sans-serif', fontSize: '12px', color: '#d8ff9a',
+        stroke: '#000', strokeThickness: 3,
+      }).setOrigin(0.5);
+      cont.add([spr, lbl]);
+      let foe = null;
+      const walker = new FreeWalker(this, cont, {
+        tile: TILE, tx: 5, ty: 8, speed: 46, mode: 4, radius: 18,
+        walkablePx: walkablePxZone(ISLES.campo),
+        setAnim: (st, dir) => {
+          if (dir.includes('w')) spr.setFlipX(true);
+          else if (dir.includes('e')) spr.setFlipX(false);
+          if (foe && foe.attacking) return;
+          if (st === 'walk') spr.play('swamp-ogre-walk', true);
+          else { spr.anims.stop(); spr.setTexture('swamp-ogre-idle'); }
+          cont.setDepth(cont.y);
+        },
+      });
+      const wander = new HomeWanderer(this, walker, { radius: 135, pauseChance: 0.25 });
+      foe = {
+        walker, spr, cont, wander, last: 0, lunging: false,
+        attackKey: 'swamp-ogre-attack', attacking: false, damage: 6,
+      };
+      this.mobs.push(wander);
+      this.foes.push(foe);
+    }
     // monstros gerados por IA (4 direções reais + walk)
     const spawnAIMob = (nome, base, cell, zone) => {
       for (const [d, r] of Object.entries(ROWS)) {
@@ -898,6 +934,21 @@
       this.time.delayedCall(130, () => doll.iterate(c => c.clearTint && c.clearTint()));
     };
     this.mobStrike = (f) => {
+      if (f.attackKey && !f.attacking) {
+        f.walker.setAnim('idle', dirBetween(f.walker, this.player));
+        f.attacking = true;
+        f.spr.play(f.attackKey, true);
+        f.spr.once('animationcomplete', () => {
+          f.attacking = false;
+          f.walker.setAnim(f.walker.moving ? 'walk' : 'idle', f.walker.dir);
+        });
+        this.time.delayedCall(350, () => {
+          this.flashDoll();
+          this.setHp(this.P.hp - (f.damage || 3));
+          this.cameras.main.shake(90, 0.0025);
+        });
+        return;
+      }
       // investida VISUAL no sprite interno (o corpo/walker continua livre — sem congelar)
       f.walker.setAnim('idle', dirBetween(f.walker, this.player)); // encara só no golpe
       if (!f.lunging) {
