@@ -165,7 +165,7 @@
     }
     // Cavaleiro da Morte v2: chefe montado, frames grandes e âncora nos cascos.
     this.load.image('death-knight-idle', A + 'creatures/neve/ghost_knight/idle.png');
-    this.load.spritesheet('death-knight-walk', A + 'creatures/neve/ghost_knight/walk.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('death-knight-walk', A + 'creatures/neve/ghost_knight/walk.png', { frameWidth: 320, frameHeight: 192 });
     this.load.spritesheet('death-knight-attack', A + 'creatures/neve/ghost_knight/attack.png', { frameWidth: 320, frameHeight: 192 });
     for (const [, path, fw, fh, hasWalk] of MOBS) { // Pixel Adventure upscalado 2x → frame nativo × 2
       this.load.spritesheet(`en-${path}-idle`, `${A}creatures/${path}/idle.png`, { frameWidth: fw * 2, frameHeight: fh * 2 });
