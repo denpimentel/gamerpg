@@ -101,6 +101,7 @@
 }
 .slot:hover { filter: brightness(1.12); }
 .slot.sel { filter: drop-shadow(0 0 3px #ffd76a) brightness(1.15); }
+.slot[hidden] { display: none !important; }
 .slot img { width: 62%; height: 62%; object-fit: contain; image-rendering: pixelated; }
 .slot span { display: none; }
 @media (max-width: 640px) { #inv { width: 262px; } }
@@ -419,13 +420,20 @@ const MOUNTS_UI = [
   ['cinza', 'Cinza', 'horse_cinza'], ['dourado', 'Dourado', 'horse_dourado'],
   ['branco', 'Branco', 'horse_branco'], ['porco', 'Porco Rosa ✦', 'mount_porco'],
   ['slime', 'Slime ✦', 'mount_slime'],
+  ['skeletal_horse', 'Cavalo-Esqueleto', 'mount_skeletal_horse', true],
+  ['skeletal_horse_gold', 'Cavalo-Esqueleto Dourado', 'mount_skeletal_horse_gold', true],
 ];
+const MOUNT_UNLOCK_KEY = 'gamerpg.unlockedMounts';
+let unlockedMounts;
+try { unlockedMounts = new Set(JSON.parse(localStorage.getItem(MOUNT_UNLOCK_KEY) || '[]')); }
+catch (_) { unlockedMounts = new Set(); }
 function buildSlots(elId, items, kind) {
   const el = document.getElementById(elId);
-  for (const [id, label, icon] of items) {
+  for (const [id, label, icon, locked] of items) {
     const b = document.createElement('div');
     b.className = 'slot';
     b.dataset.id = id;
+    if (kind === 'mount' && locked && !unlockedMounts.has(id)) b.hidden = true;
     b.innerHTML = `<img src="../assets/64/ui/icons/${icon || id}.png" alt=""><span>${label}</span>`;
     b.onclick = () => {
       window.__equip && window.__equip(kind, id);
@@ -438,6 +446,19 @@ buildSlots('slotsS', [['skin_lpc', 'Herói LPC'], ['skin_ai', 'Cavaleiro IA ✦'
 buildSlots('slotsW', WEAPONS_UI, 'weapon');
 buildSlots('slotsA', ARMORS_UI, 'armor');
 buildSlots('slotsM', MOUNTS_UI, 'mount');
+window.__unlockMount = id => {
+  unlockedMounts.add(id);
+  try { localStorage.setItem(MOUNT_UNLOCK_KEY, JSON.stringify([...unlockedMounts])); } catch (_) {}
+  const slot = document.querySelector(`#slotsM .slot[data-id="${id}"]`);
+  if (slot) {
+    slot.hidden = false;
+    slot.animate([
+      { transform: 'scale(0.6)', filter: 'brightness(2.4)' },
+      { transform: 'scale(1.08)', filter: 'brightness(1.5)' },
+      { transform: 'scale(1)', filter: 'brightness(1)' },
+    ], { duration: 700, easing: 'ease-out' });
+  }
+};
 document.getElementById('invToggle').onclick = () =>
   document.getElementById('inv').classList.toggle('open');
 window.__markEquipped = (kind, id) => {
@@ -517,6 +538,6 @@ addEventListener('keydown', e => {
   sync();
 })();
 </script>
-<script src="game.js?v=ghost4"></script>
+<script src="game.js?v=death-knight-v2"></script>
 </body>
 </html>

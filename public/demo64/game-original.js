@@ -98,6 +98,14 @@
     slime: { frame: 92, walkCols: 6, speed: 200, dy: 40, rate: 12,
              bob: [1, -1, -3, -4, -3, -1],
              offs: { n: [0, -12], w: [0, -12], s: [0, -12], e: [0, -12] } },
+    skeletal_horse: { frame: 192, walkCols: 6, speed: 260, dy: 34, rate: 10,
+             scale: 0.72, singleRow: true,
+             bob: [0, -2, -4, -2, 0, -1],
+             offs: { n: [0, -58], w: [0, -58], s: [0, -58], e: [0, -58] } },
+    skeletal_horse_gold: { frame: 192, walkCols: 6, speed: 270, dy: 34, rate: 10,
+             scale: 0.72, singleRow: true,
+             bob: [0, -2, -4, -2, 0, -1],
+             offs: { n: [0, -58], w: [0, -58], s: [0, -58], e: [0, -58] } },
   };
 
   // --- monstros Pixel Adventure (upscalados 2x → frame nativo × 2 no load): ---
@@ -151,12 +159,14 @@
     this.load.spritesheet('swamp-ogre-walk', A + 'creatures/campo/swamp_ogre/walk.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('swamp-ogre-attack', A + 'creatures/campo/swamp_ogre/attack.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('sheep', A + 'creatures/common/sheep/idle.png', { frameWidth: 64, frameHeight: 64 });
-    for (const n of ['yeti', 'golem', 'wolf', 'ghost_knight']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
+    for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
       this.load.spritesheet('ai' + n + '-walk', A + 'creatures/neve/' + n + '/walk.png', { frameWidth: 92, frameHeight: 92 });
     }
-    // Ghost Knight attack (spritesheet dedicada)
-    this.load.spritesheet('aighost_knight-attack', A + 'creatures/neve/ghost_knight/attack.png', { frameWidth: 92, frameHeight: 92 });
+    // Cavaleiro da Morte v2: chefe montado, frames grandes e âncora nos cascos.
+    this.load.image('death-knight-idle', A + 'creatures/neve/ghost_knight/idle.png');
+    this.load.spritesheet('death-knight-walk', A + 'creatures/neve/ghost_knight/walk.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('death-knight-attack', A + 'creatures/neve/ghost_knight/attack.png', { frameWidth: 192, frameHeight: 192 });
     for (const [, path, fw, fh, hasWalk] of MOBS) { // Pixel Adventure upscalado 2x → frame nativo × 2
       this.load.spritesheet(`en-${path}-idle`, `${A}creatures/${path}/idle.png`, { frameWidth: fw * 2, frameHeight: fh * 2 });
       if (hasWalk) this.load.spritesheet(`en-${path}-walk`, `${A}creatures/${path}/walk.png`, { frameWidth: fw * 2, frameHeight: fh * 2 });
@@ -463,7 +473,41 @@
     spawnAIMob('Yeti ✦IA', 'aiyeti', [43, 6], ISLES.neve);
     spawnAIMob('Golem de Gelo ✦IA', 'aigolem', [47, 9], ISLES.neve);
     spawnAIMob('Lobo Ártico ✦IA', 'aiwolf', [45, 4], ISLES.neve);
-    spawnAIMob('Cavaleiro Fantasma ✦IA', 'aighost_knight', [46, 7], ISLES.neve);
+    // Chefe montado: arte 192px em vista lateral, espelhada para oeste.
+    mk('death-knight-walk', 'death-knight-walk', 0, 5, 10, -1);
+    mk('death-knight-attack', 'death-knight-attack', 0, 5, 10, 0);
+    {
+      const cont = this.add.container(0, 0);
+      const spr = this.add.sprite(0, 34, 'death-knight-idle')
+        .setOrigin(0.5, 184 / 192).setScale(0.9);
+      const lbl = this.add.text(0, -126, 'Cavaleiro da Morte · 120/120', {
+        fontFamily: 'sans-serif', fontSize: '13px', fontStyle: 'bold',
+        color: '#b9f6ff', stroke: '#06131a', strokeThickness: 4,
+      }).setOrigin(0.5);
+      cont.add([spr, lbl]);
+      let foe = null;
+      const walker = new FreeWalker(this, cont, {
+        tile: TILE, tx: 46, ty: 7, speed: 58, mode: 4, radius: 20,
+        walkablePx: walkablePxZone(ISLES.neve),
+        setAnim: (st, dir) => {
+          if (dir.includes('w')) spr.setFlipX(true);
+          else if (dir.includes('e')) spr.setFlipX(false);
+          if (foe && (foe.attacking || foe.dead)) return;
+          if (st === 'walk') spr.play('death-knight-walk', true);
+          else { spr.anims.stop(); spr.setTexture('death-knight-idle'); }
+          cont.setDepth(cont.y);
+        },
+      });
+      const wander = new HomeWanderer(this, walker, { radius: 150, pauseChance: 0.2 });
+      foe = {
+        walker, spr, cont, lbl, wander, last: 0, lunging: false,
+        attackKey: 'death-knight-attack', attacking: false, damage: 8,
+        isDeathKnight: true, hp: 120, hpMax: 120, dead: false,
+      };
+      walker.foe = foe;
+      this.mobs.push(wander);
+      this.foes.push(foe);
+    }
     // ovelhas (ambiente)
     mk('sheep-idle', 'sheep', 0, -1, 3, -1);
     [[3, 8], [10, 9], [16, 4]].forEach(([sx, sy], i) => {
@@ -565,9 +609,12 @@
       const cycle = state === 'walk' ? (ai ? 'walk' : 'gallop') : 'stand';
       if (ai) { // camada única em escala nativa, atrás do cavaleiro
         mountF.setVisible(false);
-        mountB.setVisible(true).setOrigin(0.5, 0.95).setScale(1).setPosition(0, ai.dy);
-        if (cycle === 'walk') mountB.play(ensureMountAnim(`mtai-${P.mount}-walk`, row, ai.walkCols, ai.rate), true);
-        else { mountB.anims.stop(); mountB.setTexture(`mtai-${P.mount}-idle`, row); }
+        const mountRow = ai.singleRow ? 0 : row;
+        mountB.setVisible(true).setOrigin(0.5, 0.95).setScale(ai.scale ?? 1).setPosition(0, ai.dy);
+        if (ai.singleRow) mountB.setFlipX(d4 === 'w');
+        else mountB.setFlipX(false);
+        if (cycle === 'walk') mountB.play(ensureMountAnim(`mtai-${P.mount}-walk`, mountRow, ai.walkCols, ai.rate), true);
+        else { mountB.anims.stop(); mountB.setTexture(`mtai-${P.mount}-idle`, mountRow); }
       } else {
         for (const [spr, l] of [[mountB, 'b'], [mountF, 'f']]) {
           const tex = `mt-${P.mount}-${cycle}${l}`;
@@ -933,7 +980,55 @@
       doll.iterate(c => c.setTint && c.setTint(0xff7070));
       this.time.delayedCall(130, () => doll.iterate(c => c.clearTint && c.clearTint()));
     };
+    const announceReward = (text, color = '#b9f6ff') => {
+      const msg = this.add.text(this.scale.width / 2, 90, text, {
+        fontFamily: '"Pixelify Sans", sans-serif', fontSize: '22px', fontStyle: 'bold',
+        color, align: 'center', stroke: '#06131a', strokeThickness: 6,
+      }).setOrigin(0.5).setScrollFactor(0).setDepth(9000).setAlpha(0);
+      this.tweens.add({ targets: msg, alpha: 1, y: 78, duration: 220, hold: 2200,
+        yoyo: true, onComplete: () => msg.destroy() });
+    };
+    this.defeatFoe = (f) => {
+      if (!f || f.dead) return;
+      f.dead = true;
+      f.attacking = false;
+      f.walker.__dead = true;
+      f.cont.setVisible(false);
+
+      if (f.isDeathKnight) {
+        const forced = qs.get('forceMount');
+        const roll = Math.random();
+        const reward = forced === 'skeletal_horse' || forced === 'skeletal_horse_gold'
+          ? forced : roll < 0.001 ? 'skeletal_horse_gold' : roll < 0.011 ? 'skeletal_horse' : null;
+        if (reward) {
+          const golden = reward === 'skeletal_horse_gold';
+          window.__unlockMount && window.__unlockMount(reward);
+          announceReward(golden
+            ? 'DROP LENDÁRIO!\\nCavalo-Esqueleto Dourado · 0,1%'
+            : 'RECOMPENSA RARA!\\nCavalo-Esqueleto · 1%',
+            golden ? '#ffd75a' : '#b9f6ff');
+        } else {
+          announceReward('Cavaleiro da Morte derrotado\\nNenhuma montaria desta vez', '#d7dde8');
+        }
+        this.time.delayedCall(5000, () => {
+          f.hp = f.hpMax;
+          f.dead = false;
+          f.walker.__dead = false;
+          f.cont.setVisible(true);
+          f.lbl.setText(`Cavaleiro da Morte · ${f.hp}/${f.hpMax}`);
+          f.spr.clearTint().setTexture('death-knight-idle');
+          f.walker.setAnim('idle', 'e');
+        });
+      }
+    };
+    this.damageFoe = (f, amount) => {
+      if (!f || f.dead || !f.hpMax) return;
+      f.hp = Math.max(0, f.hp - amount);
+      if (f.lbl) f.lbl.setText(`Cavaleiro da Morte · ${f.hp}/${f.hpMax}`);
+      if (f.hp <= 0) this.defeatFoe(f);
+    };
     this.mobStrike = (f) => {
+      if (f.dead) return;
       if (f.attackKey && !f.attacking) {
         f.walker.setAnim('idle', dirBetween(f.walker, this.player));
         f.attacking = true;
@@ -943,6 +1038,7 @@
           f.walker.setAnim(f.walker.moving ? 'walk' : 'idle', f.walker.dir);
         });
         this.time.delayedCall(350, () => {
+          if (f.dead) return;
           this.flashDoll();
           this.setHp(this.P.hp - (f.damage || 3));
           this.cameras.main.shake(90, 0.0025);
@@ -1185,6 +1281,7 @@
     // o fraco sempre pode fugir/desviar; o golpe anima por cima do deslocamento.
     let nearest = null, nearestD = Infinity;
     for (const f of this.foes) {
+      if (f.dead) continue;
       const d = Math.hypot(f.walker.x - this.player.x, f.walker.y - this.player.y);
       if (d > COMBAT.range) continue; // fora da envergadura única: ninguém ataca
       if (time - f.last >= COMBAT.mobCdMs) { f.last = time; this.mobStrike(f); }
@@ -1196,8 +1293,10 @@
       this.autoAttack();
       const alvo = nearest; // flash no meio do golpe
       this.time.delayedCall(200, () => {
+        if (alvo.dead) return;
         alvo.spr.setTint(0xff7070);
         this.time.delayedCall(130, () => alvo.spr.clearTint());
+        this.damageFoe(alvo, 12);
       });
     }
     // rastro espectral no galope (skill 2 — clona o frame corrente, qualquer montaria)
@@ -1206,7 +1305,7 @@
       this.fxGhost();
     }
     this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
-    this.mobs.forEach(m => m.update(delta));
+    this.mobs.forEach(m => { if (!m.walker.__dead) m.update(delta); });
     updateEvilSpirits(this, time, delta);
   }
 

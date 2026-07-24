@@ -1,0 +1,11 @@
+{
+  "id": "skeletal_horse_gold",
+  "name": "Cavalo-Esqueleto Dourado",
+  "frameWidth": 192,
+  "frameHeight": 192,
+  "baselineY": 184,
+  "fps": 10,
+  "speed": 270,
+  "dropChance": 0.001,
+  "sourceBoss": "death_knight"
+}
