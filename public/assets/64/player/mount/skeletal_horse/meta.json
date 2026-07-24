@@ -6,6 +6,8 @@
   "baselineY": 184,
   "fps": 10,
   "speed": 260,
+  "renderScale": 0.68,
+  "riderSaddleOffsetY": -32,
   "dropChance": 0.01,
   "sourceBoss": "death_knight"
 }
