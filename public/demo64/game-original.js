@@ -99,13 +99,13 @@
              bob: [1, -1, -3, -4, -3, -1],
              offs: { n: [0, -12], w: [0, -12], s: [0, -12], e: [0, -12] } },
     skeletal_horse: { frame: 192, walkCols: 6, speed: 260, dy: 34, rate: 10,
-             scale: 0.72, singleRow: true,
+             scale: 0.68, singleRow: true, legY: -40,
              bob: [0, -2, -4, -2, 0, -1],
-             offs: { n: [0, -58], w: [0, -58], s: [0, -58], e: [0, -58] } },
+             offs: { n: [0, -32], w: [0, -32], s: [0, -32], e: [0, -32] } },
     skeletal_horse_gold: { frame: 192, walkCols: 6, speed: 270, dy: 34, rate: 10,
-             scale: 0.72, singleRow: true,
+             scale: 0.68, singleRow: true, legY: -40,
              bob: [0, -2, -4, -2, 0, -1],
-             offs: { n: [0, -58], w: [0, -58], s: [0, -58], e: [0, -58] } },
+             offs: { n: [0, -32], w: [0, -32], s: [0, -32], e: [0, -32] } },
   };
 
   // --- monstros Pixel Adventure (upscalados 2x → frame nativo × 2 no load): ---
@@ -166,7 +166,7 @@
     // Cavaleiro da Morte v2: chefe montado, frames grandes e âncora nos cascos.
     this.load.image('death-knight-idle', A + 'creatures/neve/ghost_knight/idle.png');
     this.load.spritesheet('death-knight-walk', A + 'creatures/neve/ghost_knight/walk.png', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('death-knight-attack', A + 'creatures/neve/ghost_knight/attack.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('death-knight-attack', A + 'creatures/neve/ghost_knight/attack.png', { frameWidth: 320, frameHeight: 192 });
     for (const [, path, fw, fh, hasWalk] of MOBS) { // Pixel Adventure upscalado 2x → frame nativo × 2
       this.load.spritesheet(`en-${path}-idle`, `${A}creatures/${path}/idle.png`, { frameWidth: fw * 2, frameHeight: fh * 2 });
       if (hasWalk) this.load.spritesheet(`en-${path}-walk`, `${A}creatures/${path}/walk.png`, { frameWidth: fw * 2, frameHeight: fh * 2 });
@@ -589,7 +589,10 @@
         const bob = cycle === 'walk' && ai.bob ? ai.bob[col % ai.bob.length] : 0;
         for (const spr of Object.values(layers)) spr.setPosition(mx * K, 24 + (my + bob) * K);
         // perninha do lado de cá: mesma base fixa + o MESMO bob do tronco (cavalga junto)
-        if (legSpr.visible) legSpr.setPosition((d4 === 'w' ? 3 : -3), -13 + bob * K);
+        if (legSpr.visible) legSpr.setPosition(
+          (d4 === 'w' ? 3 : -3),
+          (ai.legY ?? -13) + bob * K
+        );
         return;
       }
       const off = RIDE_OFF[cycle][d4];

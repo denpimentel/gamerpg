@@ -10,7 +10,15 @@
   "animations": {
     "idle": { "file": "idle.png", "frames": 1 },
     "walk": { "file": "walk.png", "frames": 6, "fps": 10, "loop": true },
-    "attack": { "file": "attack.png", "frames": 6, "fps": 10, "loop": false, "impactFrame": 3 }
+    "attack": {
+      "file": "attack.png",
+      "frames": 6,
+      "frameWidth": 320,
+      "frameHeight": 192,
+      "fps": 10,
+      "loop": false,
+      "impactFrame": 3
+    }
   },
   "rewards": {
     "skeletal_horse": 0.01,
