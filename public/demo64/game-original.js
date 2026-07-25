@@ -472,6 +472,7 @@
         walker, spr, cont, wander, last: 0, lunging: false,
         attackKey: 'swamp-ogre-attack', attacking: false, damage: 6,
         isSwampOgre: true, attackImpactMs: 400, knockbackDistance: 96,
+        baseScale: 0.72, attackScale: 0.82,
       };
       this.mobs.push(wander);
       this.foes.push(foe);
@@ -1221,7 +1222,8 @@
     this.dropChanceMultiplier = () =>
       this.time.now < (P.cloverBuffUntil || 0) ? 1.30 : 1;
     this.rollDrop = (baseChance) =>
-      Math.random() < Math.min(1, baseChance * this.dropChanceMultiplier());
+      window.__dropRate100
+        || Math.random() < Math.min(1, baseChance * this.dropChanceMultiplier());
     this.grantCloverBuff = () => {
       P.cloverBuffUntil = this.time.now + 180000;
       announceReward('BUFF ATIVO!\nSorte do Trevo · +30% de drop · 3 min', '#dfff7d');
@@ -1470,12 +1472,20 @@
         if (this.rollDrop(0.05)) unlockDeerReward('deer_king_antler', 'Galhada do Rei Cervo · 5%', '#dfffa2');
         if (this.rollDrop(0.03)) unlockDeerReward('meadow_cape', 'Capa da Campina · 3%', '#b9f69f');
         const forcedDeerDrop = new URLSearchParams(window.location.search).get('forceDeerDrop');
-        if (forcedDeerDrop === 'ancestral_deer' || (!forcedDeerDrop && this.rollDrop(0.01))) {
+        const testDeerDrop = window.__dropRate100
+          ? (this._testDeerLegendary = !this._testDeerLegendary)
+            ? 'spring_deer' : 'ancestral_deer'
+          : null;
+        if (forcedDeerDrop === 'ancestral_deer'
+            || (!forcedDeerDrop && (testDeerDrop === 'ancestral_deer'
+              || (!testDeerDrop && this.rollDrop(0.01))))) {
           window.__unlockMount && window.__unlockMount('ancestral_deer');
           celebrateMountDrop('ancestral_deer');
           unlockDeerReward('ancestral_deer', 'Montaria Rei Cervo · 1%', '#b9f6ff');
         }
-        if (forcedDeerDrop === 'spring_deer' || (!forcedDeerDrop && this.rollDrop(0.001))) {
+        if (forcedDeerDrop === 'spring_deer'
+            || (!forcedDeerDrop && (testDeerDrop === 'spring_deer'
+              || (!testDeerDrop && this.rollDrop(0.001))))) {
           window.__unlockMount && window.__unlockMount('spring_deer');
           celebrateMountDrop('spring_deer');
           unlockDeerReward('spring_deer', 'Montaria Rei Cervo Enfurecido · 0,1%', '#ff745c');
@@ -1534,10 +1544,14 @@
         const forced = qs.get('forceMount');
         const dropMultiplier = this.dropChanceMultiplier();
         const roll = Math.random();
+        const testMountDrop = window.__dropRate100
+          ? (this._testHorseLegendary = !this._testHorseLegendary)
+            ? 'skeletal_horse_gold' : 'skeletal_horse'
+          : null;
         const reward = forced === 'skeletal_horse' || forced === 'skeletal_horse_gold'
           ? forced
-          : roll < 0.001 * dropMultiplier ? 'skeletal_horse_gold'
-            : roll < 0.011 * dropMultiplier ? 'skeletal_horse' : null;
+          : testMountDrop || (roll < 0.001 * dropMultiplier ? 'skeletal_horse_gold'
+            : roll < 0.011 * dropMultiplier ? 'skeletal_horse' : null);
         if (reward) {
           const golden = reward === 'skeletal_horse_gold';
           window.__unlockMount && window.__unlockMount(reward);
@@ -1582,9 +1596,11 @@
       if (f.attackKey && !f.attacking) {
         f.walker.setAnim('idle', dirBetween(f.walker, this.player));
         f.attacking = true;
+        if (f.attackScale) f.spr.setScale(f.attackScale);
         f.spr.play(f.attackKey, true);
         f.spr.once('animationcomplete', () => {
           f.attacking = false;
+          if (f.baseScale) f.spr.setScale(f.baseScale);
           f.walker.setAnim(f.walker.moving ? 'walk' : 'idle', f.walker.dir);
         });
         this.time.delayedCall(f.attackImpactMs || 350, () => {
