@@ -170,6 +170,10 @@
     this.load.image('meadow-turtle-idle', A + 'creatures/campo/meadow_turtle/idle.png?v=1');
     this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=1', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=1', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('deer-king-idle', A + 'creatures/campo/deer_king/idle.png?v=1');
+    this.load.image('deer-king-enraged', A + 'creatures/campo/deer_king/enraged.png?v=1');
+    this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=1', { frameWidth: 256, frameHeight: 256 });
+    this.load.spritesheet('deer-king-charge', A + 'creatures/campo/deer_king/charge.png?v=1', { frameWidth: 256, frameHeight: 256 });
     for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
       this.load.spritesheet('ai' + n + '-walk', A + 'creatures/neve/' + n + '/walk.png', { frameWidth: 92, frameHeight: 92 });
@@ -666,6 +670,48 @@
       this.mobs.push(wander);
       this.foes.push(foe);
     }
+    // Rei Cervo: chefe ancestral do CAMPO, com quatro habilidades e fase enfurecida.
+    mk('deer-king-walk', 'deer-king-walk', 0, 5, 9, -1);
+    mk('deer-king-charge', 'deer-king-charge', 0, 5, 11, 0);
+    {
+      const cont = this.add.container(0, 0);
+      const spr = this.add.sprite(0, 44, 'deer-king-idle')
+        .setOrigin(0.5, 248 / 256).setScale(0.78);
+      const lbl = this.add.text(0, -154, 'Rei Cervo — Guardião da Campina', {
+        fontFamily: '"Pixelify Sans", sans-serif', fontSize: '15px',
+        fontStyle: 'bold', color: '#dfffa2', stroke: '#18310d', strokeThickness: 5,
+      }).setOrigin(0.5);
+      cont.add([spr, lbl]);
+      let foe = null;
+      const walker = new FreeWalker(this, cont, {
+        tile: TILE, tx: 7, ty: 5, speed: 38, mode: 4, radius: 24,
+        walkablePx: walkablePxZone(ISLES.campo),
+        setAnim: (st, dir) => {
+          if (dir.includes('w')) spr.setFlipX(true);
+          else if (dir.includes('e')) spr.setFlipX(false);
+          if (foe && foe.attacking) return;
+          if (st === 'walk') spr.play('deer-king-walk', true);
+          else {
+            spr.anims.stop();
+            spr.setTexture(foe && foe.enraged ? 'deer-king-enraged' : 'deer-king-idle');
+          }
+          if (foe && foe.enraged) spr.setTint(0xffe5e5);
+          else spr.clearTint();
+          cont.setDepth(cont.y);
+        },
+      });
+      const wander = new HomeWanderer(this, walker, {
+        radius: 70, pauseChance: 0.38, moveMin: 850, moveMax: 1450,
+      });
+      foe = {
+        walker, spr, cont, lbl, wander, last: 0, skillIndex: 0,
+        attacking: false, damage: 12, hp: 600, hpMax: 600,
+        dead: false, enraged: false, isDeerKing: true,
+      };
+      this.mobs.push(wander);
+      this.foes.push(foe);
+    }
+
     // ------- player paper doll -------
     const P = this.P = { skin: 'lpc', armor: 'leather', weapon: 'longsword', mount: null, dir: 's', attacking: false,
       nome: 'Calney', hp: 100, hpMax: 100, gold: 125, idade: 10,
@@ -1292,12 +1338,147 @@
       announceReward('ARMA RARA!\\nLança de Lord Mas · 0,5%', '#8affda');
       this.cameras.main.shake(220, 0.005);
     };
+    const showBossSkill = (f, text, color = '#dfff9a') => {
+      const tag = this.add.text(f.cont.x, f.cont.y - 178, text, {
+        fontFamily: '"Pixelify Sans", sans-serif', fontSize: '16px',
+        fontStyle: 'bold', color, stroke: '#10230b', strokeThickness: 5,
+      }).setOrigin(0.5).setDepth(9000);
+      this.tweens.add({ targets: tag, y: tag.y - 18, alpha: 0,
+        duration: 1050, ease: 'Cubic.easeOut', onComplete: () => tag.destroy() });
+    };
+    const bossHitPlayer = (damage, shake = 0.004) => {
+      this.flashDoll();
+      this.setHp(P.hp - damage);
+      this.cameras.main.shake(180, shake);
+    };
+    this.deerKingAttack = (f) => {
+      if (!f || f.dead || f.attacking) return;
+      f.attacking = true;
+      f.walker.__dead = true;
+      const skill = f.skillIndex++ % 4;
+      const rageSpeed = f.enraged ? 0.72 : 1;
+      const finish = (delay = 950) => this.time.delayedCall(delay * rageSpeed, () => {
+        if (f.dead) return;
+        f.attacking = false;
+        f.walker.__dead = false;
+        f.spr.clearTint();
+        f.walker.setAnim('idle', dirBetween(f.walker, this.player));
+      });
+
+      if (skill === 0) {
+        showBossSkill(f, 'INVESTIDA REAL');
+        f.spr.play('deer-king-charge', true);
+        if (f.enraged) f.spr.setTint(0xffb5b5);
+        const dx = this.player.x - f.cont.x, dy = this.player.y - f.cont.y;
+        const len = Math.hypot(dx, dy) || 1;
+        const distance = Math.min(150, Math.max(50, len - 24));
+        const tx = f.cont.x + dx / len * distance;
+        const ty = f.cont.y + dy / len * distance;
+        for (let i = 1; i <= 9; i++) {
+          this.time.delayedCall(i * 55 * rageSpeed, () => {
+            if (f.dead) return;
+            const leaf = this.add.image(f.cont.x - dx / len * 20, f.cont.y + 8, 'fx-p-spark')
+              .setTint(i % 3 ? 0x7ed957 : 0xd8f27a).setBlendMode(Phaser.BlendModes.ADD)
+              .setScale(0.42).setDepth(f.cont.y + 2);
+            this.tweens.add({ targets: leaf, x: leaf.x + (Math.random() - 0.5) * 45,
+              y: leaf.y - 20 - Math.random() * 25, angle: 180, alpha: 0,
+              duration: 520, onComplete: () => leaf.destroy() });
+          });
+        }
+        this.tweens.add({ targets: f.cont, x: tx, y: ty, duration: 520 * rageSpeed,
+          ease: 'Cubic.easeIn', onComplete: () => {
+            if (Math.hypot(f.cont.x - this.player.x, f.cont.y - this.player.y) < 62) {
+              bossHitPlayer(f.enraged ? 18 : 14, 0.007);
+            }
+          } });
+        finish(760);
+      } else if (skill === 1) {
+        showBossSkill(f, 'RAÍZES ANCESTRAIS');
+        const dx = this.player.x - f.cont.x, dy = this.player.y - f.cont.y;
+        const len = Math.hypot(dx, dy) || 1;
+        for (let i = 1; i <= 4; i++) {
+          const rx = f.cont.x + dx / len * i * 48;
+          const ry = f.cont.y + dy / len * i * 48;
+          this.time.delayedCall(i * 170 * rageSpeed, () => {
+            const root = this.add.image(rx, ry, 'fx-ring').setTint(0x6f9e3d)
+              .setBlendMode(Phaser.BlendModes.ADD).setScale(0.18, 0.09).setDepth(ry + 1);
+            this.tweens.add({ targets: root, scaleX: 0.72, scaleY: 0.34, alpha: 0,
+              duration: 620, ease: 'Back.easeOut', onComplete: () => root.destroy() });
+            if (Math.hypot(rx - this.player.x, ry - this.player.y) < 42) {
+              bossHitPlayer(f.enraged ? 13 : 10);
+            }
+          });
+        }
+        finish(1050);
+      } else if (skill === 2) {
+        showBossSkill(f, 'CHUVA DE ESPINHOS', '#f4e89c');
+        const count = f.enraged ? 16 : 12;
+        for (let i = 0; i < count; i++) {
+          const angle = Math.PI * 2 * i / count;
+          const thorn = this.add.image(f.cont.x, f.cont.y - 35, 'fx-p-spark')
+            .setTint(f.enraged ? 0xff6b4a : 0xcab56a).setScale(0.55)
+            .setDepth(f.cont.y + 10);
+          this.tweens.add({ targets: thorn,
+            x: thorn.x + Math.cos(angle) * 185, y: thorn.y + Math.sin(angle) * 145,
+            angle: 270, alpha: 0, duration: 720 * rageSpeed,
+            ease: 'Cubic.easeOut', onComplete: () => thorn.destroy() });
+        }
+        if (Math.hypot(f.cont.x - this.player.x, f.cont.y - this.player.y) < 175) {
+          this.time.delayedCall(330 * rageSpeed, () => bossHitPlayer(f.enraged ? 14 : 11));
+        }
+        finish(850);
+      } else {
+        showBossSkill(f, 'CHAMADO DA FLORESTA');
+        [-34, 34].forEach((offset, index) => {
+          const boar = this.add.image(f.cont.x + offset, f.cont.y + 16, 'mossy-boar-idle')
+            .setOrigin(0.5, 184 / 192).setScale(0.42).setDepth(f.cont.y + 5);
+          boar.setFlipX(this.player.x < boar.x);
+          const targetX = this.player.x + (index ? 18 : -18);
+          const targetY = this.player.y;
+          this.tweens.add({ targets: boar, x: targetX, y: targetY,
+            duration: 900 * rageSpeed, ease: 'Cubic.easeIn',
+            onComplete: () => {
+              if (Math.hypot(boar.x - this.player.x, boar.y - this.player.y) < 44) {
+                bossHitPlayer(f.enraged ? 9 : 7, 0.003);
+              }
+              boar.destroy();
+            } });
+        });
+        finish(1150);
+      }
+    };
+    const unlockDeerReward = (id, label, color) => {
+      const key = 'deerKingRewards';
+      let rewards = [];
+      try { rewards = JSON.parse(localStorage.getItem(key) || '[]'); } catch (_) {}
+      if (!rewards.includes(id)) rewards.push(id);
+      localStorage.setItem(key, JSON.stringify(rewards));
+      announceReward(`RECOMPENSA DO REI CERVO!\n${label}`, color);
+    };
     this.defeatFoe = (f) => {
       if (!f || f.dead) return;
       f.dead = true;
       f.attacking = false;
       f.walker.__dead = true;
       f.cont.setVisible(false);
+
+      if (f.isDeerKing) {
+        if (this.rollDrop(0.05)) unlockDeerReward('deer_king_antler', 'Galhada do Rei Cervo · 5%', '#dfffa2');
+        if (this.rollDrop(0.03)) unlockDeerReward('meadow_cape', 'Capa da Campina · 3%', '#b9f69f');
+        if (this.rollDrop(0.01)) unlockDeerReward('ancestral_deer', 'Cervo Ancestral · 1%', '#b9f6ff');
+        if (this.rollDrop(0.001)) unlockDeerReward('spring_deer', 'Cervo da Primavera · 0,1%', '#ff9df2');
+        this.time.delayedCall(15000, () => {
+          f.hp = f.hpMax;
+          f.dead = false;
+          f.enraged = false;
+          f.skillIndex = 0;
+          f.walker.__dead = false;
+          f.cont.setVisible(true);
+          f.spr.clearTint().setTexture('deer-king-idle');
+          f.walker.setAnim('idle', 'e');
+        });
+        return;
+      }
 
       if (f.isCloverSpider) {
         this.grantCloverBuff();
@@ -1373,6 +1554,14 @@
     this.damageFoe = (f, amount) => {
       if (!f || f.dead || !f.hpMax) return;
       f.hp = Math.max(0, f.hp - amount);
+      if (f.isDeerKing && !f.enraged && f.hp > 0 && f.hp <= f.hpMax * 0.30) {
+        f.enraged = true;
+        f.skillIndex = 0;
+        f.spr.anims.stop();
+        f.spr.setTexture('deer-king-enraged').setTint(0xffdddd);
+        showBossSkill(f, 'FASE ENFURECIDA!', '#ff7777');
+        this.cameras.main.shake(420, 0.009);
+      }
       if (f.hp <= 0) this.defeatFoe(f);
     };
     this.mobStrike = (f) => {
@@ -1658,8 +1847,16 @@
     for (const f of this.foes) {
       if (f.dead) continue;
       const d = Math.hypot(f.walker.x - this.player.x, f.walker.y - this.player.y);
+      if (f.isDeerKing && d < 310 && !f.attacking
+          && time - f.last >= (f.enraged ? 1900 : 2700)) {
+        f.last = time;
+        this.deerKingAttack(f);
+      }
       if (d > COMBAT.range) continue; // fora da envergadura única: ninguém ataca
-      if (time - f.last >= COMBAT.mobCdMs) { f.last = time; this.mobStrike(f); }
+      if (!f.isDeerKing && time - f.last >= COMBAT.mobCdMs) {
+        f.last = time;
+        this.mobStrike(f);
+      }
       if (d < nearestD) { nearestD = d; nearest = f; }
     }
     if (nearest && !this.P.attacking && time - this.lastPlayerAtk >= COMBAT.playerCdMs) {
