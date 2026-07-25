@@ -1,0 +1,22 @@
+{
+  "id": "cursed_scarecrow",
+  "name": "Espantalho Amaldiçoado",
+  "biome": "campo",
+  "role": "ranged_caster",
+  "frameWidth": 192,
+  "frameHeight": 192,
+  "baselineY": 184,
+  "facing": "east",
+  "animations": {
+    "idle": { "frames": 1 },
+    "walk": { "frames": 6, "fps": 9, "loop": true },
+    "attack": { "frames": 5, "fps": 9, "loop": false }
+  },
+  "combat": {
+    "hp": 48,
+    "damage": 4,
+    "speed": 44,
+    "attackType": "shadow_crow",
+    "respawnMs": 7000
+  }
+}
