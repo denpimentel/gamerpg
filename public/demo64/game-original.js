@@ -115,10 +115,6 @@
   // --- monstros Pixel Adventure (upscalados 2x → frame nativo × 2 no load): ---
   //     [nome, 'bioma/pasta', fwNativo, fhNativo, temWalk, célula]
   const MOBS = [
-    ['Galinha', 'campo/chicken', 32, 34, true, [4, 6]],
-    ['Coelho', 'campo/bunny', 34, 44, true, [8, 4]],
-    ['Abelha', 'campo/bee', 36, 34, false, [6, 9]],
-    ['Slime', 'campo/slime', 44, 30, false, [9, 8]],
     ['Caracol', 'deserto/snail', 38, 24, true, [17, 5]],
     ['Rino', 'deserto/rino', 52, 34, true, [20, 6]],
     ['Javali', 'deserto/angrypig', 36, 30, true, [22, 9]],
@@ -174,7 +170,6 @@
     this.load.image('meadow-war-bull-idle', A + 'creatures/campo/meadow_war_bull/idle.png?v=1');
     this.load.spritesheet('meadow-war-bull-walk', A + 'creatures/campo/meadow_war_bull/walk.png?v=1', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('meadow-war-bull-attack', A + 'creatures/campo/meadow_war_bull/attack.png?v=1', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('sheep', A + 'creatures/common/sheep/idle.png', { frameWidth: 64, frameHeight: 64 });
     for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
       this.load.spritesheet('ai' + n + '-walk', A + 'creatures/neve/' + n + '/walk.png', { frameWidth: 92, frameHeight: 92 });
@@ -649,7 +644,7 @@
       cont.add([spr, lbl]);
       let foe = null;
       const walker = new FreeWalker(this, cont, {
-        tile: TILE, tx: 9, ty: 5, speed: 42, mode: 4, radius: 20,
+        tile: TILE, tx: 10, ty: 7, speed: 42, mode: 4, radius: 20,
         walkablePx: walkablePxZone(ISLES.campo),
         setAnim: (st, dir) => {
           if (dir.includes('w')) spr.setFlipX(true);
@@ -661,7 +656,7 @@
         },
       });
       const wander = new HomeWanderer(this, walker, {
-        radius: 110, pauseChance: 0.28, moveMin: 800, moveMax: 1450,
+        radius: 85, pauseChance: 0.28, moveMin: 800, moveMax: 1450,
       });
       foe = {
         walker, spr, cont, wander, last: 0, lunging: false,
@@ -671,22 +666,6 @@
       this.mobs.push(wander);
       this.foes.push(foe);
     }
-    // ovelhas (ambiente)
-    mk('sheep-idle', 'sheep', 0, -1, 3, -1);
-    [[3, 8], [10, 9], [16, 4]].forEach(([sx, sy], i) => {
-      const s = this.add.sprite(0, 0, 'sheep', 0).setOrigin(0.5, 0.8).setScale(SCALE.sheep);
-      const w = new FreeWalker(this, s, {
-        tile: TILE, tx: sx, ty: sy, speed: 40, mode: 4,
-        walkablePx,
-        setAnim: (st, dir) => {
-          if (dir.includes('w')) s.setFlipX(true);
-          else if (dir.includes('e')) s.setFlipX(false);
-          s.play('sheep-idle', true); s.setDepth(s.y);
-        },
-      });
-      this.mobs.push(new HomeWanderer(this, w, { radius: 120, pauseChance: 0.4 }));
-    });
-
     // ------- player paper doll -------
     const P = this.P = { skin: 'lpc', armor: 'leather', weapon: 'longsword', mount: null, dir: 's', attacking: false,
       nome: 'Calney', hp: 100, hpMax: 100, gold: 125, idade: 10,
