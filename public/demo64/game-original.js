@@ -539,18 +539,29 @@
     const mkMount = () => this.add.sprite(0, 24 - 32 * K + 3, 'mt-marrom-standf', 2)
       .setScale(SCALE.player / 2).setVisible(false);
     const mountB = mkMount(), mountF = mkMount();
-    const mountEyeGlow = this.add.image(46, -49, 'fx-orb').setVisible(false)
-      .setBlendMode(Phaser.BlendModes.ADD).setTint(0xff3218).setAlpha(0.72).setScale(0.24);
+    const mountEyeGlow = this.add.image(46, -49, 'fx-p-fire').setVisible(false)
+      .setBlendMode(Phaser.BlendModes.ADD).setTint(0xff7a18).setAlpha(0.82).setScale(0.1);
     this.tweens.add({
-      targets: mountEyeGlow, alpha: 1, scale: 0.38,
+      targets: mountEyeGlow, alpha: 1, scale: 0.16,
       duration: 420, ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
+    });
+    const magmaHooves = [[-49, 25], [-20, 27], [25, 27], [52, 25]].map(([x, y], i) => {
+      const glow = this.add.image(x, y, 'fx-p-fire').setVisible(false)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setTint(i % 2 ? 0xffb020 : 0xff5418).setAlpha(0.76).setScale(0.12);
+      this.tweens.add({
+        targets: glow, alpha: 1, scale: 0.2, y: y - 2,
+        delay: i * 90, duration: 380 + i * 35,
+        ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
+      });
+      return glow;
     });
     // "pezinho do lado de cá" — perna dobrada dedicada (só montarias IA, vistas e/w),
     // desenhada NA FRENTE da montaria e ATRÁS do tronco do cavaleiro
     const legSpr = this.add.sprite(0, 24, 'mount-leg').setOrigin(0.5, 0).setScale(SCALE.player / 2).setVisible(false);
     const aiSpr = this.aiSpr = this.add.sprite(0, 24, 'aihero-idle', 2)
       .setOrigin(0.5, 0.93).setVisible(false);
-    doll.add([mountB, legSpr, ...Object.values(layers), aiSpr, mountF, mountEyeGlow]);
+    doll.add([mountB, legSpr, ...Object.values(layers), aiSpr, mountF, ...magmaHooves, mountEyeGlow]);
     for (const [d, r] of Object.entries(ROWS)) {
       this.anims.create({ key: 'aihero-walk-' + d, frameRate: 11, repeat: -1,
         frames: this.anims.generateFrameNumbers('aihero-walk', { start: r * 6, end: r * 6 + 5 }) });
@@ -617,8 +628,10 @@
       const ai = AI_MOUNTS[P.mount];
       const cycle = state === 'walk' ? (ai ? 'walk' : 'gallop') : 'stand';
       mountEyeGlow.setVisible(P.mount === 'skeletal_horse_gold');
+      magmaHooves.forEach(glow => glow.setVisible(P.mount === 'skeletal_horse_gold'));
       if (mountEyeGlow.visible) {
         mountEyeGlow.setPosition(d4 === 'w' ? -46 : 46, -49).setFlipX(d4 === 'w');
+        magmaHooves.forEach(glow => doll.bringToTop(glow));
         doll.bringToTop(mountEyeGlow);
       }
       if (ai) { // camada única em escala nativa, atrás do cavaleiro
@@ -895,22 +908,8 @@
     const setMount = (m) => {
       P.mount = m;
       ridePose = null;
-      if (this.legendaryMountFire) {
-        this.legendaryMountFire.destroy();
-        this.legendaryMountFire = null;
-      }
       mountEyeGlow.setVisible(m === 'skeletal_horse_gold');
-      if (m === 'skeletal_horse_gold') {
-        this.legendaryMountFire = this.add.particles(0, 0, 'fx-p-fire', {
-          x: { min: -54, max: 54 }, y: { min: -3, max: 20 },
-          angle: { min: 252, max: 288 }, speed: { min: 16, max: 48 },
-          lifespan: { min: 420, max: 760 }, frequency: 72, quantity: 1,
-          scale: { start: 0.48, end: 0 }, alpha: { start: 0.8, end: 0 },
-          tint: [0xff3218, 0xff7020, 0xffc43d],
-          blendMode: Phaser.BlendModes.ADD,
-        });
-        this.legendaryMountFire.startFollow(doll, 0, 12);
-      }
+      magmaHooves.forEach(glow => glow.setVisible(m === 'skeletal_horse_gold'));
       this.player.speed = m ? (AI_MOUNTS[m] ? AI_MOUNTS[m].speed : 260) : 165; // galope/trote
       this.player.radius = m ? 16 : 12;
       if (!m) {
@@ -1416,7 +1415,6 @@
       this._ghostT = time;
       this.fxGhost();
     }
-    if (this.legendaryMountFire) this.legendaryMountFire.setDepth(this.player.y + 38);
     this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
     this.mobs.forEach(m => { if (!m.walker.__dead) m.update(delta); });
     updateEvilSpirits(this, time, delta);
