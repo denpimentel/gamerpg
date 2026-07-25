@@ -165,6 +165,9 @@
     this.load.image('mossy-boar-idle', A + 'creatures/campo/mossy_boar/idle.png');
     this.load.spritesheet('mossy-boar-walk', A + 'creatures/campo/mossy_boar/walk.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('mossy-boar-attack', A + 'creatures/campo/mossy_boar/attack.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('clover-spider-idle', A + 'creatures/campo/clover_spider/idle.png');
+    this.load.spritesheet('clover-spider-walk', A + 'creatures/campo/clover_spider/walk.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('clover-spider-attack', A + 'creatures/campo/clover_spider/attack.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('sheep', A + 'creatures/common/sheep/idle.png', { frameWidth: 64, frameHeight: 64 });
     for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
@@ -550,6 +553,42 @@
         walker, spr, cont, wander, last: 0, lunging: false,
         attackKey: 'mossy-boar-attack', attacking: false, damage: 5,
         isMossyBoar: true,
+      };
+      this.mobs.push(wander);
+      this.foes.push(foe);
+    }
+    // Aranha de Trevo: criatura de controle, com teia que reduz movimento.
+    mk('clover-spider-walk', 'clover-spider-walk', 0, 5, 10, -1);
+    mk('clover-spider-attack', 'clover-spider-attack', 0, 5, 10, 0);
+    {
+      const cont = this.add.container(0, 0);
+      const spr = this.add.sprite(0, 34, 'clover-spider-idle')
+        .setOrigin(0.5, 184 / 192).setScale(0.68);
+      const lbl = this.add.text(0, -82, 'Aranha de Trevo', {
+        fontFamily: 'sans-serif', fontSize: '12px', color: '#dfff7d',
+        stroke: '#000', strokeThickness: 3,
+      }).setOrigin(0.5);
+      cont.add([spr, lbl]);
+      let foe = null;
+      const walker = new FreeWalker(this, cont, {
+        tile: TILE, tx: 3, ty: 5, speed: 52, mode: 4, radius: 16,
+        walkablePx: walkablePxZone(ISLES.campo),
+        setAnim: (st, dir) => {
+          if (dir.includes('w')) spr.setFlipX(true);
+          else if (dir.includes('e')) spr.setFlipX(false);
+          if (foe && foe.attacking) return;
+          if (st === 'walk') spr.play('clover-spider-walk', true);
+          else { spr.anims.stop(); spr.setTexture('clover-spider-idle'); }
+          cont.setDepth(cont.y);
+        },
+      });
+      const wander = new HomeWanderer(this, walker, {
+        radius: 125, pauseChance: 0.32, moveMin: 500, moveMax: 1100,
+      });
+      foe = {
+        walker, spr, cont, wander, last: 0, lunging: false,
+        attackKey: 'clover-spider-attack', attacking: false, damage: 3,
+        isCloverSpider: true,
       };
       this.mobs.push(wander);
       this.foes.push(foe);
@@ -1229,6 +1268,18 @@
           if (hitDistance > COMBAT.range * 1.35) return;
           this.flashDoll();
           this.setHp(this.P.hp - (f.damage || 3));
+          if (f.isCloverSpider) {
+            this.webSlowUntil = Math.max(this.webSlowUntil || 0, this.time.now + 1800);
+            const web = this.add.image(0, 8, 'fx-ring').setTint(0xbaff67)
+              .setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.9).setScale(0.45, 0.25);
+            doll.add(web);
+            doll.bringToTop(web);
+            this.tweens.add({
+              targets: web, angle: 220, scaleX: 0.9, scaleY: 0.48, alpha: 0,
+              duration: 1800, ease: 'Sine.easeOut', onComplete: () => web.destroy(),
+            });
+            burst('fx-p-ice', doll.x, doll.y + 4, 0xbaff67, 12);
+          }
           this.cameras.main.shake(90, 0.0025);
         });
         return;
@@ -1492,6 +1543,10 @@
       this._ghostT = time;
       this.fxGhost(this.P.mount === 'skeletal_horse_gold' ? 0xff7a20 : undefined);
     }
+    const baseSpeed = this.P.mount
+      ? (AI_MOUNTS[this.P.mount] ? AI_MOUNTS[this.P.mount].speed : 260)
+      : 165;
+    this.player.speed = time < (this.webSlowUntil || 0) ? baseSpeed * 0.55 : baseSpeed;
     this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
     this.mobs.forEach(m => { if (!m.walker.__dead) m.update(delta); });
     updateEvilSpirits(this, time, delta);
