@@ -110,6 +110,14 @@
              scale: 0.68, singleRow: true, legY: -40,
              bob: [0, -2, -4, -2, 0, -1],
              offs: { n: [0, -32], w: [0, -32], s: [0, -32], e: [0, -32] } },
+    ancestral_deer: { frame: 256, walkCols: 6, speed: 275, dy: 32, rate: 9,
+             scale: 0.58, singleRow: true, legY: -50,
+             bob: [0, -2, 0, -2, 0, -2],
+             offs: { n: [0, -43], w: [0, -43], s: [0, -43], e: [0, -43] } },
+    spring_deer: { frame: 256, walkCols: 6, speed: 285, dy: 32, rate: 9,
+             scale: 0.58, singleRow: true, legY: -50,
+             bob: [0, -2, 0, -2, 0, -2],
+             offs: { n: [0, -43], w: [0, -43], s: [0, -43], e: [0, -43] } },
   };
 
   // --- monstros Pixel Adventure (upscalados 2x → frame nativo × 2 no load): ---
@@ -171,9 +179,11 @@
     this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=1', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=1', { frameWidth: 192, frameHeight: 192 });
     this.load.image('deer-king-idle', A + 'creatures/campo/deer_king/idle.png?v=cartoon1');
-    this.load.image('deer-king-enraged', A + 'creatures/campo/deer_king/enraged.png?v=cartoon1');
-    this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=cartoon1', { frameWidth: 256, frameHeight: 256 });
+    this.load.image('deer-king-enraged', A + 'creatures/campo/deer_king/enraged.png?v=polish1');
+    this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=polish1', { frameWidth: 256, frameHeight: 256 });
+    this.load.spritesheet('deer-king-walk-enraged', A + 'player/mount/spring_deer/walk.png?v=deer-mount-v1', { frameWidth: 256, frameHeight: 256 });
     this.load.spritesheet('deer-king-charge', A + 'creatures/campo/deer_king/charge.png?v=cartoon1', { frameWidth: 256, frameHeight: 256 });
+    this.load.spritesheet('deer-king-charge-enraged', A + 'creatures/campo/deer_king/charge_enraged.png?v=polish1', { frameWidth: 256, frameHeight: 256 });
     for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
       this.load.spritesheet('ai' + n + '-walk', A + 'creatures/neve/' + n + '/walk.png', { frameWidth: 92, frameHeight: 92 });
@@ -205,7 +215,8 @@
       }
     }
     for (const [m, cfg] of Object.entries(AI_MOUNTS)) {
-      const mountVersion = m === 'skeletal_horse_gold' ? '?v=green-eye-v2' : '';
+      const mountVersion = m === 'skeletal_horse_gold' ? '?v=green-eye-v2'
+        : (m === 'ancestral_deer' || m === 'spring_deer') ? '?v=deer-mount-v1' : '';
       this.load.spritesheet(`mtai-${m}-idle`, `${A}player/mount/${m}/idle.png${mountVersion}`, { frameWidth: cfg.frame, frameHeight: cfg.frame });
       this.load.spritesheet(`mtai-${m}-walk`, `${A}player/mount/${m}/walk.png${mountVersion}`, { frameWidth: cfg.frame, frameHeight: cfg.frame });
     }
@@ -672,7 +683,9 @@
     }
     // Rei Cervo: chefe ancestral do CAMPO, com quatro habilidades e fase enfurecida.
     mk('deer-king-walk', 'deer-king-walk', 0, 5, 9, -1);
+    mk('deer-king-walk-enraged', 'deer-king-walk-enraged', 0, 5, 9, -1);
     mk('deer-king-charge', 'deer-king-charge', 0, 5, 11, 0);
+    mk('deer-king-charge-enraged', 'deer-king-charge-enraged', 0, 5, 11, 0);
     {
       const cont = this.add.container(0, 0);
       const spr = this.add.sprite(0, 44, 'deer-king-idle')
@@ -690,7 +703,7 @@
           if (dir.includes('w')) spr.setFlipX(true);
           else if (dir.includes('e')) spr.setFlipX(false);
           if (foe && foe.attacking) return;
-          if (st === 'walk') spr.play('deer-king-walk', true);
+          if (st === 'walk') spr.play(foe && foe.enraged ? 'deer-king-walk-enraged' : 'deer-king-walk', true);
           else {
             spr.anims.stop();
             spr.setTexture(foe && foe.enraged ? 'deer-king-enraged' : 'deer-king-idle');
@@ -1227,7 +1240,7 @@
       }
     };
     const celebrateMountDrop = (reward) => {
-      const golden = reward === 'skeletal_horse_gold';
+      const golden = reward === 'skeletal_horse_gold' || reward === 'spring_deer';
       const cx = this.scale.width / 2, cy = this.scale.height / 2;
       const tint = golden ? 0xff4b18 : 0x79e8ff;
       const flash = this.add.rectangle(cx, cy, this.scale.width, this.scale.height,
@@ -1367,8 +1380,7 @@
 
       if (skill === 0) {
         showBossSkill(f, 'INVESTIDA REAL');
-        f.spr.play('deer-king-charge', true);
-        if (f.enraged) f.spr.setTint(0xffb5b5);
+        f.spr.play(f.enraged ? 'deer-king-charge-enraged' : 'deer-king-charge', true);
         const dx = this.player.x - f.cont.x, dy = this.player.y - f.cont.y;
         const len = Math.hypot(dx, dy) || 1;
         const distance = Math.min(150, Math.max(50, len - 24));
@@ -1410,41 +1422,32 @@
           });
         }
         finish(1050);
-      } else if (skill === 2) {
-        showBossSkill(f, 'CHUVA DE ESPINHOS', '#f4e89c');
-        const count = f.enraged ? 16 : 12;
-        for (let i = 0; i < count; i++) {
-          const angle = Math.PI * 2 * i / count;
-          const thorn = this.add.image(f.cont.x, f.cont.y - 35, 'fx-p-spark')
-            .setTint(f.enraged ? 0xff6b4a : 0xcab56a).setScale(0.55)
-            .setDepth(f.cont.y + 10);
-          this.tweens.add({ targets: thorn,
-            x: thorn.x + Math.cos(angle) * 185, y: thorn.y + Math.sin(angle) * 145,
-            angle: 270, alpha: 0, duration: 720 * rageSpeed,
-            ease: 'Cubic.easeOut', onComplete: () => thorn.destroy() });
-        }
-        if (Math.hypot(f.cont.x - this.player.x, f.cont.y - this.player.y) < 175) {
-          this.time.delayedCall(330 * rageSpeed, () => bossHitPlayer(f.enraged ? 14 : 11));
-        }
-        finish(850);
       } else {
-        showBossSkill(f, 'CHAMADO DA FLORESTA');
-        [-34, 34].forEach((offset, index) => {
-          const boar = this.add.image(f.cont.x + offset, f.cont.y + 16, 'mossy-boar-idle')
-            .setOrigin(0.5, 184 / 192).setScale(0.42).setDepth(f.cont.y + 5);
-          boar.setFlipX(this.player.x < boar.x);
-          const targetX = this.player.x + (index ? 18 : -18);
-          const targetY = this.player.y;
-          this.tweens.add({ targets: boar, x: targetX, y: targetY,
-            duration: 900 * rageSpeed, ease: 'Cubic.easeIn',
-            onComplete: () => {
-              if (Math.hypot(boar.x - this.player.x, boar.y - this.player.y) < 44) {
-                bossHitPlayer(f.enraged ? 9 : 7, 0.003);
-              }
-              boar.destroy();
-            } });
-        });
-        finish(1150);
+        const doubleVolley = skill === 3;
+        showBossSkill(f, doubleVolley ? 'GALHADA DUPLA' : 'CHUVA DE ESPINHOS', '#f4e89c');
+        const count = f.enraged ? 16 : 12;
+        const volleys = doubleVolley ? 2 : 1;
+        for (let wave = 0; wave < volleys; wave++) {
+          this.time.delayedCall(wave * 310 * rageSpeed, () => {
+            if (f.dead) return;
+            for (let i = 0; i < count; i++) {
+              const angle = Math.PI * 2 * (i + wave * 0.5) / count;
+              const thorn = this.add.image(f.cont.x, f.cont.y - 35, 'fx-p-spark')
+                .setTint(f.enraged ? 0xff6b4a : 0xcab56a).setScale(0.55)
+                .setDepth(f.cont.y + 10);
+              this.tweens.add({ targets: thorn,
+                x: thorn.x + Math.cos(angle) * 185, y: thorn.y + Math.sin(angle) * 145,
+                angle: 270, alpha: 0, duration: 720 * rageSpeed,
+                ease: 'Cubic.easeOut', onComplete: () => thorn.destroy() });
+            }
+            if (Math.hypot(f.cont.x - this.player.x, f.cont.y - this.player.y) < 175) {
+              this.time.delayedCall(330 * rageSpeed, () => {
+                if (!f.dead) bossHitPlayer(f.enraged ? 14 : 11);
+              });
+            }
+          });
+        }
+        finish(doubleVolley ? 1250 : 850);
       }
     };
     const unlockDeerReward = (id, label, color) => {
@@ -1465,8 +1468,16 @@
       if (f.isDeerKing) {
         if (this.rollDrop(0.05)) unlockDeerReward('deer_king_antler', 'Galhada do Rei Cervo · 5%', '#dfffa2');
         if (this.rollDrop(0.03)) unlockDeerReward('meadow_cape', 'Capa da Campina · 3%', '#b9f69f');
-        if (this.rollDrop(0.01)) unlockDeerReward('ancestral_deer', 'Cervo Ancestral · 1%', '#b9f6ff');
-        if (this.rollDrop(0.001)) unlockDeerReward('spring_deer', 'Cervo da Primavera · 0,1%', '#ff9df2');
+        if (this.rollDrop(0.01)) {
+          window.__unlockMount && window.__unlockMount('ancestral_deer');
+          celebrateMountDrop('ancestral_deer');
+          unlockDeerReward('ancestral_deer', 'Montaria Rei Cervo · 1%', '#b9f6ff');
+        }
+        if (this.rollDrop(0.001)) {
+          window.__unlockMount && window.__unlockMount('spring_deer');
+          celebrateMountDrop('spring_deer');
+          unlockDeerReward('spring_deer', 'Montaria Rei Cervo Enfurecido · 0,1%', '#ff745c');
+        }
         this.time.delayedCall(15000, () => {
           f.hp = f.hpMax;
           f.dead = false;
