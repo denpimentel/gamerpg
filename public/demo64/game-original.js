@@ -172,9 +172,9 @@
     this.load.image('clover-spider-idle', A + 'creatures/campo/clover_spider/idle.png');
     this.load.spritesheet('clover-spider-walk', A + 'creatures/campo/clover_spider/walk.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('clover-spider-attack', A + 'creatures/campo/clover_spider/attack.png', { frameWidth: 192, frameHeight: 192 });
-    this.load.image('cursed-scarecrow-idle', A + 'creatures/campo/cursed_scarecrow/idle.png?v=cartoon1');
-    this.load.spritesheet('cursed-scarecrow-walk', A + 'creatures/campo/cursed_scarecrow/walk.png?v=cartoon1', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('cursed-scarecrow-attack', A + 'creatures/campo/cursed_scarecrow/attack.png?v=cartoon1', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('cursed-scarecrow-idle', A + 'creatures/campo/cursed_scarecrow/idle.png?v=small1');
+    this.load.spritesheet('cursed-scarecrow-walk', A + 'creatures/campo/cursed_scarecrow/walk.png?v=small1', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('cursed-scarecrow-attack', A + 'creatures/campo/cursed_scarecrow/attack.png?v=small1', { frameWidth: 192, frameHeight: 192 });
     this.load.image('meadow-turtle-idle', A + 'creatures/campo/meadow_turtle/idle.png?v=1');
     this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=1', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=1', { frameWidth: 192, frameHeight: 192 });
@@ -481,8 +481,8 @@
     {
       const cont = this.add.container(0, 0);
       const spr = this.add.sprite(0, 34, 'cursed-scarecrow-idle')
-        .setOrigin(0.5, 184 / 192).setScale(0.72);
-      const lbl = this.add.text(0, -82, 'Espantalho Amaldiçoado', {
+        .setOrigin(0.5, 184 / 192).setScale(0.36);
+      const lbl = this.add.text(0, -48, 'Espantalho Amaldiçoado', {
         fontFamily: 'sans-serif', fontSize: '12px', color: '#d9b6ff',
         stroke: '#000', strokeThickness: 3,
       }).setOrigin(0.5);
