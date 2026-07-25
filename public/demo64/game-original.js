@@ -163,9 +163,9 @@
     // --- creatures/ ---
     this.load.spritesheet('goblin', A + 'creatures/pedra/goblin_tocha/sheet.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('tnt', A + 'creatures/deserto/goblin_tnt/sheet.png', { frameWidth: 192, frameHeight: 192 });
-    this.load.image('swamp-ogre-idle', A + 'creatures/campo/swamp_ogre/idle.png?v=cartoon2');
-    this.load.spritesheet('swamp-ogre-walk', A + 'creatures/campo/swamp_ogre/walk.png?v=cartoon2', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('swamp-ogre-attack', A + 'creatures/campo/swamp_ogre/attack.png?v=cartoon2', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('swamp-ogre-idle', A + 'creatures/campo/swamp_ogre/idle.png?v=angry1');
+    this.load.spritesheet('swamp-ogre-walk', A + 'creatures/campo/swamp_ogre/walk.png?v=angry1', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('swamp-ogre-attack', A + 'creatures/campo/swamp_ogre/attack.png?v=angry1', { frameWidth: 192, frameHeight: 192 });
     this.load.image('mossy-boar-idle', A + 'creatures/campo/mossy_boar/idle.png');
     this.load.spritesheet('mossy-boar-walk', A + 'creatures/campo/mossy_boar/walk.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('mossy-boar-attack', A + 'creatures/campo/mossy_boar/attack.png', { frameWidth: 192, frameHeight: 192 });
