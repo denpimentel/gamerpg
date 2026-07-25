@@ -111,13 +111,13 @@
              bob: [0, -2, -4, -2, 0, -1],
              offs: { n: [0, -32], w: [0, -32], s: [0, -32], e: [0, -32] } },
     ancestral_deer: { frame: 256, walkCols: 6, speed: 275, dy: 32, rate: 9,
-             scale: 0.58, singleRow: true, legY: -50,
+             scale: 0.58, singleRow: true, legY: -27,
              bob: [0, -2, 0, -2, 0, -2],
-             offs: { n: [0, -43], w: [0, -43], s: [0, -43], e: [0, -43] } },
+             offs: { n: [0, -25], w: [0, -25], s: [0, -25], e: [0, -25] } },
     spring_deer: { frame: 256, walkCols: 6, speed: 285, dy: 32, rate: 9,
-             scale: 0.58, singleRow: true, legY: -50,
+             scale: 0.58, singleRow: true, legY: -27,
              bob: [0, -2, 0, -2, 0, -2],
-             offs: { n: [0, -43], w: [0, -43], s: [0, -43], e: [0, -43] } },
+             offs: { n: [0, -25], w: [0, -25], s: [0, -25], e: [0, -25] } },
   };
 
   // --- monstros Pixel Adventure (upscalados 2x → frame nativo × 2 no load): ---
@@ -180,8 +180,8 @@
     this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=1', { frameWidth: 192, frameHeight: 192 });
     this.load.image('deer-king-idle', A + 'creatures/campo/deer_king/idle.png?v=cartoon1');
     this.load.image('deer-king-enraged', A + 'creatures/campo/deer_king/enraged.png?v=polish1');
-    this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=polish1', { frameWidth: 256, frameHeight: 256 });
-    this.load.spritesheet('deer-king-walk-enraged', A + 'player/mount/spring_deer/walk.png?v=deer-mount-v1', { frameWidth: 256, frameHeight: 256 });
+    this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=walk3', { frameWidth: 256, frameHeight: 256 });
+    this.load.spritesheet('deer-king-walk-enraged', A + 'player/mount/spring_deer/walk.png?v=walk3', { frameWidth: 256, frameHeight: 256 });
     this.load.spritesheet('deer-king-charge', A + 'creatures/campo/deer_king/charge.png?v=cartoon1', { frameWidth: 256, frameHeight: 256 });
     this.load.spritesheet('deer-king-charge-enraged', A + 'creatures/campo/deer_king/charge_enraged.png?v=polish1', { frameWidth: 256, frameHeight: 256 });
     for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
@@ -216,7 +216,7 @@
     }
     for (const [m, cfg] of Object.entries(AI_MOUNTS)) {
       const mountVersion = m === 'skeletal_horse_gold' ? '?v=green-eye-v2'
-        : (m === 'ancestral_deer' || m === 'spring_deer') ? '?v=deer-mount-v1' : '';
+        : (m === 'ancestral_deer' || m === 'spring_deer') ? '?v=walk3' : '';
       this.load.spritesheet(`mtai-${m}-idle`, `${A}player/mount/${m}/idle.png${mountVersion}`, { frameWidth: cfg.frame, frameHeight: cfg.frame });
       this.load.spritesheet(`mtai-${m}-walk`, `${A}player/mount/${m}/walk.png${mountVersion}`, { frameWidth: cfg.frame, frameHeight: cfg.frame });
     }
@@ -1886,7 +1886,9 @@
     // rastro espectral no galope (skill 2 — clona o frame corrente, qualquer montaria)
     if (this.P.mount && this.player.moving && time - (this._ghostT || 0) > 95) {
       this._ghostT = time;
-      this.fxGhost(this.P.mount === 'skeletal_horse_gold' ? 0xff7a20 : undefined);
+      const trailTint = this.P.mount === 'spring_deer' ? 0xff3028
+        : this.P.mount === 'skeletal_horse_gold' ? 0xff7a20 : undefined;
+      this.fxGhost(trailTint);
     }
     const baseSpeed = this.P.mount
       ? (AI_MOUNTS[this.P.mount] ? AI_MOUNTS[this.P.mount].speed : 260)
