@@ -172,7 +172,7 @@
     this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=1', { frameWidth: 192, frameHeight: 192 });
     this.load.image('deer-king-idle', A + 'creatures/campo/deer_king/idle.png?v=1');
     this.load.image('deer-king-enraged', A + 'creatures/campo/deer_king/enraged.png?v=1');
-    this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=1', { frameWidth: 256, frameHeight: 256 });
+    this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=2', { frameWidth: 256, frameHeight: 256 });
     this.load.spritesheet('deer-king-charge', A + 'creatures/campo/deer_king/charge.png?v=1', { frameWidth: 256, frameHeight: 256 });
     for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
