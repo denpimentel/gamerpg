@@ -40,11 +40,12 @@ A opção de obsidiana foi escolhida como formato-base da Runa de Ataque. Duas c
 
 Arquivos em `public/assets/64/runes/attack/`.
 
-### Alternativa B — pedra colorida com espada esculpida
+### Alternativa B — molde de forja colorido
 
-- a espada não possui cor própria nem brilho;
-- o símbolo é um baixo-relevo esculpido na própria pedra;
-- um sulco escuro e uma borda clara do mesmo material formam a espada;
+- não existe uma espada desenhada ou preenchida;
+- a pedra funciona como uma matriz de forja;
+- uma cavidade profunda no formato da espada contém lâmina, guarda, cabo e pomo;
+- paredes chanfradas e sombra interna reforçam o espaço negativo do molde;
 - somente a pedra muda conforme a raridade;
 - **Comum:** pedra branca/prateada;
 - **Rara:** pedra azul;
