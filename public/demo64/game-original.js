@@ -983,6 +983,16 @@
       doll.iterate(c => c.setTint && c.setTint(0xff7070));
       this.time.delayedCall(130, () => doll.iterate(c => c.clearTint && c.clearTint()));
     };
+    this.knockbackPlayer = (attacker, distance = 58) => {
+      const dx = this.player.x - attacker.walker.x;
+      const dy = this.player.y - attacker.walker.y;
+      const len = Math.hypot(dx, dy) || 1;
+      this.playerKnockback = {
+        vx: (dx / len) * distance * 5.2,
+        vy: (dy / len) * distance * 5.2,
+        until: this.time.now + 240,
+      };
+    };
     const announceReward = (text, color = '#b9f6ff') => {
       const msg = this.add.text(this.scale.width / 2, 90, text, {
         fontFamily: '"Pixelify Sans", sans-serif', fontSize: '22px', fontStyle: 'bold',
@@ -990,6 +1000,56 @@
       }).setOrigin(0.5).setScrollFactor(0).setDepth(9000).setAlpha(0);
       this.tweens.add({ targets: msg, alpha: 1, y: 78, duration: 220, hold: 2200,
         yoyo: true, onComplete: () => msg.destroy() });
+    };
+    const celebrateMountDrop = (reward) => {
+      const golden = reward === 'skeletal_horse_gold';
+      const cx = this.scale.width / 2, cy = this.scale.height / 2;
+      const tint = golden ? 0xffd43b : 0x79e8ff;
+      const flash = this.add.rectangle(cx, cy, this.scale.width, this.scale.height,
+        golden ? 0xffc928 : 0x9befff, golden ? 0.34 : 0.18)
+        .setScrollFactor(0).setDepth(8990);
+      this.tweens.add({ targets: flash, alpha: 0, duration: golden ? 800 : 480,
+        onComplete: () => flash.destroy() });
+
+      const ringCount = golden ? 3 : 2;
+      for (let i = 0; i < ringCount; i++) {
+        const ring = this.add.image(cx, cy + 36, 'fx-ring').setScrollFactor(0).setDepth(8992)
+          .setTint(tint).setBlendMode(Phaser.BlendModes.ADD).setAlpha(0.95).setScale(0.25);
+        this.tweens.add({ targets: ring, scale: 2.2 + i * 0.55, alpha: 0,
+          delay: i * 130, duration: golden ? 950 : 720, ease: 'Cubic.easeOut',
+          onComplete: () => ring.destroy() });
+      }
+
+      const preview = this.add.image(cx, cy + 20, `mtai-${reward}-idle`)
+        .setScrollFactor(0).setDepth(8995).setOrigin(0.5, 0.95)
+        .setScale(0.15).setAlpha(0).setTint(golden ? 0xffed91 : 0xffffff);
+      this.tweens.add({ targets: preview, alpha: 1, scale: golden ? 1.02 : 0.9,
+        y: cy - 2, duration: golden ? 700 : 520, ease: 'Back.easeOut',
+        hold: golden ? 2600 : 1900, yoyo: true, onComplete: () => preview.destroy() });
+
+      const sparks = golden ? 42 : 24;
+      for (let i = 0; i < sparks; i++) {
+        const angle = (Math.PI * 2 * i / sparks) + Math.random() * 0.2;
+        const radius = golden ? 150 + Math.random() * 150 : 110 + Math.random() * 100;
+        const spark = this.add.image(cx, cy + 10, i % 4 === 0 ? 'fx-orb' : 'fx-p-spark')
+          .setScrollFactor(0).setDepth(8994).setTint(tint)
+          .setBlendMode(Phaser.BlendModes.ADD).setScale(golden ? 0.7 : 0.5).setAlpha(0);
+        this.tweens.add({ targets: spark, alpha: { from: 0, to: 1 },
+          x: cx + Math.cos(angle) * radius, y: cy + 10 + Math.sin(angle) * radius * 0.65,
+          scale: 0, rotation: Math.random() * Math.PI * 3, delay: Math.random() * 260,
+          duration: golden ? 1100 : 820, ease: 'Cubic.easeOut', onComplete: () => spark.destroy() });
+      }
+      if (golden) {
+        const legendary = this.add.text(cx, cy - 138, '✦  LENDÁRIO  ✦', {
+          fontFamily: '"Pixelify Sans", sans-serif', fontSize: '34px', fontStyle: 'bold',
+          color: '#fff2a8', stroke: '#6b3300', strokeThickness: 8,
+        }).setOrigin(0.5).setScrollFactor(0).setDepth(8998).setScale(0.35).setAlpha(0);
+        this.tweens.add({ targets: legendary, alpha: 1, scale: 1, duration: 520,
+          ease: 'Back.easeOut', hold: 2500, yoyo: true, onComplete: () => legendary.destroy() });
+        this.cameras.main.shake(360, 0.008);
+      } else {
+        this.cameras.main.shake(180, 0.004);
+      }
     };
     this.defeatFoe = (f) => {
       if (!f || f.dead) return;
@@ -1006,6 +1066,7 @@
         if (reward) {
           const golden = reward === 'skeletal_horse_gold';
           window.__unlockMount && window.__unlockMount(reward);
+          celebrateMountDrop(reward);
           announceReward(golden
             ? 'DROP LENDÁRIO!\\nCavalo-Esqueleto Dourado · 0,1%'
             : 'RECOMPENSA RARA!\\nCavalo-Esqueleto · 1%',
@@ -1042,8 +1103,11 @@
         });
         this.time.delayedCall(350, () => {
           if (f.dead) return;
+          const hitDistance = Math.hypot(f.walker.x - this.player.x, f.walker.y - this.player.y);
+          if (hitDistance > COMBAT.range * 1.35) return;
           this.flashDoll();
           this.setHp(this.P.hp - (f.damage || 3));
+          if (f.isDeathKnight) this.knockbackPlayer(f, 64);
           this.cameras.main.shake(90, 0.0025);
         });
         return;
@@ -1307,7 +1371,24 @@
       this._ghostT = time;
       this.fxGhost();
     }
-    this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
+    if (this.playerKnockback && time < this.playerKnockback.until) {
+      const kb = this.playerKnockback;
+      const secs = Math.min(delta || 16, 40) / 1000;
+      const nx = this.player.x + kb.vx * secs;
+      const ny = this.player.y + kb.vy * secs;
+      if (this.player.free(nx, this.player.y)) this.player.x = nx;
+      else kb.vx = 0;
+      if (this.player.free(this.player.x, ny)) this.player.y = ny;
+      else kb.vy = 0;
+      kb.vx *= 0.78;
+      kb.vy *= 0.78;
+      this.player.sprite.setPosition(Math.round(this.player.x), Math.round(this.player.y));
+      this.player.moving = true;
+      this.setDoll('idle', this.player.dir);
+    } else {
+      this.playerKnockback = null;
+      this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
+    }
     this.mobs.forEach(m => { if (!m.walker.__dead) m.update(delta); });
     updateEvilSpirits(this, time, delta);
   }
