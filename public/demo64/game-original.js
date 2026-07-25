@@ -983,16 +983,6 @@
       doll.iterate(c => c.setTint && c.setTint(0xff7070));
       this.time.delayedCall(130, () => doll.iterate(c => c.clearTint && c.clearTint()));
     };
-    this.knockbackPlayer = (attacker, distance = 58) => {
-      const dx = this.player.x - attacker.walker.x;
-      const dy = this.player.y - attacker.walker.y;
-      const len = Math.hypot(dx, dy) || 1;
-      this.playerKnockback = {
-        vx: (dx / len) * distance * 5.2,
-        vy: (dy / len) * distance * 5.2,
-        until: this.time.now + 240,
-      };
-    };
     const announceReward = (text, color = '#b9f6ff') => {
       const msg = this.add.text(this.scale.width / 2, 90, text, {
         fontFamily: '"Pixelify Sans", sans-serif', fontSize: '22px', fontStyle: 'bold',
@@ -1107,7 +1097,6 @@
           if (hitDistance > COMBAT.range * 1.35) return;
           this.flashDoll();
           this.setHp(this.P.hp - (f.damage || 3));
-          if (f.isDeathKnight) this.knockbackPlayer(f, 64);
           this.cameras.main.shake(90, 0.0025);
         });
         return;
@@ -1371,24 +1360,7 @@
       this._ghostT = time;
       this.fxGhost();
     }
-    if (this.playerKnockback && time < this.playerKnockback.until) {
-      const kb = this.playerKnockback;
-      const secs = Math.min(delta || 16, 40) / 1000;
-      const nx = this.player.x + kb.vx * secs;
-      const ny = this.player.y + kb.vy * secs;
-      if (this.player.free(nx, this.player.y)) this.player.x = nx;
-      else kb.vx = 0;
-      if (this.player.free(this.player.x, ny)) this.player.y = ny;
-      else kb.vy = 0;
-      kb.vx *= 0.78;
-      kb.vy *= 0.78;
-      this.player.sprite.setPosition(Math.round(this.player.x), Math.round(this.player.y));
-      this.player.moving = true;
-      this.setDoll('idle', this.player.dir);
-    } else {
-      this.playerKnockback = null;
-      this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
-    }
+    this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
     this.mobs.forEach(m => { if (!m.walker.__dead) m.update(delta); });
     updateEvilSpirits(this, time, delta);
   }
