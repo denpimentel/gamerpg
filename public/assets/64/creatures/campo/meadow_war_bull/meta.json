@@ -1,0 +1,22 @@
+{
+  "id": "meadow_war_bull",
+  "name": "Touro de Guerra do Prado",
+  "biome": "campo",
+  "role": "tank",
+  "frameWidth": 192,
+  "frameHeight": 192,
+  "baselineY": 184,
+  "facing": "east",
+  "animations": {
+    "idle": { "frames": 1 },
+    "walk": { "frames": 6, "fps": 8, "loop": true },
+    "attack": { "frames": 6, "fps": 11, "loop": false }
+  },
+  "combat": {
+    "hp": 84,
+    "damage": 8,
+    "speed": 42,
+    "attackType": "short_charge",
+    "respawnMs": 8000
+  }
+}
