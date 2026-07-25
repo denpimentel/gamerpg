@@ -24,3 +24,13 @@ As probabilidades normais de drop precisam continuar separadas do botão tempor�
 - combinações, bônus de conjunto e conflitos;
 - apresentação dos oito slots no inventário;
 - persistência e salvamento das runas aplicadas.
+
+## Conceitos gráficos: Runa de Ataque
+
+Três opções 64×64 foram preparadas para escolha:
+
+1. **Pedra Antiga** — rocha cinza irregular com espada vermelha gravada.
+2. **Obsidiana** — fragmento escuro com espada diagonal e fissuras incandescentes.
+3. **Terracota** — pedra arredondada com espada dourada de leitura simples.
+
+Os arquivos estão em `public/assets/64/runes/concepts/`. Nenhuma opção é definitiva até a escolha visual.
