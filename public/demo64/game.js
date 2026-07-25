@@ -1,7 +1,7 @@
 /* GameRPG loader */
 (function () {
   const script = document.createElement('script');
-  script.src = './game-original.js?v=turtle-nosefix-v1';
+  script.src = './game-original.js?v=ogre-cartoon-v2';
   script.onerror = () => console.error('[GameRPG] Falha ao carregar o jogo principal.');
   document.head.appendChild(script);
 })();
