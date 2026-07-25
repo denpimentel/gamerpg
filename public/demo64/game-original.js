@@ -1613,7 +1613,6 @@
       this.setHp(this.P.hp - 3); // dano do golpe do bicho
     };
 
-    initEvilSpirits(this);
     window.__scene = this;
   }
 

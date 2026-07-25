@@ -208,6 +208,9 @@
 @media (max-width: 640px) {
   #codexHud { top: 204px; }
 }
+/* Interface de teste removida: mantém somente o HUD principal do canto. */
+#evilSpiritBar,
+#codexHud { display: none !important; }
 </style>
 </head>
 <body>
@@ -557,6 +560,6 @@ addEventListener('keydown', e => {
   sync();
 })();
 </script>
-<script src="game.js?v=deer-king-v2"></script>
+<script src="game.js?v=clean-hud-v1"></script>
 </body>
 </html>
