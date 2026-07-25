@@ -539,29 +539,12 @@
     const mkMount = () => this.add.sprite(0, 24 - 32 * K + 3, 'mt-marrom-standf', 2)
       .setScale(SCALE.player / 2).setVisible(false);
     const mountB = mkMount(), mountF = mkMount();
-    const mountEyeGlow = this.add.image(46, -49, 'fx-p-fire').setVisible(false)
-      .setBlendMode(Phaser.BlendModes.ADD).setTint(0xff7a18).setAlpha(0.82).setScale(0.1);
-    this.tweens.add({
-      targets: mountEyeGlow, alpha: 1, scale: 0.16,
-      duration: 420, ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
-    });
-    const magmaHooves = [[-49, 25], [-20, 27], [25, 27], [52, 25]].map(([x, y], i) => {
-      const glow = this.add.image(x, y, 'fx-p-fire').setVisible(false)
-        .setBlendMode(Phaser.BlendModes.ADD)
-        .setTint(i % 2 ? 0xffb020 : 0xff5418).setAlpha(0.76).setScale(0.12);
-      this.tweens.add({
-        targets: glow, alpha: 1, scale: 0.2, y: y - 2,
-        delay: i * 90, duration: 380 + i * 35,
-        ease: 'Sine.easeInOut', yoyo: true, repeat: -1,
-      });
-      return glow;
-    });
     // "pezinho do lado de cá" — perna dobrada dedicada (só montarias IA, vistas e/w),
     // desenhada NA FRENTE da montaria e ATRÁS do tronco do cavaleiro
     const legSpr = this.add.sprite(0, 24, 'mount-leg').setOrigin(0.5, 0).setScale(SCALE.player / 2).setVisible(false);
     const aiSpr = this.aiSpr = this.add.sprite(0, 24, 'aihero-idle', 2)
       .setOrigin(0.5, 0.93).setVisible(false);
-    doll.add([mountB, legSpr, ...Object.values(layers), aiSpr, mountF, ...magmaHooves, mountEyeGlow]);
+    doll.add([mountB, legSpr, ...Object.values(layers), aiSpr, mountF]);
     for (const [d, r] of Object.entries(ROWS)) {
       this.anims.create({ key: 'aihero-walk-' + d, frameRate: 11, repeat: -1,
         frames: this.anims.generateFrameNumbers('aihero-walk', { start: r * 6, end: r * 6 + 5 }) });
@@ -627,13 +610,6 @@
     const renderMounted = (state, d4, row) => {
       const ai = AI_MOUNTS[P.mount];
       const cycle = state === 'walk' ? (ai ? 'walk' : 'gallop') : 'stand';
-      mountEyeGlow.setVisible(P.mount === 'skeletal_horse_gold');
-      magmaHooves.forEach(glow => glow.setVisible(P.mount === 'skeletal_horse_gold'));
-      if (mountEyeGlow.visible) {
-        mountEyeGlow.setPosition(d4 === 'w' ? -46 : 46, -49).setFlipX(d4 === 'w');
-        magmaHooves.forEach(glow => doll.bringToTop(glow));
-        doll.bringToTop(mountEyeGlow);
-      }
       if (ai) { // camada única em escala nativa, atrás do cavaleiro
         mountF.setVisible(false);
         const mountRow = ai.singleRow ? 0 : row;
@@ -908,8 +884,6 @@
     const setMount = (m) => {
       P.mount = m;
       ridePose = null;
-      mountEyeGlow.setVisible(m === 'skeletal_horse_gold');
-      magmaHooves.forEach(glow => glow.setVisible(m === 'skeletal_horse_gold'));
       this.player.speed = m ? (AI_MOUNTS[m] ? AI_MOUNTS[m].speed : 260) : 165; // galope/trote
       this.player.radius = m ? 16 : 12;
       if (!m) {
@@ -1413,7 +1387,7 @@
     // rastro espectral no galope (skill 2 — clona o frame corrente, qualquer montaria)
     if (this.P.mount && this.player.moving && time - (this._ghostT || 0) > 95) {
       this._ghostT = time;
-      this.fxGhost();
+      this.fxGhost(this.P.mount === 'skeletal_horse_gold' ? 0xff7a20 : undefined);
     }
     this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
     this.mobs.forEach(m => { if (!m.walker.__dead) m.update(delta); });
