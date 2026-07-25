@@ -481,8 +481,8 @@
     {
       const cont = this.add.container(0, 0);
       const spr = this.add.sprite(0, 34, 'cursed-scarecrow-idle')
-        .setOrigin(0.5, 184 / 192).setScale(0.36);
-      const lbl = this.add.text(0, -48, 'Espantalho Amaldiçoado', {
+        .setOrigin(0.5, 184 / 192).setScale(0.52);
+      const lbl = this.add.text(0, -63, 'Espantalho Amaldiçoado', {
         fontFamily: 'sans-serif', fontSize: '12px', color: '#d9b6ff',
         stroke: '#000', strokeThickness: 3,
       }).setOrigin(0.5);
