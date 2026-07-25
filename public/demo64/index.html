@@ -94,6 +94,12 @@
   color: #5a3410; text-shadow: 0 1px 0 rgba(255,240,200,.4); margin: 8px 0 7px; }
 #inv h3:first-child { margin-top: 0; }
 .slots { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; }
+.inventory-reset {
+  width: 100%; margin-top: 8px; padding: 7px 8px; border: 1px solid #80552b;
+  border-radius: 5px; background: #3b2415; color: #f5d9a3;
+  font: 13px "Pixelify Sans", sans-serif; cursor: pointer;
+}
+.inventory-reset:hover { background: #56331b; color: #fff2c6; }
 .slot {
   aspect-ratio: 1; display: flex; align-items: center; justify-content: center;
   background: url('../assets/64/ui/tsui/slot.png') no-repeat center / 100% 100%;
@@ -229,6 +235,7 @@
   <div class="slots" id="slotsA"></div>
   <h3>Montarias</h3>
   <div class="slots" id="slotsM"></div>
+  <button class="inventory-reset" id="clearUnlockedMounts" type="button">Limpar montarias de recompensa</button>
 </div>
 <div id="hudReact"></div>
 <div id="codexHud" aria-label="Interface A.I.U.I.Codex paralela">
@@ -470,6 +477,18 @@ window.__unlockMount = id => {
     ], { duration: 700, easing: 'ease-out' });
   }
 };
+document.getElementById('clearUnlockedMounts').onclick = () => {
+  unlockedMounts.clear();
+  try { localStorage.removeItem(MOUNT_UNLOCK_KEY); } catch (_) {}
+  document.querySelectorAll('#slotsM .slot').forEach(slot => {
+    const item = MOUNTS_UI.find(([id]) => id === slot.dataset.id);
+    if (item && item[3]) slot.hidden = true;
+    slot.classList.remove('sel');
+  });
+  const foot = document.querySelector('#slotsM .slot[data-id="none"]');
+  if (foot) foot.classList.add('sel');
+  window.__equip && window.__equip('mount', 'none');
+};
 window.__unlockWeapon = id => {
   unlockedWeapons.add(id);
   try { localStorage.setItem(WEAPON_UNLOCK_KEY, JSON.stringify([...unlockedWeapons])); } catch (_) {}
@@ -562,6 +581,6 @@ addEventListener('keydown', e => {
   sync();
 })();
 </script>
-<script src="game.js?v=deer-king-polish-v1"></script>
+<script src="game.js?v=deer-king-hitbox-v1"></script>
 </body>
 </html>

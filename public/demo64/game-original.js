@@ -719,7 +719,7 @@
       foe = {
         walker, spr, cont, lbl, wander, last: 0, skillIndex: 0,
         attacking: false, damage: 12, hp: 600, hpMax: 600,
-        dead: false, enraged: false, isDeerKing: true,
+        dead: false, enraged: false, isDeerKing: true, hitRadius: 52,
       };
       this.mobs.push(wander);
       this.foes.push(foe);
@@ -1468,12 +1468,13 @@
       if (f.isDeerKing) {
         if (this.rollDrop(0.05)) unlockDeerReward('deer_king_antler', 'Galhada do Rei Cervo · 5%', '#dfffa2');
         if (this.rollDrop(0.03)) unlockDeerReward('meadow_cape', 'Capa da Campina · 3%', '#b9f69f');
-        if (this.rollDrop(0.01)) {
+        const forcedDeerDrop = new URLSearchParams(window.location.search).get('forceDeerDrop');
+        if (forcedDeerDrop === 'ancestral_deer' || (!forcedDeerDrop && this.rollDrop(0.01))) {
           window.__unlockMount && window.__unlockMount('ancestral_deer');
           celebrateMountDrop('ancestral_deer');
           unlockDeerReward('ancestral_deer', 'Montaria Rei Cervo · 1%', '#b9f6ff');
         }
-        if (this.rollDrop(0.001)) {
+        if (forcedDeerDrop === 'spring_deer' || (!forcedDeerDrop && this.rollDrop(0.001))) {
           window.__unlockMount && window.__unlockMount('spring_deer');
           celebrateMountDrop('spring_deer');
           unlockDeerReward('spring_deer', 'Montaria Rei Cervo Enfurecido · 0,1%', '#ff745c');
@@ -1862,7 +1863,8 @@
         f.last = time;
         this.deerKingAttack(f);
       }
-      if (d > COMBAT.range) continue; // fora da envergadura única: ninguém ataca
+      const playerReach = COMBAT.range + (f.hitRadius || 0);
+      if (d > playerReach) continue; // chefes grandes recebem golpes em toda a silhueta
       if (!f.isDeerKing && time - f.last >= COMBAT.mobCdMs) {
         f.last = time;
         this.mobStrike(f);
