@@ -739,17 +739,37 @@
     const slashArc = () => {
       const ang = Phaser.Math.DegToRad(DIR_ANG[P.dir] ?? 90);
       const wfx = WEAPON_FX[P.weapon] || {};
+      const lordMasLance = P.weapon === 'lord_mas_lance';
+      const attackTint = lordMasLance ? 0x79ffe6 : fxTint();
       const dx = Math.cos(ang), dy = Math.sin(ang);
       swingFlip = !swingFlip;
       // 2 camadas: NORMAL segura a leitura em fundo claro (neve!), ADD dá o glow
       const tex = wfx.lunge ? 'fx-lunge' : 'fx-slash';
-      const mk = (blend, alpha, scl) => this.add.image(doll.x + dx * 26, doll.y - 14 + dy * 26, tex)
+      const mk = (blend, alpha, scl, tint = attackTint) => this.add.image(doll.x + dx * 26, doll.y - 14 + dy * 26, tex)
         .setRotation(ang).setFlipY(swingFlip).setBlendMode(blend)
-        .setTint(fxTint()).setAlpha(alpha).setScale(scl).setDepth(doll.y + 40);
+        .setTint(tint).setAlpha(alpha).setScale(scl).setDepth(doll.y + 40);
       const base = mk(Phaser.BlendModes.NORMAL, 0.9, 0.55);
       const glow = mk(Phaser.BlendModes.ADD, 0.6, 0.62);
-      this.tweens.add({ targets: [base, glow], scale: wfx.lunge ? 0.9 : 1.05, alpha: 0,
-        duration: 190, ease: 'Cubic.easeOut', onComplete: () => { base.destroy(); glow.destroy(); } });
+      const core = lordMasLance ? mk(Phaser.BlendModes.ADD, 1, 0.38, 0xffffff) : null;
+      const outer = lordMasLance ? mk(Phaser.BlendModes.ADD, 0.42, 0.78, 0x42ffc8) : null;
+      const fxLayers = [base, glow, core, outer].filter(Boolean);
+      this.tweens.add({ targets: fxLayers, scale: lordMasLance ? 1.08 : (wfx.lunge ? 0.9 : 1.05), alpha: 0,
+        duration: lordMasLance ? 310 : 190, ease: 'Cubic.easeOut',
+        onComplete: () => fxLayers.forEach(layer => layer.destroy()) });
+      if (lordMasLance) {
+        const weaponLayers = [layers.wb, layers.wf].filter(layer => layer.visible);
+        weaponLayers.forEach(layer => layer.setBlendMode(Phaser.BlendModes.ADD).setTint(0xbaffea));
+        this.tweens.add({
+          targets: weaponLayers, alpha: 0.45, duration: 55, yoyo: true, repeat: 2,
+          onComplete: () => weaponLayers.forEach(layer =>
+            layer.setAlpha(1).clearTint().setBlendMode(Phaser.BlendModes.NORMAL)),
+        });
+        for (let i = 1; i <= 4; i++) {
+          this.time.delayedCall(i * 28, () =>
+            burst('fx-p-spark', doll.x + dx * (22 + i * 13), doll.y - 12 + dy * (22 + i * 13),
+              i % 2 ? 0x79ffe6 : 0xffffff, 4));
+        }
+      }
       const el = ELEMENTS[P.element];
       if (el) burst(el.p, doll.x + dx * 34, doll.y - 10 + dy * 34, el.tint, 10);
     };
