@@ -168,6 +168,9 @@
     this.load.image('clover-spider-idle', A + 'creatures/campo/clover_spider/idle.png');
     this.load.spritesheet('clover-spider-walk', A + 'creatures/campo/clover_spider/walk.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('clover-spider-attack', A + 'creatures/campo/clover_spider/attack.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('cursed-scarecrow-idle', A + 'creatures/campo/cursed_scarecrow/idle.png');
+    this.load.spritesheet('cursed-scarecrow-walk', A + 'creatures/campo/cursed_scarecrow/walk.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('cursed-scarecrow-attack', A + 'creatures/campo/cursed_scarecrow/attack.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('sheep', A + 'creatures/common/sheep/idle.png', { frameWidth: 64, frameHeight: 64 });
     for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
@@ -455,6 +458,42 @@
       foe = {
         walker, spr, cont, wander, last: 0, lunging: false,
         attackKey: 'swamp-ogre-attack', attacking: false, damage: 6,
+      };
+      this.mobs.push(wander);
+      this.foes.push(foe);
+    }
+    // Espantalho Amaldiçoado: conjura um corvo sombrio durante o ataque.
+    mk('cursed-scarecrow-walk', 'cursed-scarecrow-walk', 0, 5, 9, -1);
+    mk('cursed-scarecrow-attack', 'cursed-scarecrow-attack', 0, 4, 9, 0);
+    {
+      const cont = this.add.container(0, 0);
+      const spr = this.add.sprite(0, 34, 'cursed-scarecrow-idle')
+        .setOrigin(0.5, 184 / 192).setScale(0.72);
+      const lbl = this.add.text(0, -82, 'Espantalho Amaldiçoado', {
+        fontFamily: 'sans-serif', fontSize: '12px', color: '#d9b6ff',
+        stroke: '#000', strokeThickness: 3,
+      }).setOrigin(0.5);
+      cont.add([spr, lbl]);
+      let foe = null;
+      const walker = new FreeWalker(this, cont, {
+        tile: TILE, tx: 8, ty: 7, speed: 44, mode: 4, radius: 16,
+        walkablePx: walkablePxZone(ISLES.campo),
+        setAnim: (st, dir) => {
+          if (dir.includes('w')) spr.setFlipX(true);
+          else if (dir.includes('e')) spr.setFlipX(false);
+          if (foe && foe.attacking) return;
+          if (st === 'walk') spr.play('cursed-scarecrow-walk', true);
+          else { spr.anims.stop(); spr.setTexture('cursed-scarecrow-idle'); }
+          cont.setDepth(cont.y);
+        },
+      });
+      const wander = new HomeWanderer(this, walker, {
+        radius: 115, pauseChance: 0.4, moveMin: 650, moveMax: 1250,
+      });
+      foe = {
+        walker, spr, cont, wander, last: 0, lunging: false,
+        attackKey: 'cursed-scarecrow-attack', attacking: false, damage: 4,
+        hp: 48, hpMax: 48, dead: false, isCursedScarecrow: true,
       };
       this.mobs.push(wander);
       this.foes.push(foe);
@@ -1250,6 +1289,18 @@
           f.walker.__dead = false;
           f.cont.setVisible(true);
           f.spr.clearTint().setTexture('clover-spider-idle');
+          f.walker.setAnim('idle', 'e');
+        });
+        return;
+      }
+
+      if (f.isCursedScarecrow) {
+        this.time.delayedCall(7000, () => {
+          f.hp = f.hpMax;
+          f.dead = false;
+          f.walker.__dead = false;
+          f.cont.setVisible(true);
+          f.spr.clearTint().setTexture('cursed-scarecrow-idle');
           f.walker.setAnim('idle', 'e');
         });
         return;
