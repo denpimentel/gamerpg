@@ -190,8 +190,9 @@
       }
     }
     for (const [m, cfg] of Object.entries(AI_MOUNTS)) {
-      this.load.spritesheet(`mtai-${m}-idle`, `${A}player/mount/${m}/idle.png`, { frameWidth: cfg.frame, frameHeight: cfg.frame });
-      this.load.spritesheet(`mtai-${m}-walk`, `${A}player/mount/${m}/walk.png`, { frameWidth: cfg.frame, frameHeight: cfg.frame });
+      const mountVersion = m === 'skeletal_horse_gold' ? '?v=green-eye-v2' : '';
+      this.load.spritesheet(`mtai-${m}-idle`, `${A}player/mount/${m}/idle.png${mountVersion}`, { frameWidth: cfg.frame, frameHeight: cfg.frame });
+      this.load.spritesheet(`mtai-${m}-walk`, `${A}player/mount/${m}/walk.png${mountVersion}`, { frameWidth: cfg.frame, frameHeight: cfg.frame });
     }
     this.load.spritesheet('aihero-idle', A + 'player/hero_ia/idle.png', { frameWidth: 92, frameHeight: 92 });
     this.load.spritesheet('aihero-walk', A + 'player/hero_ia/walk.png', { frameWidth: 92, frameHeight: 92 });
