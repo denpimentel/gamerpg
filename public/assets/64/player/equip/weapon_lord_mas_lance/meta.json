@@ -1,0 +1,10 @@
+{
+  "id": "lord_mas_lance",
+  "name": "Lança de Lord Mas",
+  "type": "weapon",
+  "attackAnimation": "thrust",
+  "dropSource": "lord_mas",
+  "dropChance": 0.005,
+  "persistentUnlock": true,
+  "effectColor": "#62ffd2"
+}
