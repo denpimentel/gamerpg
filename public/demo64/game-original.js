@@ -163,7 +163,7 @@
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
       this.load.spritesheet('ai' + n + '-walk', A + 'creatures/neve/' + n + '/walk.png', { frameWidth: 92, frameHeight: 92 });
     }
-    // Cavaleiro da Morte v2: chefe montado, frames grandes e âncora nos cascos.
+    // Lord Mas: chefe montado, frames grandes e âncora nos cascos.
     this.load.image('death-knight-idle', A + 'creatures/neve/ghost_knight/idle.png');
     this.load.spritesheet('death-knight-walk', A + 'creatures/neve/ghost_knight/walk.png', { frameWidth: 320, frameHeight: 192 });
     this.load.spritesheet('death-knight-attack', A + 'creatures/neve/ghost_knight/attack.png', { frameWidth: 320, frameHeight: 192 });
@@ -480,7 +480,7 @@
       const cont = this.add.container(0, 0);
       const spr = this.add.sprite(0, 34, 'death-knight-idle')
         .setOrigin(0.5, 184 / 192).setScale(0.9);
-      const lbl = this.add.text(0, -126, 'Cavaleiro da Morte · 120/120', {
+      const lbl = this.add.text(0, -126, 'Lord Mas', {
         fontFamily: 'sans-serif', fontSize: '13px', fontStyle: 'bold',
         color: '#b9f6ff', stroke: '#06131a', strokeThickness: 4,
       }).setOrigin(0.5);
@@ -1010,10 +1010,29 @@
           onComplete: () => ring.destroy() });
       }
 
+      const halo = this.add.image(cx, cy + 2, 'fx-orb')
+        .setScrollFactor(0).setDepth(8993).setTint(tint)
+        .setBlendMode(Phaser.BlendModes.ADD).setScale(golden ? 3.4 : 2.8).setAlpha(0);
+      this.tweens.add({
+        targets: halo, alpha: { from: 0, to: golden ? 0.72 : 0.55 },
+        scale: golden ? 4.2 : 3.5, duration: 520, ease: 'Sine.easeOut',
+        yoyo: true, repeat: golden ? 4 : 3,
+        onComplete: () => halo.destroy(),
+      });
+      const aura = this.add.image(cx, cy + 2, 'fx-ring')
+        .setScrollFactor(0).setDepth(8994).setTint(tint)
+        .setBlendMode(Phaser.BlendModes.ADD).setScale(golden ? 1.45 : 1.15).setAlpha(0);
+      this.tweens.add({
+        targets: aura, alpha: { from: 0, to: 0.95 }, angle: golden ? 270 : 180,
+        scale: golden ? 1.8 : 1.45, duration: golden ? 900 : 1100,
+        ease: 'Sine.easeInOut', yoyo: true, repeat: golden ? 2 : 1,
+        onComplete: () => aura.destroy(),
+      });
+
       const preview = this.add.image(cx, cy + 20, `mtai-${reward}-idle`)
         .setScrollFactor(0).setDepth(8995).setOrigin(0.5, 0.95)
         .setScale(0.15).setAlpha(0).setTint(golden ? 0xffed91 : 0xffffff);
-      this.tweens.add({ targets: preview, alpha: 1, scale: golden ? 1.02 : 0.9,
+      this.tweens.add({ targets: preview, alpha: 1, scale: golden ? 0.72 : 0.62,
         y: cy - 2, duration: golden ? 700 : 520, ease: 'Back.easeOut',
         hold: golden ? 2600 : 1900, yoyo: true, onComplete: () => preview.destroy() });
 
@@ -1061,15 +1080,13 @@
             ? 'DROP LENDÁRIO!\\nCavalo-Esqueleto Dourado · 0,1%'
             : 'RECOMPENSA RARA!\\nCavalo-Esqueleto · 1%',
             golden ? '#ffd75a' : '#b9f6ff');
-        } else {
-          announceReward('Cavaleiro da Morte derrotado\\nNenhuma montaria desta vez', '#d7dde8');
         }
         this.time.delayedCall(5000, () => {
           f.hp = f.hpMax;
           f.dead = false;
           f.walker.__dead = false;
           f.cont.setVisible(true);
-          f.lbl.setText(`Cavaleiro da Morte · ${f.hp}/${f.hpMax}`);
+          f.lbl.setText('Lord Mas');
           f.spr.clearTint().setTexture('death-knight-idle');
           f.walker.setAnim('idle', 'e');
         });
@@ -1078,7 +1095,6 @@
     this.damageFoe = (f, amount) => {
       if (!f || f.dead || !f.hpMax) return;
       f.hp = Math.max(0, f.hp - amount);
-      if (f.lbl) f.lbl.setText(`Cavaleiro da Morte · ${f.hp}/${f.hpMax}`);
       if (f.hp <= 0) this.defeatFoe(f);
     };
     this.mobStrike = (f) => {
