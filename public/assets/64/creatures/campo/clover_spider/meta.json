@@ -1,0 +1,22 @@
+{
+  "id": "clover_spider",
+  "name": "Aranha de Trevo",
+  "biome": "campo",
+  "role": "controller",
+  "frameWidth": 192,
+  "frameHeight": 192,
+  "baselineY": 184,
+  "facing": "east",
+  "animations": {
+    "idle": { "frames": 1 },
+    "walk": { "frames": 6, "fps": 10, "loop": true },
+    "attack": { "frames": 6, "fps": 10, "loop": false }
+  },
+  "combat": {
+    "damage": 3,
+    "speed": 52,
+    "attackType": "clover_web",
+    "slowMultiplier": 0.55,
+    "slowDurationMs": 1800
+  }
+}
