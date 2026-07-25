@@ -175,9 +175,9 @@
     this.load.image('cursed-scarecrow-idle', A + 'creatures/campo/cursed_scarecrow/idle.png?v=small1');
     this.load.spritesheet('cursed-scarecrow-walk', A + 'creatures/campo/cursed_scarecrow/walk.png?v=small1', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('cursed-scarecrow-attack', A + 'creatures/campo/cursed_scarecrow/attack.png?v=small1', { frameWidth: 192, frameHeight: 192 });
-    this.load.image('meadow-turtle-idle', A + 'creatures/campo/meadow_turtle/idle.png?v=padded1');
-    this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=padded1', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=padded1', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('meadow-turtle-idle', A + 'creatures/campo/meadow_turtle/idle.png?v=nosefix1');
+    this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=nosefix1', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=nosefix1', { frameWidth: 192, frameHeight: 192 });
     this.load.image('deer-king-idle', A + 'creatures/campo/deer_king/idle.png?v=cartoon1');
     this.load.image('deer-king-enraged', A + 'creatures/campo/deer_king/enraged.png?v=polish1');
     this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=walk3', { frameWidth: 256, frameHeight: 256 });
@@ -651,8 +651,8 @@
     {
       const cont = this.add.container(0, 0);
       const spr = this.add.sprite(0, 34, 'meadow-turtle-idle')
-        .setOrigin(0.5, 184 / 192).setScale(0.50);
-      const lbl = this.add.text(0, -54, 'Tartaruga do Prado', {
+        .setOrigin(0.5, 184 / 192).setScale(0.40);
+      const lbl = this.add.text(0, -47, 'Tartaruga do Prado', {
         fontFamily: 'sans-serif', fontSize: '12px', color: '#e8f5a4',
         stroke: '#000', strokeThickness: 3,
       }).setOrigin(0.5);
