@@ -13,10 +13,17 @@
     "attack": { "frames": 6, "fps": 10, "loop": false }
   },
   "combat": {
+    "hp": 36,
     "damage": 3,
     "speed": 52,
     "attackType": "clover_web",
     "slowMultiplier": 0.55,
-    "slowDurationMs": 1800
+    "slowDurationMs": 1800,
+    "killReward": {
+      "type": "buff",
+      "id": "clover_luck",
+      "durationMs": 180000,
+      "dropChanceMultiplier": 1.3
+    }
   }
 }
