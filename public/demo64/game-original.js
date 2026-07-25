@@ -994,7 +994,7 @@
     const celebrateMountDrop = (reward) => {
       const golden = reward === 'skeletal_horse_gold';
       const cx = this.scale.width / 2, cy = this.scale.height / 2;
-      const tint = golden ? 0xffd43b : 0x79e8ff;
+      const tint = golden ? 0xff4b18 : 0x79e8ff;
       const flash = this.add.rectangle(cx, cy, this.scale.width, this.scale.height,
         golden ? 0xffc928 : 0x9befff, golden ? 0.34 : 0.18)
         .setScrollFactor(0).setDepth(8990);
@@ -1031,7 +1031,7 @@
 
       const preview = this.add.image(cx, cy + 20, `mtai-${reward}-idle`)
         .setScrollFactor(0).setDepth(8995).setOrigin(0.5, 0.95)
-        .setScale(0.15).setAlpha(0).setTint(golden ? 0xffed91 : 0xffffff);
+        .setScale(0.15).setAlpha(0);
       this.tweens.add({ targets: preview, alpha: 1, scale: golden ? 0.72 : 0.62,
         y: cy - 2, duration: golden ? 700 : 520, ease: 'Back.easeOut',
         hold: golden ? 2600 : 1900, yoyo: true, onComplete: () => preview.destroy() });
@@ -1040,7 +1040,8 @@
       for (let i = 0; i < sparks; i++) {
         const angle = (Math.PI * 2 * i / sparks) + Math.random() * 0.2;
         const radius = golden ? 150 + Math.random() * 150 : 110 + Math.random() * 100;
-        const spark = this.add.image(cx, cy + 10, i % 4 === 0 ? 'fx-orb' : 'fx-p-spark')
+        const sparkTex = golden ? 'fx-p-fire' : (i % 4 === 0 ? 'fx-orb' : 'fx-p-spark');
+        const spark = this.add.image(cx, cy + 10, sparkTex)
           .setScrollFactor(0).setDepth(8994).setTint(tint)
           .setBlendMode(Phaser.BlendModes.ADD).setScale(golden ? 0.7 : 0.5).setAlpha(0);
         this.tweens.add({ targets: spark, alpha: { from: 0, to: 1 },
@@ -1049,6 +1050,18 @@
           duration: golden ? 1100 : 820, ease: 'Cubic.easeOut', onComplete: () => spark.destroy() });
       }
       if (golden) {
+        for (let i = 0; i < 18; i++) {
+          const flame = this.add.image(cx - 68 + Math.random() * 136, cy + 34, 'fx-p-fire')
+            .setScrollFactor(0).setDepth(8996).setBlendMode(Phaser.BlendModes.ADD)
+            .setTint(i % 3 === 0 ? 0xffd34a : 0xff431c).setAlpha(0).setScale(0.45 + Math.random() * 0.4);
+          this.tweens.add({
+            targets: flame, alpha: { from: 0, to: 0.95 },
+            x: flame.x + (Math.random() - 0.5) * 34,
+            y: cy - 55 - Math.random() * 85, scale: 0,
+            delay: Math.random() * 900, duration: 700 + Math.random() * 450,
+            repeat: 1, ease: 'Sine.easeOut', onComplete: () => flame.destroy(),
+          });
+        }
         const legendary = this.add.text(cx, cy - 138, '✦  LENDÁRIO  ✦', {
           fontFamily: '"Pixelify Sans", sans-serif', fontSize: '34px', fontStyle: 'bold',
           color: '#fff2a8', stroke: '#6b3300', strokeThickness: 8,
