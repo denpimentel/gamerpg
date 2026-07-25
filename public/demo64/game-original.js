@@ -163,9 +163,9 @@
     // --- creatures/ ---
     this.load.spritesheet('goblin', A + 'creatures/pedra/goblin_tocha/sheet.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('tnt', A + 'creatures/deserto/goblin_tnt/sheet.png', { frameWidth: 192, frameHeight: 192 });
-    this.load.image('swamp-ogre-idle', A + 'creatures/campo/swamp_ogre/idle.png?v=angry1');
-    this.load.spritesheet('swamp-ogre-walk', A + 'creatures/campo/swamp_ogre/walk.png?v=angry1', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('swamp-ogre-attack', A + 'creatures/campo/swamp_ogre/attack.png?v=angry1', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('swamp-ogre-idle', A + 'creatures/campo/swamp_ogre/idle.png?v=club1');
+    this.load.spritesheet('swamp-ogre-walk', A + 'creatures/campo/swamp_ogre/walk.png?v=club1', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('swamp-ogre-attack', A + 'creatures/campo/swamp_ogre/attack.png?v=club1', { frameWidth: 192, frameHeight: 192 });
     this.load.image('mossy-boar-idle', A + 'creatures/campo/mossy_boar/idle.png');
     this.load.spritesheet('mossy-boar-walk', A + 'creatures/campo/mossy_boar/walk.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('mossy-boar-attack', A + 'creatures/campo/mossy_boar/attack.png', { frameWidth: 192, frameHeight: 192 });
@@ -471,6 +471,7 @@
       foe = {
         walker, spr, cont, wander, last: 0, lunging: false,
         attackKey: 'swamp-ogre-attack', attacking: false, damage: 6,
+        isSwampOgre: true, attackImpactMs: 400, knockbackDistance: 96,
       };
       this.mobs.push(wander);
       this.foes.push(foe);
@@ -1586,12 +1587,53 @@
           f.attacking = false;
           f.walker.setAnim(f.walker.moving ? 'walk' : 'idle', f.walker.dir);
         });
-        this.time.delayedCall(350, () => {
+        this.time.delayedCall(f.attackImpactMs || 350, () => {
           if (f.dead) return;
           const hitDistance = Math.hypot(f.walker.x - this.player.x, f.walker.y - this.player.y);
           if (hitDistance > COMBAT.range * 1.35) return;
           this.flashDoll();
           this.setHp(this.P.hp - (f.damage || 3));
+          if (f.isSwampOgre) {
+            const dx = this.player.x - f.walker.x;
+            const dy = this.player.y - f.walker.y;
+            const len = Math.hypot(dx, dy) || 1;
+            const nx = dx / len, ny = dy / len;
+            const startX = this.player.x, startY = this.player.y;
+            let targetX = startX, targetY = startY;
+            // Resolve em passos curtos pela mesma colisão do jogador. Assim o
+            // golpe nunca atravessa água/árvores nem separa cavaleiro e montaria.
+            for (let pushed = 0; pushed < f.knockbackDistance; pushed += 6) {
+              const nextX = targetX + nx * 6;
+              const nextY = targetY + ny * 6;
+              let moved = false;
+              if (this.player.free(nextX, targetY)) { targetX = nextX; moved = true; }
+              if (this.player.free(targetX, nextY)) { targetY = nextY; moved = true; }
+              if (!moved) break;
+            }
+            this.player.x = targetX;
+            this.player.y = targetY;
+            this.playerKnockbackUntil = this.time.now + 260;
+            if (this._ogrePushTween) this._ogrePushTween.stop();
+            this._ogrePushTween = this.tweens.add({
+              targets: this.player.sprite,
+              x: Math.round(targetX), y: Math.round(targetY),
+              duration: 240, ease: 'Cubic.easeOut',
+              onComplete: () => {
+                this.player.sprite.setPosition(Math.round(this.player.x), Math.round(this.player.y));
+                this._ogrePushTween = null;
+              },
+            });
+            const impactX = f.walker.x + nx * 34;
+            const impactY = f.walker.y + ny * 24 + 8;
+            const ring = this.add.image(impactX, impactY, 'fx-ring')
+              .setTint(0xffc46b).setBlendMode(Phaser.BlendModes.ADD)
+              .setScale(0.25, 0.13).setAlpha(0.9).setDepth(impactY + 5);
+            this.tweens.add({ targets: ring, scaleX: 1.25, scaleY: 0.62,
+              alpha: 0, duration: 300, ease: 'Cubic.easeOut',
+              onComplete: () => ring.destroy() });
+            burst('fx-p-dust', impactX, impactY, 0xd09a5a, 13);
+            this.cameras.main.shake(180, 0.006);
+          }
           if (f.isCloverSpider) {
             this.webSlowUntil = Math.max(this.webSlowUntil || 0, this.time.now + 1800);
             const web = this.add.image(0, 8, 'fx-ring').setTint(0xbaff67)
@@ -1894,7 +1936,9 @@
       ? (AI_MOUNTS[this.P.mount] ? AI_MOUNTS[this.P.mount].speed : 260)
       : 165;
     this.player.speed = time < (this.webSlowUntil || 0) ? baseSpeed * 0.55 : baseSpeed;
-    this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
+    if (time >= (this.playerKnockbackUntil || 0)) {
+      this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
+    }
     this.mobs.forEach(m => { if (!m.walker.__dead) m.update(delta); });
     updateEvilSpirits(this, time, delta);
   }
