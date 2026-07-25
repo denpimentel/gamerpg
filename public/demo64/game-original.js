@@ -588,7 +588,7 @@
       foe = {
         walker, spr, cont, wander, last: 0, lunging: false,
         attackKey: 'clover-spider-attack', attacking: false, damage: 3,
-        isCloverSpider: true,
+        hp: 36, hpMax: 36, dead: false, isCloverSpider: true,
       };
       this.mobs.push(wander);
       this.foes.push(foe);
@@ -1097,6 +1097,32 @@
       this.tweens.add({ targets: msg, alpha: 1, y: 78, duration: 220, hold: 2200,
         yoyo: true, onComplete: () => msg.destroy() });
     };
+    this.cloverBuffText = this.add.text(this.scale.width - 20, 104, '', {
+      fontFamily: '"Pixelify Sans", sans-serif', fontSize: '17px', fontStyle: 'bold',
+      color: '#dfff7d', stroke: '#15320b', strokeThickness: 5,
+    }).setOrigin(1, 0).setScrollFactor(0).setDepth(8500).setVisible(false);
+    this.dropChanceMultiplier = () =>
+      this.time.now < (P.cloverBuffUntil || 0) ? 1.30 : 1;
+    this.rollDrop = (baseChance) =>
+      Math.random() < Math.min(1, baseChance * this.dropChanceMultiplier());
+    this.grantCloverBuff = () => {
+      P.cloverBuffUntil = this.time.now + 180000;
+      announceReward('BUFF ATIVO!\nSorte do Trevo · +30% de drop · 3 min', '#dfff7d');
+      const cx = this.scale.width / 2, cy = this.scale.height / 2;
+      for (let i = 0; i < 18; i++) {
+        const angle = Math.PI * 2 * i / 18;
+        const spark = this.add.image(cx, cy, i % 3 === 0 ? 'fx-orb' : 'fx-p-spark')
+          .setScrollFactor(0).setDepth(8994).setBlendMode(Phaser.BlendModes.ADD)
+          .setTint(i % 3 === 0 ? 0xf1ff85 : 0x66e339).setScale(0.35 + Math.random() * 0.25);
+        this.tweens.add({
+          targets: spark,
+          x: cx + Math.cos(angle) * (80 + Math.random() * 90),
+          y: cy + Math.sin(angle) * (55 + Math.random() * 65),
+          angle: 180, alpha: 0, scale: 0, duration: 850 + Math.random() * 300,
+          ease: 'Cubic.easeOut', onComplete: () => spark.destroy(),
+        });
+      }
+    };
     const celebrateMountDrop = (reward) => {
       const golden = reward === 'skeletal_horse_gold';
       const cx = this.scale.width / 2, cy = this.scale.height / 2;
@@ -1216,11 +1242,27 @@
       f.walker.__dead = true;
       f.cont.setVisible(false);
 
+      if (f.isCloverSpider) {
+        this.grantCloverBuff();
+        this.time.delayedCall(7000, () => {
+          f.hp = f.hpMax;
+          f.dead = false;
+          f.walker.__dead = false;
+          f.cont.setVisible(true);
+          f.spr.clearTint().setTexture('clover-spider-idle');
+          f.walker.setAnim('idle', 'e');
+        });
+        return;
+      }
+
       if (f.isDeathKnight) {
         const forced = qs.get('forceMount');
+        const dropMultiplier = this.dropChanceMultiplier();
         const roll = Math.random();
         const reward = forced === 'skeletal_horse' || forced === 'skeletal_horse_gold'
-          ? forced : roll < 0.001 ? 'skeletal_horse_gold' : roll < 0.011 ? 'skeletal_horse' : null;
+          ? forced
+          : roll < 0.001 * dropMultiplier ? 'skeletal_horse_gold'
+            : roll < 0.011 * dropMultiplier ? 'skeletal_horse' : null;
         if (reward) {
           const golden = reward === 'skeletal_horse_gold';
           window.__unlockMount && window.__unlockMount(reward);
@@ -1231,7 +1273,7 @@
             golden ? '#ffd75a' : '#b9f6ff');
         }
         const forcedWeapon = qs.get('forceWeapon');
-        const weaponReward = forcedWeapon === 'lord_mas_lance' || Math.random() < 0.005;
+        const weaponReward = forcedWeapon === 'lord_mas_lance' || this.rollDrop(0.005);
         if (weaponReward) {
           window.__unlockWeapon && window.__unlockWeapon('lord_mas_lance');
           celebrateWeaponDrop();
@@ -1515,6 +1557,19 @@
   }
 
   function update(time, delta) {
+    const cloverRemaining = Math.max(0, (this.P.cloverBuffUntil || 0) - time);
+    if (this.cloverBuffText) {
+      this.cloverBuffText.setX(this.scale.width - 20);
+      if (cloverRemaining > 0) {
+        const totalSeconds = Math.ceil(cloverRemaining / 1000);
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = String(totalSeconds % 60).padStart(2, '0');
+        this.cloverBuffText.setText(`☘ Sorte do Trevo · +30% · ${minutes}:${seconds}`)
+          .setVisible(true);
+      } else {
+        this.cloverBuffText.setVisible(false);
+      }
+    }
     // --- combate automático: UMA distância por par decide os DOIS lados.
     // SEM CONGELAMENTO: atacar nunca trava movimento (nem do player nem dos bichos) —
     // o fraco sempre pode fugir/desviar; o golpe anima por cima do deslocamento.
