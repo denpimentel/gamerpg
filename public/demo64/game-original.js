@@ -162,6 +162,9 @@
     this.load.image('swamp-ogre-idle', A + 'creatures/campo/swamp_ogre/idle.png');
     this.load.spritesheet('swamp-ogre-walk', A + 'creatures/campo/swamp_ogre/walk.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('swamp-ogre-attack', A + 'creatures/campo/swamp_ogre/attack.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('mossy-boar-idle', A + 'creatures/campo/mossy_boar/idle.png');
+    this.load.spritesheet('mossy-boar-walk', A + 'creatures/campo/mossy_boar/walk.png', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('mossy-boar-attack', A + 'creatures/campo/mossy_boar/attack.png', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('sheep', A + 'creatures/common/sheep/idle.png', { frameWidth: 64, frameHeight: 64 });
     for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
@@ -511,6 +514,43 @@
         isDeathKnight: true, hp: 120, hpMax: 120, dead: false,
       };
       walker.foe = foe;
+      this.mobs.push(wander);
+      this.foes.push(foe);
+    }
+    // Javali Musgoso: primeiro monstro da nova fauna original do CAMPO.
+    // Seis frames por estado, escala fixa e cascos na baseline y=184.
+    mk('mossy-boar-walk', 'mossy-boar-walk', 0, 5, 10, -1);
+    mk('mossy-boar-attack', 'mossy-boar-attack', 0, 5, 10, 0);
+    {
+      const cont = this.add.container(0, 0);
+      const spr = this.add.sprite(0, 34, 'mossy-boar-idle')
+        .setOrigin(0.5, 184 / 192).setScale(0.72);
+      const lbl = this.add.text(0, -76, 'Javali Musgoso', {
+        fontFamily: 'sans-serif', fontSize: '12px', color: '#e9ff9f',
+        stroke: '#000', strokeThickness: 3,
+      }).setOrigin(0.5);
+      cont.add([spr, lbl]);
+      let foe = null;
+      const walker = new FreeWalker(this, cont, {
+        tile: TILE, tx: 10, ty: 10, speed: 66, mode: 4, radius: 17,
+        walkablePx: walkablePxZone(ISLES.campo),
+        setAnim: (st, dir) => {
+          if (dir.includes('w')) spr.setFlipX(true);
+          else if (dir.includes('e')) spr.setFlipX(false);
+          if (foe && foe.attacking) return;
+          if (st === 'walk') spr.play('mossy-boar-walk', true);
+          else { spr.anims.stop(); spr.setTexture('mossy-boar-idle'); }
+          cont.setDepth(cont.y);
+        },
+      });
+      const wander = new HomeWanderer(this, walker, {
+        radius: 145, pauseChance: 0.18, moveMin: 750, moveMax: 1450,
+      });
+      foe = {
+        walker, spr, cont, wander, last: 0, lunging: false,
+        attackKey: 'mossy-boar-attack', attacking: false, damage: 5,
+        isMossyBoar: true,
+      };
       this.mobs.push(wander);
       this.foes.push(foe);
     }
