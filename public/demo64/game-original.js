@@ -167,9 +167,9 @@
     this.load.image('cursed-scarecrow-idle', A + 'creatures/campo/cursed_scarecrow/idle.png?v=3');
     this.load.spritesheet('cursed-scarecrow-walk', A + 'creatures/campo/cursed_scarecrow/walk.png?v=3', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('cursed-scarecrow-attack', A + 'creatures/campo/cursed_scarecrow/attack.png?v=3', { frameWidth: 192, frameHeight: 192 });
-    this.load.image('meadow-war-bull-idle', A + 'creatures/campo/meadow_war_bull/idle.png?v=1');
-    this.load.spritesheet('meadow-war-bull-walk', A + 'creatures/campo/meadow_war_bull/walk.png?v=1', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('meadow-war-bull-attack', A + 'creatures/campo/meadow_war_bull/attack.png?v=1', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('meadow-turtle-idle', A + 'creatures/campo/meadow_turtle/idle.png?v=1');
+    this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=1', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=1', { frameWidth: 192, frameHeight: 192 });
     for (const n of ['yeti', 'golem', 'wolf']) { // IA PixelLab: 92px, idle 1col / walk 6col, linhas n/w/s/e
       this.load.spritesheet('ai' + n + '-idle', A + 'creatures/neve/' + n + '/idle.png', { frameWidth: 92, frameHeight: 92 });
       this.load.spritesheet('ai' + n + '-walk', A + 'creatures/neve/' + n + '/walk.png', { frameWidth: 92, frameHeight: 92 });
@@ -630,28 +630,28 @@
       this.mobs.push(wander);
       this.foes.push(foe);
     }
-    // Touro de Guerra do Prado: tanque pesado com investida curta.
-    mk('meadow-war-bull-walk', 'meadow-war-bull-walk', 0, 5, 8, -1);
-    mk('meadow-war-bull-attack', 'meadow-war-bull-attack', 0, 5, 11, 0);
+    // Tartaruga do Prado: tanque lento que ataca girando dentro do casco.
+    mk('meadow-turtle-walk', 'meadow-turtle-walk', 0, 5, 8, -1);
+    mk('meadow-turtle-attack', 'meadow-turtle-attack', 0, 5, 12, 0);
     {
       const cont = this.add.container(0, 0);
-      const spr = this.add.sprite(0, 34, 'meadow-war-bull-idle')
-        .setOrigin(0.5, 184 / 192).setScale(0.76);
-      const lbl = this.add.text(0, -78, 'Touro de Guerra do Prado', {
-        fontFamily: 'sans-serif', fontSize: '12px', color: '#f5e4a6',
+      const spr = this.add.sprite(0, 34, 'meadow-turtle-idle')
+        .setOrigin(0.5, 184 / 192).setScale(0.72);
+      const lbl = this.add.text(0, -76, 'Tartaruga do Prado', {
+        fontFamily: 'sans-serif', fontSize: '12px', color: '#e8f5a4',
         stroke: '#000', strokeThickness: 3,
       }).setOrigin(0.5);
       cont.add([spr, lbl]);
       let foe = null;
       const walker = new FreeWalker(this, cont, {
-        tile: TILE, tx: 10, ty: 7, speed: 42, mode: 4, radius: 20,
+        tile: TILE, tx: 10, ty: 7, speed: 36, mode: 4, radius: 19,
         walkablePx: walkablePxZone(ISLES.campo),
         setAnim: (st, dir) => {
           if (dir.includes('w')) spr.setFlipX(true);
           else if (dir.includes('e')) spr.setFlipX(false);
           if (foe && foe.attacking) return;
-          if (st === 'walk') spr.play('meadow-war-bull-walk', true);
-          else { spr.anims.stop(); spr.setTexture('meadow-war-bull-idle'); }
+          if (st === 'walk') spr.play('meadow-turtle-walk', true);
+          else { spr.anims.stop(); spr.setTexture('meadow-turtle-idle'); }
           cont.setDepth(cont.y);
         },
       });
@@ -660,8 +660,8 @@
       });
       foe = {
         walker, spr, cont, wander, last: 0, lunging: false,
-        attackKey: 'meadow-war-bull-attack', attacking: false, damage: 8,
-        hp: 84, hpMax: 84, dead: false, isMeadowWarBull: true,
+        attackKey: 'meadow-turtle-attack', attacking: false, damage: 7,
+        hp: 96, hpMax: 96, dead: false, isMeadowTurtle: true,
       };
       this.mobs.push(wander);
       this.foes.push(foe);
@@ -1324,13 +1324,13 @@
         return;
       }
 
-      if (f.isMeadowWarBull) {
+      if (f.isMeadowTurtle) {
         this.time.delayedCall(8000, () => {
           f.hp = f.hpMax;
           f.dead = false;
           f.walker.__dead = false;
           f.cont.setVisible(true);
-          f.spr.clearTint().setTexture('meadow-war-bull-idle');
+          f.spr.clearTint().setTexture('meadow-turtle-idle');
           f.walker.setAnim('idle', 'e');
         });
         return;

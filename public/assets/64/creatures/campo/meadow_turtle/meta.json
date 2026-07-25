@@ -1,6 +1,6 @@
 {
-  "id": "meadow_war_bull",
-  "name": "Touro de Guerra do Prado",
+  "id": "meadow_turtle",
+  "name": "Tartaruga do Prado",
   "biome": "campo",
   "role": "tank",
   "frameWidth": 192,
@@ -10,13 +10,13 @@
   "animations": {
     "idle": { "frames": 1 },
     "walk": { "frames": 6, "fps": 8, "loop": true },
-    "attack": { "frames": 6, "fps": 11, "loop": false }
+    "attack": { "frames": 6, "fps": 12, "loop": false }
   },
   "combat": {
-    "hp": 84,
-    "damage": 8,
-    "speed": 42,
-    "attackType": "short_charge",
+    "hp": 96,
+    "damage": 7,
+    "speed": 36,
+    "attackType": "shell_spin",
     "respawnMs": 8000
   }
 }
