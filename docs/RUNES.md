@@ -25,12 +25,15 @@ As probabilidades normais de drop precisam continuar separadas do botão tempor�
 - apresentação dos oito slots no inventário;
 - persistência e salvamento das runas aplicadas.
 
-## Conceitos gráficos: Runa de Ataque
+## Direção gráfica escolhida: Runa de Ataque
 
-Três opções 64×64 foram preparadas para escolha:
+A opção de obsidiana foi escolhida como base oficial da Runa de Ataque:
 
-1. **Pedra Antiga** — rocha cinza irregular com espada vermelha gravada.
-2. **Obsidiana** — fragmento escuro com espada diagonal e fissuras incandescentes.
-3. **Terracota** — pedra arredondada com espada dourada de leitura simples.
+- a pedra, o formato, as fissuras laranjas e o contorno permanecem iguais;
+- somente a espada gravada muda de cor conforme a raridade;
+- **Comum:** espada branca/prateada;
+- **Rara:** espada azul;
+- **Épica:** espada roxa;
+- **Lendária:** espada dourada.
 
-Os arquivos estão em `public/assets/64/runes/concepts/`. Nenhuma opção é definitiva até a escolha visual.
+Os arquivos definitivos estão em `public/assets/64/runes/attack/`. Os conceitos descartados continuam em `public/assets/64/runes/concepts/` como histórico visual.
