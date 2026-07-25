@@ -409,6 +409,7 @@ addEventListener('keydown', e => {
 const WEAPONS_UI = [
   ['longsword', 'Espada longa'], ['dagger', 'Adaga'], ['mace', 'Maça'],
   ['waraxe', 'Machado'], ['spear', 'Lança'],
+  ['lord_mas_lance', 'Lança de Lord Mas', 'lord_mas_lance', true],
 ];
 const ARMORS_UI = [
   ['shirt', 'Camisa'], ['leather', 'Couro'], ['chain', 'Cota de malha'],
@@ -424,9 +425,13 @@ const MOUNTS_UI = [
   ['skeletal_horse_gold', 'Cavalo-Esqueleto Dourado', 'mount_skeletal_horse_gold', true],
 ];
 const MOUNT_UNLOCK_KEY = 'gamerpg.unlockedMounts';
+const WEAPON_UNLOCK_KEY = 'gamerpg.unlockedWeapons';
 let unlockedMounts;
+let unlockedWeapons;
 try { unlockedMounts = new Set(JSON.parse(localStorage.getItem(MOUNT_UNLOCK_KEY) || '[]')); }
 catch (_) { unlockedMounts = new Set(); }
+try { unlockedWeapons = new Set(JSON.parse(localStorage.getItem(WEAPON_UNLOCK_KEY) || '[]')); }
+catch (_) { unlockedWeapons = new Set(); }
 function buildSlots(elId, items, kind) {
   const el = document.getElementById(elId);
   for (const [id, label, icon, locked] of items) {
@@ -434,6 +439,7 @@ function buildSlots(elId, items, kind) {
     b.className = 'slot';
     b.dataset.id = id;
     if (kind === 'mount' && locked && !unlockedMounts.has(id)) b.hidden = true;
+    if (kind === 'weapon' && locked && !unlockedWeapons.has(id)) b.hidden = true;
     b.innerHTML = `<img src="../assets/64/ui/icons/${icon || id}.png" alt=""><span>${label}</span>`;
     b.onclick = () => {
       window.__equip && window.__equip(kind, id);
@@ -457,6 +463,19 @@ window.__unlockMount = id => {
       { transform: 'scale(1.08)', filter: 'brightness(1.5)' },
       { transform: 'scale(1)', filter: 'brightness(1)' },
     ], { duration: 700, easing: 'ease-out' });
+  }
+};
+window.__unlockWeapon = id => {
+  unlockedWeapons.add(id);
+  try { localStorage.setItem(WEAPON_UNLOCK_KEY, JSON.stringify([...unlockedWeapons])); } catch (_) {}
+  const slot = document.querySelector(`#slotsW .slot[data-id="${id}"]`);
+  if (slot) {
+    slot.hidden = false;
+    slot.animate([
+      { transform: 'scale(0.6) rotate(-8deg)', filter: 'brightness(2.8)' },
+      { transform: 'scale(1.12) rotate(3deg)', filter: 'brightness(1.7)' },
+      { transform: 'scale(1) rotate(0)', filter: 'brightness(1)' },
+    ], { duration: 850, easing: 'ease-out' });
   }
 };
 document.getElementById('invToggle').onclick = () =>
@@ -538,6 +557,6 @@ addEventListener('keydown', e => {
   sync();
 })();
 </script>
-<script src="game.js?v=lord-mas-v6"></script>
+<script src="game.js?v=lord-mas-v7"></script>
 </body>
 </html>

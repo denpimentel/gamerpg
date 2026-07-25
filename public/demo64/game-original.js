@@ -69,8 +69,12 @@
     mace: [['walk', '', 64], ['walk_behind', '', 64], ['slash', '', 192], ['slash_behind', '', 192]],
     waraxe: [['walk', '', 64], ['slash', '', 192], ['slash_behind', '', 192]],
     spear: [['walk', '', 64], ['walk_behind', '', 64], ['thrust', '', 64], ['thrust_behind', '', 64]],
+    lord_mas_lance: [['walk', '', 64], ['walk_behind', '', 64], ['thrust', '', 64], ['thrust_behind', '', 64]],
   };
-  const ATTACK_ANIM = { longsword: 'slash', dagger: 'slash', mace: 'slash', waraxe: 'slash', spear: 'thrust' };
+  const ATTACK_ANIM = {
+    longsword: 'slash', dagger: 'slash', mace: 'slash', waraxe: 'slash',
+    spear: 'thrust', lord_mas_lance: 'thrust',
+  };
 
   // --- montarias LPC (cavalo em 2 camadas: atrás → cavaleiro cortado na cintura → frente) ---
   const MOUNTS = ['marrom', 'preto', 'cinza', 'dourado', 'branco'];
@@ -197,6 +201,7 @@
     this.load.spritesheet('aihero-idle', A + 'player/hero_ia/idle.png', { frameWidth: 92, frameHeight: 92 });
     this.load.spritesheet('aihero-walk', A + 'player/hero_ia/walk.png', { frameWidth: 92, frameHeight: 92 });
     this.load.image('mount-leg', A + 'player/mount_leg.png'); // pezinho do lado de cá (montado)
+    this.load.image('lord-mas-lance-icon', A + 'ui/icons/lord_mas_lance.png');
     this.load.spritesheet('evil_spirit', A + 'effects/evil_spirit_sheet.png', { frameWidth: 192, frameHeight: 192 });
   }
 
@@ -712,6 +717,7 @@
       mace: { tint: 0xffd27a, heavy: true },
       waraxe: { tint: 0xffa96b, heavy: true },
       spear: { tint: 0xe2d0ff, heavy: false, lunge: true },
+      lord_mas_lance: { tint: 0x62ffd2, heavy: false, lunge: true },
     };
     const ELEMENTS = { none: null,
       fogo: { tint: 0xff7a2a, p: 'fx-p-fire' },
@@ -1074,6 +1080,36 @@
         this.cameras.main.shake(180, 0.004);
       }
     };
+    const celebrateWeaponDrop = () => {
+      const cx = this.scale.width / 2, cy = this.scale.height / 2;
+      const tint = 0x62ffd2;
+      const halo = this.add.image(cx, cy, 'fx-orb').setScrollFactor(0).setDepth(8992)
+        .setBlendMode(Phaser.BlendModes.ADD).setTint(tint).setAlpha(0).setScale(0.4);
+      const ring = this.add.image(cx, cy, 'fx-ring').setScrollFactor(0).setDepth(8993)
+        .setBlendMode(Phaser.BlendModes.ADD).setTint(tint).setAlpha(0.9).setScale(0.25);
+      const icon = this.add.image(cx, cy, 'lord-mas-lance-icon').setScrollFactor(0).setDepth(8995)
+        .setScale(0.25).setAlpha(0).setAngle(-35);
+      this.tweens.add({ targets: halo, alpha: 0.7, scale: 3.2, duration: 520,
+        yoyo: true, repeat: 3, onComplete: () => halo.destroy() });
+      this.tweens.add({ targets: ring, alpha: 0, scale: 2.3, angle: 220,
+        duration: 1200, ease: 'Cubic.easeOut', onComplete: () => ring.destroy() });
+      this.tweens.add({ targets: icon, alpha: 1, scale: 1.1, angle: -18,
+        duration: 620, ease: 'Back.easeOut', hold: 2100, yoyo: true,
+        onComplete: () => icon.destroy() });
+      for (let i = 0; i < 24; i++) {
+        const angle = Math.PI * 2 * i / 24;
+        const spark = this.add.image(cx, cy, 'fx-p-spark').setScrollFactor(0).setDepth(8994)
+          .setBlendMode(Phaser.BlendModes.ADD).setTint(i % 3 ? tint : 0xc8fff1).setScale(0.5);
+        this.tweens.add({
+          targets: spark, x: cx + Math.cos(angle) * (100 + Math.random() * 90),
+          y: cy + Math.sin(angle) * (65 + Math.random() * 70),
+          alpha: 0, scale: 0, delay: Math.random() * 180, duration: 850,
+          ease: 'Cubic.easeOut', onComplete: () => spark.destroy(),
+        });
+      }
+      announceReward('ARMA RARA!\\nLança de Lord Mas · 0,5%', '#8affda');
+      this.cameras.main.shake(220, 0.005);
+    };
     this.defeatFoe = (f) => {
       if (!f || f.dead) return;
       f.dead = true;
@@ -1094,6 +1130,12 @@
             ? 'DROP LENDÁRIO!\\nCavalo-Esqueleto Dourado · 0,1%'
             : 'RECOMPENSA RARA!\\nCavalo-Esqueleto · 1%',
             golden ? '#ffd75a' : '#b9f6ff');
+        }
+        const forcedWeapon = qs.get('forceWeapon');
+        const weaponReward = forcedWeapon === 'lord_mas_lance' || Math.random() < 0.005;
+        if (weaponReward) {
+          window.__unlockWeapon && window.__unlockWeapon('lord_mas_lance');
+          celebrateWeaponDrop();
         }
         this.time.delayedCall(5000, () => {
           f.hp = f.hpMax;
