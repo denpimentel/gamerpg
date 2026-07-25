@@ -1,7 +1,7 @@
 /* GameRPG loader */
 (function () {
   const script = document.createElement('script');
-  script.src = './game-original.js?v=clover-spider-v1';
+  script.src = './game-original.js?v=clover-buff-v1';
   script.onerror = () => console.error('[GameRPG] Falha ao carregar o jogo principal.');
   document.head.appendChild(script);
 })();
