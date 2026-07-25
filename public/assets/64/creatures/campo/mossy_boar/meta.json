@@ -1,0 +1,20 @@
+{
+  "id": "mossy_boar",
+  "name": "Javali Musgoso",
+  "biome": "campo",
+  "role": "charger",
+  "frameWidth": 192,
+  "frameHeight": 192,
+  "baselineY": 184,
+  "facing": "east",
+  "animations": {
+    "idle": { "frames": 1 },
+    "walk": { "frames": 6, "fps": 10, "loop": true },
+    "attack": { "frames": 6, "fps": 10, "loop": false }
+  },
+  "combat": {
+    "damage": 5,
+    "speed": 66,
+    "attackType": "tusk_charge"
+  }
+}
