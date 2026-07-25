@@ -1,0 +1,34 @@
+{
+  "id": "deer_king",
+  "name": "Rei Cervo — Guardião da Campina",
+  "biome": "campo",
+  "role": "boss",
+  "frameWidth": 256,
+  "frameHeight": 256,
+  "baselineY": 248,
+  "facing": "east",
+  "animations": {
+    "idle": { "frames": 1 },
+    "walk": { "frames": 6, "fps": 9, "loop": true },
+    "charge": { "frames": 6, "fps": 11, "loop": false },
+    "enraged": { "frames": 1, "hpThreshold": 0.3 }
+  },
+  "combat": {
+    "hp": 600,
+    "damage": 12,
+    "speed": 38,
+    "respawnMs": 15000,
+    "skills": [
+      "royal_charge",
+      "ancestral_roots",
+      "thorn_rain",
+      "call_of_the_forest"
+    ]
+  },
+  "drops": [
+    { "id": "deer_king_antler", "name": "Galhada do Rei Cervo", "chance": 0.05 },
+    { "id": "meadow_cape", "name": "Capa da Campina", "chance": 0.03 },
+    { "id": "ancestral_deer", "name": "Cervo Ancestral", "chance": 0.01 },
+    { "id": "spring_deer", "name": "Cervo da Primavera", "chance": 0.001 }
+  ]
+}
