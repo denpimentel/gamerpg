@@ -175,9 +175,9 @@
     this.load.image('cursed-scarecrow-idle', A + 'creatures/campo/cursed_scarecrow/idle.png?v=small1');
     this.load.spritesheet('cursed-scarecrow-walk', A + 'creatures/campo/cursed_scarecrow/walk.png?v=small1', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('cursed-scarecrow-attack', A + 'creatures/campo/cursed_scarecrow/attack.png?v=small1', { frameWidth: 192, frameHeight: 192 });
-    this.load.image('meadow-turtle-idle', A + 'creatures/campo/meadow_turtle/idle.png?v=outline1');
-    this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=outline1', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=outline1', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('meadow-turtle-idle', A + 'creatures/campo/meadow_turtle/idle.png?v=outline2');
+    this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=outline2', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=outline2', { frameWidth: 192, frameHeight: 192 });
     this.load.image('deer-king-idle', A + 'creatures/campo/deer_king/idle.png?v=cartoon1');
     this.load.image('deer-king-enraged', A + 'creatures/campo/deer_king/enraged.png?v=polish1');
     this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=walk3', { frameWidth: 256, frameHeight: 256 });
