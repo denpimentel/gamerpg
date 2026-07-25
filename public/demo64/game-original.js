@@ -651,8 +651,8 @@
     {
       const cont = this.add.container(0, 0);
       const spr = this.add.sprite(0, 34, 'meadow-turtle-idle')
-        .setOrigin(0.5, 184 / 192).setScale(0.72);
-      const lbl = this.add.text(0, -76, 'Tartaruga do Prado', {
+        .setOrigin(0.5, 184 / 192).setScale(0.46);
+      const lbl = this.add.text(0, -54, 'Tartaruga do Prado', {
         fontFamily: 'sans-serif', fontSize: '12px', color: '#e8f5a4',
         stroke: '#000', strokeThickness: 3,
       }).setOrigin(0.5);
