@@ -25,15 +25,30 @@ As probabilidades normais de drop precisam continuar separadas do botão tempor�
 - apresentação dos oito slots no inventário;
 - persistência e salvamento das runas aplicadas.
 
-## Direção gráfica escolhida: Runa de Ataque
+## Testes gráficos: Runa de Ataque
 
-A opção de obsidiana foi escolhida como base oficial da Runa de Ataque:
+A opção de obsidiana foi escolhida como formato-base da Runa de Ataque. Duas convenções de raridade estão sendo comparadas antes da decisão final.
 
-- a pedra, o formato, as fissuras laranjas e o contorno permanecem iguais;
-- somente a espada gravada muda de cor conforme a raridade;
+### Alternativa A — espada colorida
+
+- a pedra permanece obsidiana em todas as raridades;
+- somente a espada muda de cor;
 - **Comum:** espada branca/prateada;
 - **Rara:** espada azul;
 - **Épica:** espada roxa;
 - **Lendária:** espada dourada.
 
-Os arquivos definitivos estão em `public/assets/64/runes/attack/`. Os conceitos descartados continuam em `public/assets/64/runes/concepts/` como histórico visual.
+Arquivos em `public/assets/64/runes/attack/`.
+
+### Alternativa B — pedra colorida
+
+- a espada e as fissuras permanecem laranja/incandescentes;
+- somente a pedra muda conforme a raridade;
+- **Comum:** pedra branca/prateada;
+- **Rara:** pedra azul;
+- **Épica:** pedra roxa;
+- **Lendária:** pedra dourada.
+
+Arquivos em `public/assets/64/runes/attack/stone_color/`.
+
+Nenhuma das duas convenções é definitiva até a comparação visual.
