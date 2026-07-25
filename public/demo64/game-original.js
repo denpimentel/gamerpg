@@ -111,13 +111,13 @@
              bob: [0, -2, -4, -2, 0, -1],
              offs: { n: [0, -32], w: [0, -32], s: [0, -32], e: [0, -32] } },
     ancestral_deer: { frame: 256, walkCols: 6, speed: 275, dy: 32, rate: 9,
-             scale: 0.58, singleRow: true, legY: -27,
+             scale: 0.58, singleRow: true, legY: -13,
              bob: [0, -2, 0, -2, 0, -2],
-             offs: { n: [0, -25], w: [0, -25], s: [0, -25], e: [0, -25] } },
+             offs: { n: [-8, -18], w: [9, -18], s: [-8, -18], e: [-9, -18] } },
     spring_deer: { frame: 256, walkCols: 6, speed: 285, dy: 32, rate: 9,
-             scale: 0.58, singleRow: true, legY: -27,
+             scale: 0.58, singleRow: true, legY: -13,
              bob: [0, -2, 0, -2, 0, -2],
-             offs: { n: [0, -25], w: [0, -25], s: [0, -25], e: [0, -25] } },
+             offs: { n: [-8, -18], w: [9, -18], s: [-8, -18], e: [-9, -18] } },
   };
 
   // --- monstros Pixel Adventure (upscalados 2x → frame nativo × 2 no load): ---
