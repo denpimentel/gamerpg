@@ -231,6 +231,179 @@
 /* Interface de teste removida: mantém somente o HUD principal do canto. */
 #evilSpiritBar,
 #codexHud { display: none !important; }
+
+/* Forja rúnica — pergaminho, madeira escura e magma. */
+#craftProximity {
+  position: fixed; left: 50%; bottom: 84px; z-index: 9100; transform: translateX(-50%);
+  border: 3px solid #f0b94d; border-radius: 7px; padding: 9px 16px;
+  background: #35170de8; color: #fff0aa; font: 700 15px "Pixelify Sans", sans-serif;
+  box-shadow: 0 0 0 3px #1d0b06, 0 5px 15px #0009; cursor: pointer;
+}
+#craftProximity[hidden] { display: none; }
+#craftOverlay {
+  position: fixed; inset: 0; z-index: 10000; display: grid; place-items: center;
+  padding: 16px; background: #120804b8; backdrop-filter: blur(2px);
+}
+#craftOverlay[hidden] { display: none; }
+.forge-panel {
+  width: min(490px, 92vw); max-height: 88vh; overflow: auto; position: relative;
+  color: #4a260e; border: 7px solid #663016; border-radius: 10px;
+  background:
+    linear-gradient(#efd998e8, #d6b66fe8),
+    repeating-linear-gradient(0deg, transparent 0 7px, #70401810 8px);
+  box-shadow: inset 0 0 0 3px #f9e9ad, inset 0 0 28px #8b4c2055, 0 18px 55px #000c;
+  font-family: "Pixelify Sans", sans-serif;
+}
+.forge-header {
+  display: flex; align-items: center; justify-content: space-between; padding: 8px 13px;
+  border-bottom: 5px solid #713716; background: #f4dfa1; letter-spacing: .08em;
+}
+.forge-header h2 { margin: 0; font-size: 17px; text-shadow: 1px 1px #fff0b5; }
+.forge-close {
+  width: 34px; height: 34px; border: 3px solid #55220f; border-radius: 5px;
+  background: #8e3f21; color: #ffe9a8; font: 700 20px inherit; cursor: pointer;
+}
+.forge-body { padding: 8px; }
+.forge-top { display: grid; grid-template-columns: 125px 1fr; gap: 7px; }
+.forge-item {
+  position: relative; min-height: 142px; display: grid; place-items: center;
+  border: 4px solid #895025; border-radius: 8px; background: #b87c3b33;
+  box-shadow: inset 0 0 22px #6b2e142f;
+}
+.forge-item.drop-ready, .forge-socket.drop-ready { outline: 4px dashed #ffdc6b; outline-offset: -7px; }
+.forge-item.empty::after {
+  content: "CLIQUE NO ITEM DA BARRA"; position: absolute; inset: 12px; display: grid; place-items: center;
+  border: 3px dashed #8a562b; border-radius: 7px; color: #74451e; font-weight: 700; text-align: center;
+}
+.forge-item.item-heating { animation: itemHeat .7s steps(4) infinite; }
+.forge-item.item-broken img { animation: itemBreak .75s steps(5) forwards; }
+@keyframes itemHeat { 50% { box-shadow: inset 0 0 38px #ff6a16, 0 0 22px #ff8d24; } }
+@keyframes itemBreak { 45% { transform: rotate(-8deg) scale(1.08); filter: brightness(2) sepia(1); } 100% { transform: translateY(55px) rotate(25deg) scale(.25); opacity: 0; } }
+.forge-item .item-shard {
+  position:absolute; width:52px; image-rendering:pixelated; pointer-events:none;
+  filter:grayscale(.8) brightness(.48);
+}
+.forge-item img { width: 52px; image-rendering: pixelated; filter: drop-shadow(0 3px 1px #54251355); }
+.forge-item-name {
+  position: absolute; left: 10px; right: 10px; bottom: 8px; text-align: center;
+  font-weight: 700; font-size: 11px;
+}
+.forge-core {
+  position: absolute; width: 66px; height: 28px; bottom: 44px; border-radius: 50%;
+  background: radial-gradient(ellipse, #fffbd0 0 10%, #ffc12f 25%, #ec5315 55%, #66180c 76%);
+  box-shadow: 0 0 12px #ff6b18, 0 -8px 22px #ff9b20aa; opacity: .72;
+}
+.forge-core.active { animation: forgePulse .48s steps(3) infinite; }
+@keyframes forgePulse { 50% { transform: scale(1.25,.85); filter: brightness(1.5); } }
+.socket-area h3, .rune-tray h3 { margin: 0 0 4px; font-size: 11px; }
+.socket-grid { display: grid; grid-template-columns: repeat(4, minmax(35px, 1fr)); gap: 4px; }
+.rune-grid { display: grid; grid-template-columns: repeat(8, minmax(32px, 1fr)); gap: 4px; }
+.forge-socket, .forge-rune {
+  position: relative; aspect-ratio: 1; min-height: 38px; display: grid; place-items: center;
+  overflow: hidden; border: 3px solid #743617; border-radius: 5px; background: #55220f;
+  box-shadow: inset 0 0 0 2px #2b0e08, 0 1px 0 #f0ce80;
+}
+.forge-socket::before {
+  content: ""; width: 34px; height: 34px; border: 3px solid #2c1009; transform: rotate(45deg);
+  background: #38130c; opacity: .78;
+}
+.forge-socket img, .forge-rune img { position: absolute; width: 78%; image-rendering: pixelated; }
+.forge-socket > img:not(.rune-shard) {
+  left: 50%; top: 50%; transform: translate(-50%, -50%) !important;
+  transform-origin: 50% 50% !important;
+}
+.forge-socket.success { animation: socketSuccess .7s steps(2); box-shadow: inset 0 0 0 3px #fff1a5, 0 0 18px #ff9d24; }
+.forge-socket.failed { animation: socketFail .55s steps(2); box-shadow: inset 0 0 0 3px #8f2015, 0 0 14px #ff2e14; }
+.forge-socket .rune-remains { filter: grayscale(.9) brightness(.42); transform: rotate(17deg) scale(.72); opacity: .82; }
+.forge-socket .magma-rune {
+  transform: translate(-50%, -50%) !important;
+  filter: sepia(1) saturate(7) hue-rotate(338deg) brightness(1.3) drop-shadow(0 0 4px #ff6b18);
+}
+.forge-socket .rune-shard {
+  position: absolute; width: 88%; image-rendering: pixelated; pointer-events: none;
+  filter: brightness(1.55) sepia(1) saturate(3);
+}
+.forge-socket.shattering { overflow: hidden; }
+.forge-socket.shattering::after {
+  content: ""; position: absolute; inset: 15%; border-radius: 50%;
+  background: radial-gradient(circle, #fff8b0 0 5%, #ff7b16 18%, transparent 58%);
+  animation: shatterFlash .28s steps(2) forwards;
+}
+@keyframes shatterFlash { to { transform: scale(1.7); opacity: 0; } }
+@keyframes socketSuccess { 50% { filter: brightness(1.65); } }
+@keyframes socketFail { 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+.rune-tray { margin-top: 16px; padding-top: 13px; border-top: 3px solid #a36c35; }
+.craft-inventory {
+  margin-top: 6px; padding: 6px; border: 3px solid #98602c; border-radius: 6px;
+  background: #6d351c; color: #ffe5a0;
+}
+.craft-inventory h3 { margin: 0 0 5px; font-size: 12px; }
+.inventory-craft-grid { display: block; }
+.inventory-item, .forge-rune { touch-action: none; }
+.inventory-item {
+  position: relative; min-height: 58px; display: grid; place-items: center; border: 3px solid #40200f;
+  border-radius: 7px; background: #c5944f; cursor: grab; box-shadow: inset 0 0 0 3px #efce7c;
+}
+.inventory-item img { width: 40px; image-rendering: pixelated; }
+.inventory-item.used, .forge-rune.used { opacity: .22; pointer-events: none; }
+.forge-rune { min-height: 38px; cursor: pointer; transition: filter .15s; padding: 0; }
+.forge-rune:hover, .forge-rune.selected { filter: brightness(1.17); outline: 2px solid #fff1a0; }
+.forge-rune.consumed { opacity: .17; pointer-events: none; }
+.rune-level {
+  position: absolute; right: 2px; bottom: 2px; z-index: 4; padding: 1px 4px;
+  border: 2px solid #35150c; border-radius: 4px; background: #f0d37f; color: #38170b;
+  font-size: 8px; font-weight: 700;
+}
+.magma-fill {
+  position: absolute; inset: auto 0 0; z-index: 2; height: 0; pointer-events: none;
+  background: linear-gradient(#fff792, #ff981c 20%, #e83c0d 66%, #67110a);
+  mix-blend-mode: screen; opacity: .9;
+}
+.forge-rune.heating .magma-fill { animation: magmaFill .42s steps(5) forwards; }
+@keyframes magmaFill { to { height: 100%; } }
+.forge-rune.breaking img { animation: runeBreak .55s steps(4) forwards; }
+@keyframes runeBreak {
+  25% { transform: translate(-4px,2px) rotate(-4deg); filter: brightness(2) sepia(1); }
+  55% { transform: translate(5px,-1px) rotate(6deg); clip-path: polygon(0 0,47% 0,42% 100%,0 100%,0 0,55% 0,100% 0,100% 100%,50% 100%); }
+  100% { transform: translateY(35px) rotate(18deg) scale(.4); opacity: 0; }
+}
+.flying-rune { position: fixed; z-index: 12000; image-rendering: pixelated; pointer-events: none; filter: drop-shadow(0 0 12px #ff8a18) brightness(1.4); }
+.forge-controls {
+  display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: stretch;
+  margin-top: 6px; padding: 6px; border: 2px solid #9b642e; border-radius: 6px; background: #e8ce8b;
+}
+.rune-info strong { display: block; font-size: 12px; }
+.rune-info span { display: block; margin-top: 2px; font-size: 10px; }
+.upgrade-button, .craft-button, .test-gold {
+  border: 3px solid #54210e; border-radius: 5px; color: #ffeaa4; background: #86401f;
+  font: 700 15px "Pixelify Sans", sans-serif; padding: 8px 13px; cursor: pointer;
+  box-shadow: inset 0 0 0 2px #ba6830, 0 3px 0 #3a1409;
+}
+.upgrade-button:disabled, .craft-button:disabled { filter: grayscale(.8); opacity: .55; cursor: default; }
+.forge-footer { display: flex; align-items: center; gap: 6px; margin-top: 6px; }
+.craft-button { flex: 1; padding: 7px; font-size: 13px; background: #7d2d18; }
+.test-gold { background: #6f5420; font-size: 13px; }
+.forge-status { min-height: 18px; margin-top: 6px; text-align: center; font-size: 11px; font-weight: 700; }
+.skip-button { background:#3d2f27; }
+.skip-button[hidden] { display:none; }
+.bag-grid { grid-template-columns: repeat(8, minmax(32px,1fr)); }
+.bag-empty { aspect-ratio:1; min-height:38px; border:3px solid #48200f; border-radius:5px; background:#2f150e; box-shadow:inset 0 0 0 2px #180806; }
+#playerHotbar {
+  position:fixed; left:50%; bottom:12px; transform:translateX(-50%); z-index:10020;
+  display:grid; grid-template-columns:repeat(8,46px); gap:4px; padding:5px;
+  border:3px solid #6d391b; border-radius:7px; background:#2c150ddd; box-shadow:0 5px 15px #0009;
+}
+.hotbar-slot { position:relative; width:46px; height:46px; display:grid; place-items:center; border:3px solid #8c542a; background:#4b2514; cursor:pointer; }
+.hotbar-slot img { width:72%; image-rendering:pixelated; }
+.hotbar-slot em { position:absolute; right:2px; bottom:0; color:#ffe29a; font:700 9px "Pixelify Sans"; }
+body.craft-open #playerHotbar { z-index:11000; bottom:8px; }
+.forge-gold { color: #8a4b00; white-space: nowrap; }
+@media (max-width: 620px) {
+  .forge-top { grid-template-columns: 1fr; }
+  .forge-item { min-height: 150px; }
+  .forge-item img { width: 72px; }
+  .rune-grid { grid-template-columns: repeat(4, minmax(54px, 1fr)); }
+}
 </style>
 </head>
 <body>
@@ -241,6 +414,57 @@
 </div>
 <button id="invToggle">🎒 Inventário</button>
 <button id="dropRateToggle" type="button" aria-pressed="false">DROP 100%: OFF</button>
+<button id="craftProximity" type="button" hidden>🔥 F — Forjar com o Ferreiro</button>
+<div id="playerHotbar" aria-label="Barra de itens, 8 slots">
+  <button class="hotbar-slot" data-hotbar="0" type="button" aria-label="Espada longa"><img src="../assets/64/ui/icons/longsword.png" alt=""><em>1</em></button>
+  <button class="hotbar-slot" data-hotbar="1" type="button" aria-label="Slot vazio 2"><em>2</em></button>
+  <button class="hotbar-slot" data-hotbar="2" type="button" aria-label="Slot vazio 3"><em>3</em></button>
+  <button class="hotbar-slot" data-hotbar="3" type="button" aria-label="Slot vazio 4"><em>4</em></button>
+  <button class="hotbar-slot" data-hotbar="4" type="button" aria-label="Slot vazio 5"><em>5</em></button>
+  <button class="hotbar-slot" data-hotbar="5" type="button" aria-label="Slot vazio 6"><em>6</em></button>
+  <button class="hotbar-slot" data-hotbar="6" type="button" aria-label="Slot vazio 7"><em>7</em></button>
+  <button class="hotbar-slot" data-hotbar="7" type="button" aria-label="Slot vazio 8"><em>8</em></button>
+</div>
+<div id="craftOverlay" hidden>
+  <section class="forge-panel" role="dialog" aria-modal="true" aria-labelledby="forgeTitle">
+    <header class="forge-header">
+      <h2 id="forgeTitle">FORJA RÚNICA</h2>
+      <button class="forge-close" id="forgeClose" type="button" aria-label="Fechar">×</button>
+    </header>
+    <div class="forge-body">
+      <div class="forge-top">
+        <div class="forge-item empty" id="forgeItemSlot" aria-label="Slot do item">
+          <div class="forge-core" id="forgeCore"></div>
+          <div class="forge-item-name">ITEM · 70% DE SUCESSO</div>
+        </div>
+        <div class="socket-area">
+          <h3>ENCAIXES DO ITEM</h3>
+          <div class="socket-grid" id="forgeSockets"></div>
+        </div>
+      </div>
+      <div class="craft-inventory">
+        <h3 id="runeBagTitle">BAG DE RUNAS · 16 SLOTS <small>(expansível até 28)</small></h3>
+        <div class="inventory-craft-grid">
+          <div class="rune-grid bag-grid" id="forgeRunes"></div>
+        </div>
+      </div>
+      <div class="forge-controls">
+        <div class="rune-info">
+          <strong id="runeName">Runa Comum · Nível 1</strong>
+          <span id="runeStats">+2 Ataque · 85% de chance</span>
+          <span class="forge-gold" id="forgeGold">🟡 125 GOLD</span>
+        </div>
+        <button class="upgrade-button" id="upgradeRune" type="button">Evoluir · 10 GOLD</button>
+      </div>
+      <div class="forge-footer">
+        <button class="test-gold" id="testForgeGold" type="button">+500 GOLD · TESTE</button>
+        <button class="test-gold skip-button" id="skipForge" type="button" hidden>SKIP »</button>
+        <button class="craft-button" id="startForge" type="button">🔥 INICIAR FORJA · 25 GOLD</button>
+      </div>
+      <div class="forge-status" id="forgeStatus">Arraste o item e as runas para os encaixes.</div>
+    </div>
+  </section>
+</div>
 <div id="inv">
   <h3>Personagem</h3>
   <div class="slots" id="slotsS"></div>
@@ -536,6 +760,305 @@ addEventListener('keydown', e => {
   if (e.key === 'i' || e.key === 'I') document.getElementById('inv').classList.toggle('open');
 });
 
+// Forja manual: o jogador arrasta o item e cada runa do inventário para seus slots.
+(function () {
+  const A = '../assets/64/runes/attack/stone_color/';
+  const ITEM_ICON = '../assets/64/ui/icons/longsword.png';
+  const rarities = [
+    ['common','Comum',1,'#e4e4dc'], ['common','Comum',1,'#e4e4dc'],
+    ['rare','Rara',1.35,'#53b9ff'], ['rare','Rara',1.35,'#53b9ff'],
+    ['epic','Épica',1.75,'#ca76ff'], ['epic','Épica',1.75,'#ca76ff'],
+    ['legendary','Lendária',2.3,'#ffd34f'], ['legendary','Lendária',2.3,'#ffd34f'],
+  ];
+  const runes = rarities.map(([id,name,mult,color], index) =>
+    ({ index, rarity:{id,name,mult,color}, level:1, slot:null, resolved:false }));
+  const overlay = document.getElementById('craftOverlay');
+  const proximity = document.getElementById('craftProximity');
+  const itemSlot = document.getElementById('forgeItemSlot');
+  const socketsEl = document.getElementById('forgeSockets');
+  const runesEl = document.getElementById('forgeRunes');
+  const statusEl = document.getElementById('forgeStatus');
+  const nameEl = document.getElementById('runeName');
+  const statsEl = document.getElementById('runeStats');
+  const goldEl = document.getElementById('forgeGold');
+  const upgradeButton = document.getElementById('upgradeRune');
+  const craftButton = document.getElementById('startForge');
+  const skipButton = document.getElementById('skipForge');
+  let selected = 0, itemPlaced = false, forging = false, finished = false, skipRequested = false;
+  let bagCapacity = 16;
+  const chanceFor = level => Math.round(85 + (level - 1) * 15 / 9);
+  const attackFor = rune => Math.round(2 * rune.level * rune.rarity.mult);
+  const upgradeCost = level => 5 + level * 5;
+  const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+  const forgeWait = ms => new Promise(resolve => {
+    const started = performance.now();
+    const timer = setInterval(() => {
+      if (skipRequested || performance.now() - started >= ms) {
+        clearInterval(timer); resolve();
+      }
+    }, 25);
+  });
+  const gold = () => window.__getGold ? window.__getGold() : 0;
+  const runeSrc = rune => `${A}attack_rune_${rune.rarity.id}.png`;
+  const craftQuery = new URLSearchParams(location.search);
+
+  function allowDrop(el, accept, onDrop) {
+    el.ondragover = event => { event.preventDefault(); el.classList.add('drop-ready'); };
+    el.ondragleave = () => el.classList.remove('drop-ready');
+    el.ondrop = event => {
+      event.preventDefault(); el.classList.remove('drop-ready');
+      const data = event.dataTransfer.getData('text/plain');
+      if (data.startsWith(accept)) onDrop(data);
+    };
+  }
+
+  function renderSockets(reset = false) {
+    if (reset) socketsEl.innerHTML = '';
+    if (!socketsEl.children.length) {
+      for (let i = 0; i < 8; i++) {
+        const slot = document.createElement('div');
+        slot.className = 'forge-socket';
+        slot.dataset.socket = i;
+        slot.setAttribute('aria-label', `Encaixe ${i + 1}`);
+        socketsEl.appendChild(slot);
+      }
+    }
+  }
+
+  function renderInventory() {
+    const runeHtml = runes.map(r => `
+      <button class="forge-rune${r.index === selected ? ' selected' : ''}${r.slot !== null ? ' used' : ''}"
+        data-rune="${r.index}" type="button"
+        aria-label="Runa ${r.rarity.name}, nível ${r.level}">
+        <img src="${runeSrc(r)}" alt=""><span class="magma-fill"></span>
+        <span class="rune-level">Lv.${r.level}</span>
+      </button>`).join('');
+    const emptyHtml = Array.from({length:bagCapacity - runes.length}, (_,i) =>
+      `<div class="bag-empty" aria-label="Slot vazio da BAG ${i + 9}"></div>`).join('');
+    runesEl.innerHTML = runeHtml + emptyHtml;
+    document.getElementById('runeBagTitle').innerHTML =
+      `BAG DE RUNAS · ${bagCapacity} SLOTS <small>(expansível até 28)</small>`;
+    runesEl.querySelectorAll('.forge-rune').forEach(button => {
+      button.onclick = () => {
+        if (forging) return;
+        selected = Number(button.dataset.rune);
+        placeRune(selected);
+      };
+    });
+    updateInfo();
+  }
+
+  function placeItem() {
+    if (forging || itemPlaced) return;
+    itemPlaced = true;
+    itemSlot.classList.remove('empty');
+    itemSlot.insertAdjacentHTML('afterbegin', `<img src="${ITEM_ICON}" alt="Espada longa">`);
+    statusEl.textContent = 'Item colocado. Clique nas runas para preencher os encaixes.';
+    renderInventory();
+  }
+
+  function placeRune(runeIndex) {
+    if (forging) return;
+    const rune = runes[runeIndex];
+    if (!itemPlaced) { statusEl.textContent = 'Primeiro clique na espada da barra de itens.'; return; }
+    if (!rune || rune.slot !== null) return;
+    const slotIndex = Array.from({length:8}, (_,i) => i).find(i => !runes.some(r => r.slot === i));
+    if (slotIndex === undefined) return;
+    rune.slot = slotIndex;
+    const socket = socketsEl.querySelector(`[data-socket="${slotIndex}"]`);
+    socket.innerHTML = `<img src="${runeSrc(rune)}" alt="Runa ${rune.rarity.name}">`;
+    selected = runeIndex;
+    statusEl.textContent = `Runa ${rune.rarity.name} colocada no encaixe ${slotIndex + 1}.`;
+    renderInventory();
+  }
+
+  function updateInfo() {
+    const rune = runes[selected];
+    nameEl.textContent = `Runa ${rune.rarity.name} · Nível ${rune.level}`;
+    nameEl.style.color = rune.rarity.color;
+    statsEl.textContent = `+${attackFor(rune)} Ataque · ${chanceFor(rune.level)}% de chance`;
+    goldEl.textContent = `🟡 ${gold()} GOLD`;
+    upgradeButton.textContent = rune.level >= 10 ? 'NÍVEL MÁXIMO' : `Evoluir · ${upgradeCost(rune.level)} GOLD`;
+    upgradeButton.disabled = forging || rune.level >= 10;
+    craftButton.disabled = forging || !itemPlaced || runes.some(r => r.slot === null);
+  }
+
+  document.querySelector('[data-hotbar="0"]').onclick = () => {
+    if (window.__craftOpen && !itemPlaced && !forging) placeItem();
+  };
+  // Futuras runas de ingrediente chamam este gancho ao expandir a BAG.
+  window.__expandRuneBag = amount => {
+    bagCapacity = Math.min(28, bagCapacity + Math.max(1, Number(amount) || 4));
+    renderInventory();
+    return bagCapacity;
+  };
+
+  function resetForge() {
+    itemPlaced = false; forging = false; finished = false; skipRequested = false;
+    runes.forEach(r => { r.slot = null; r.resolved = false; });
+    itemSlot.className = 'forge-item empty';
+    itemSlot.innerHTML = '<div class="forge-core" id="forgeCore"></div><div class="forge-item-name">ITEM · 70% DE SUCESSO</div>';
+    renderSockets(true); renderInventory();
+    craftButton.textContent = '🔥 INICIAR FORJA · 25 GOLD';
+    craftButton.disabled = true; skipButton.hidden = true;
+    statusEl.textContent = 'Clique na espada da barra inferior para começar.';
+  }
+
+  function openForge() {
+    if (forging) return;
+    resetForge();
+    overlay.hidden = false; window.__craftOpen = true;
+    document.body.classList.add('craft-open');
+    document.getElementById('inv').classList.remove('open');
+    renderSockets(); renderInventory();
+  }
+  function closeForge() {
+    if (forging) return;
+    overlay.hidden = true; window.__craftOpen = false;
+    document.body.classList.remove('craft-open');
+    resetForge();
+  }
+  window.__openCraftPanel = openForge;
+  document.getElementById('forgeClose').onclick = closeForge;
+  proximity.onclick = openForge;
+  overlay.addEventListener('click', event => { if (event.target === overlay) closeForge(); });
+  addEventListener('blacksmithproximity', event => proximity.hidden = !event.detail.nearby || window.__craftOpen);
+  addEventListener('hudchange', updateInfo);
+  addEventListener('keydown', event => { if (event.key === 'Escape' && !overlay.hidden) closeForge(); });
+  skipButton.onclick = () => {
+    skipRequested = true;
+    skipButton.textContent = 'ACELERANDO...';
+    skipButton.disabled = true;
+  };
+
+  upgradeButton.onclick = () => {
+    const rune = runes[selected], cost = upgradeCost(rune.level);
+    if (upgradeButton.disabled) return;
+    if (!window.__spendGold || !window.__spendGold(cost)) {
+      statusEl.textContent = `GOLD insuficiente: você precisa de ${cost}.`; return;
+    }
+    rune.level++; statusEl.textContent = `${rune.rarity.name} evoluiu para o nível ${rune.level}!`;
+    renderInventory();
+  };
+  document.getElementById('testForgeGold').onclick = () => {
+    if (window.__addTestGold) window.__addTestGold(500);
+    statusEl.textContent = '+500 GOLD adicionados para o teste.';
+  };
+
+  async function shatterItem() {
+    const img = itemSlot.querySelector('img');
+    const cuts = [
+      ['polygon(0 0,50% 0,43% 35%,0 45%)',-22,-18,-22],
+      ['polygon(50% 0,100% 0,100% 42%,58% 34%)',23,-17,19],
+      ['polygon(0 45%,43% 35%,50% 68%,0 76%)',-25,2,-16],
+      ['polygon(58% 34%,100% 42%,100% 76%,52% 68%)',25,3,17],
+      ['polygon(0 76%,50% 68%,45% 100%,0 100%)',-15,21,-28],
+      ['polygon(52% 68%,100% 76%,100% 100%,45% 100%)',17,22,25],
+    ];
+    cuts.forEach(([clip,dx,dy,rot]) => {
+      const shard = img.cloneNode();
+      shard.className = 'item-shard'; shard.style.clipPath = clip;
+      itemSlot.appendChild(shard);
+      shard.animate([
+        { transform:'translate(0,0) rotate(0)', filter:'brightness(3) sepia(1)' },
+        { transform:`translate(${dx}px,${dy}px) rotate(${rot}deg)`, filter:'grayscale(.85) brightness(.45)' },
+      ], { duration:skipRequested ? 40 : 760, easing:'cubic-bezier(.2,.75,.35,1)', fill:'forwards' });
+    });
+    img.remove();
+    itemSlot.classList.add('item-fragmented');
+    await forgeWait(780);
+  }
+
+  async function resolveRune(rune) {
+    const socket = socketsEl.querySelector(`[data-socket="${rune.slot}"]`);
+    const img = socket.querySelector('img');
+    socket.classList.add('heating');
+    statusEl.textContent = `O magma alcançou o encaixe ${rune.slot + 1}...`;
+    await forgeWait(350);
+    const forcedRuneResult = craftQuery.get('forceRuneResult');
+    const runeSucceeded = forcedRuneResult === 'success'
+      || (forcedRuneResult !== 'fail' && Math.random() * 100 < chanceFor(rune.level));
+    if (runeSucceeded) {
+      // Duas piscadas sem zoom: a runa permanece imóvel e então fica ligada.
+      await img.animate([
+        { opacity:1, filter:'brightness(1)' },
+        { opacity:.28, filter:'brightness(3.2) sepia(1)' },
+        { opacity:1, filter:'brightness(1)' },
+        { opacity:.28, filter:'brightness(3.2) sepia(1)' },
+        { opacity:1, filter:'brightness(2.4) sepia(1)' },
+      ], { duration:skipRequested ? 40 : 720, easing:'steps(1)' }).finished;
+      img.classList.add('magma-rune'); socket.classList.add('success');
+      statusEl.textContent = `Encaixe ${rune.slot + 1}: runa ligada e funcionando!`;
+    } else {
+      socket.classList.add('failed', 'shattering');
+      const cuts = [
+        ['polygon(0 0,48% 0,40% 34%,0 43%)',-12,-10,-18],
+        ['polygon(48% 0,100% 0,100% 38%,61% 31%)',13,-11,16],
+        ['polygon(0 43%,40% 34%,48% 66%,0 73%)',-15,1,-12],
+        ['polygon(61% 31%,100% 38%,100% 73%,55% 66%)',15,2,14],
+        ['polygon(0 73%,48% 66%,43% 100%,0 100%)',-9,13,-20],
+        ['polygon(55% 66%,100% 73%,100% 100%,43% 100%)',10,14,22],
+      ];
+      const shards = cuts.map(([clip,dx,dy,rot]) => {
+        const shard = img.cloneNode();
+        shard.className = 'rune-shard';
+        shard.style.clipPath = clip;
+        socket.appendChild(shard);
+        shard.animate([
+          { transform:'translate(0,0) rotate(0)', filter:'brightness(2.8) sepia(1)' },
+          { transform:`translate(${dx}px,${dy}px) rotate(${rot}deg)`, filter:'grayscale(.85) brightness(.48)' },
+        ], { duration:720, easing:'cubic-bezier(.2,.75,.35,1)', fill:'forwards' });
+        return shard;
+      });
+      img.remove();
+      await forgeWait(760);
+      socket.classList.remove('shattering');
+      shards.forEach(shard => shard.style.opacity = '.88');
+      statusEl.textContent = `Encaixe ${rune.slot + 1}: restaram apenas fragmentos.`;
+    }
+    rune.resolved = true; await forgeWait(420);
+  }
+
+  craftButton.onclick = async () => {
+    if (finished) { closeForge(); return; }
+    if (craftButton.disabled) return;
+    if (!window.__spendGold || !window.__spendGold(25)) {
+      statusEl.textContent = 'Você precisa de 25 GOLD para acender a forja.'; return;
+    }
+    forging = true; skipRequested = false; updateInfo();
+    skipButton.hidden = false; skipButton.disabled = false; skipButton.textContent = 'SKIP »';
+    const core = itemSlot.querySelector('.forge-core');
+    core.classList.add('active'); itemSlot.classList.add('item-heating');
+    statusEl.textContent = 'O magma está entrando no item... 70% de chance!';
+    await forgeWait(1300);
+    const itemSucceeded = craftQuery.get('forceItemFail') !== '1'
+      && (craftQuery.get('forceItemSuccess') === '1' || Math.random() < .70);
+    if (!itemSucceeded) {
+      itemSlot.classList.remove('item-heating');
+      statusEl.textContent = 'O ITEM QUEBROU E SE FRAGMENTOU! A forja foi interrompida.';
+      await shatterItem(); core.classList.remove('active');
+      forging = false; finished = true; skipButton.hidden = true;
+      craftButton.textContent = 'SAIR DO CRAFT'; craftButton.disabled = false;
+      return;
+    }
+    itemSlot.classList.remove('item-heating'); itemSlot.classList.add('success');
+    statusEl.textContent = 'ITEM APROVADO! O magma seguirá pelos oito encaixes.';
+    await forgeWait(900);
+    let ok = 0;
+    for (const rune of [...runes].sort((a,b) => a.slot - b.slot)) {
+      await resolveRune(rune);
+      if (socketsEl.querySelector(`[data-socket="${rune.slot}"]`).classList.contains('success')) ok++;
+    }
+    core.classList.remove('active'); forging = false; finished = true; skipButton.hidden = true;
+    statusEl.textContent = `FORJA CONCLUÍDA · item preservado · ${ok}/8 moldes preenchidos`;
+    craftButton.textContent = 'SAIR DO CRAFT'; craftButton.disabled = false;
+  };
+
+  renderSockets(); renderInventory();
+  if (new URLSearchParams(location.search).get('forceCraft') === '1')
+    addEventListener('load', () => setTimeout(openForge, 350));
+})();
+
 // A.I.U.I.Codex paralelo — lê a mesma API do HUD atual; não mantém estado de jogo próprio.
 (function () {
   const A = '../assets/64/ui/codex/';
@@ -604,6 +1127,6 @@ addEventListener('keydown', e => {
   sync();
 })();
 </script>
-<script src="game.js?v=turtle-outline-v2"></script>
+<script src="game.js?v=deer-knockback-v1"></script>
 </body>
 </html>

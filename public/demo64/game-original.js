@@ -20,6 +20,14 @@
   const AI_HOUSE = { cx: -19, by: 12, cells: [] };
   for (let dx = -3; dx <= 3; dx++) for (let dy = 0; dy <= 3; dy++) AI_HOUSE.cells.push([-19 + dx, 11 - dy]);
   const TREES = [[4, 4], [9, 5], [3, 9]];
+  const FOREST_PROPS = [
+    ['broadleaf_tree', 7, 10, 1, true], ['leafy_bush', 5, 10, 1, false],
+    ['mossy_log', 11, 6, 1, false], ['fern_flowers', 6, 4, 0.9, false],
+  ];
+  const DESERT_PROPS = [
+    ['saguaro', 16, 8, 1, true], ['thorn_bush', 22, 5, 1, true],
+    ['straw_bundle', 20, 10, 1, false], ['sun_bleached_skull', 24, 8, 1, false],
+  ];
   const TREES_NEVE = [[43, 4], [48, 5], [44, 10], [49, 11], [46, 6]];
   const SPAWN = { x: 7, y: 7 };
 
@@ -38,6 +46,8 @@
     ['gobhouse',  -4, 11, 2, 3, 0],
   ];
   const blocked = new Set([...TREES, ...TREES_NEVE, ...AI_HOUSE.cells].map(([x, y]) => x + ',' + y));
+  for (const [, x, y, , solid] of [...FOREST_PROPS, ...DESERT_PROPS])
+    if (solid) blocked.add(x + ',' + y);
   // pegada de colisão: as 2 fileiras da base de cada construção
   for (const [, ax, ay, wt] of BUILDINGS)
     for (let dx = 0; dx < wt; dx++) for (let dy = 0; dy < 2; dy++) blocked.add((ax + dx) + ',' + (ay - dy));
@@ -154,6 +164,22 @@
       const n = String(i).padStart(2, '0');
       this.load.image('deco' + n, A + 'props/deco/' + n + '.png');
     }
+    for (const [name] of FOREST_PROPS) {
+      if (name === 'broadleaf_tree')
+        this.load.spritesheet('prop-forest-' + name,
+          A + 'props/biomes/forest/broadleaf_tree_sway_v4.png',
+          { frameWidth: 192, frameHeight: 192 });
+      else
+        this.load.image('prop-forest-' + name, A + 'props/biomes/forest/' + name + '.png');
+    }
+    for (const [name] of DESERT_PROPS) {
+      if (name === 'saguaro' || name === 'thorn_bush')
+        this.load.spritesheet('prop-desert-' + name,
+          A + 'props/biomes/desert/' + (name === 'saguaro' ? 'saguaro_sway_v2.png' : 'thorn_bush_sway_v2.png'),
+          { frameWidth: 192, frameHeight: 192 });
+      else
+        this.load.image('prop-desert-' + name, A + 'props/biomes/desert/' + name + '.png');
+    }
     // --- buildings/ (Tiny Swords Update 010, CC0) ---
     for (const b of ['castle', 'house', 'tower', 'gobhouse'])
       this.load.image('bld-' + b, A + 'buildings/' + b + '.png');
@@ -175,9 +201,9 @@
     this.load.image('cursed-scarecrow-idle', A + 'creatures/campo/cursed_scarecrow/idle.png?v=small1');
     this.load.spritesheet('cursed-scarecrow-walk', A + 'creatures/campo/cursed_scarecrow/walk.png?v=small1', { frameWidth: 192, frameHeight: 192 });
     this.load.spritesheet('cursed-scarecrow-attack', A + 'creatures/campo/cursed_scarecrow/attack.png?v=small1', { frameWidth: 192, frameHeight: 192 });
-    this.load.image('meadow-turtle-idle', A + 'creatures/campo/meadow_turtle/idle.png?v=outline2');
-    this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=outline2', { frameWidth: 192, frameHeight: 192 });
-    this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=outline2', { frameWidth: 192, frameHeight: 192 });
+    this.load.image('meadow-turtle-idle', A + 'creatures/campo/meadow_turtle/idle.png?v=restored1');
+    this.load.spritesheet('meadow-turtle-walk', A + 'creatures/campo/meadow_turtle/walk.png?v=restored1', { frameWidth: 192, frameHeight: 192 });
+    this.load.spritesheet('meadow-turtle-attack', A + 'creatures/campo/meadow_turtle/attack.png?v=restored1', { frameWidth: 192, frameHeight: 192 });
     this.load.image('deer-king-idle', A + 'creatures/campo/deer_king/idle.png?v=cartoon1');
     this.load.image('deer-king-enraged', A + 'creatures/campo/deer_king/enraged.png?v=polish1');
     this.load.spritesheet('deer-king-walk', A + 'creatures/campo/deer_king/walk.png?v=walk3', { frameWidth: 256, frameHeight: 256 });
@@ -224,6 +250,8 @@
     this.load.spritesheet('aihero-walk', A + 'player/hero_ia/walk.png', { frameWidth: 92, frameHeight: 92 });
     this.load.image('mount-leg', A + 'player/mount_leg.png'); // pezinho do lado de cá (montado)
     this.load.image('lord-mas-lance-icon', A + 'ui/icons/lord_mas_lance.png');
+    this.load.spritesheet('blacksmith', A + 'creatures/common/knight/walk-right.png',
+      { frameWidth: 64, frameHeight: 64 });
     this.load.spritesheet('evil_spirit', A + 'effects/evil_spirit_sheet.png', { frameWidth: 192, frameHeight: 192 });
   }
 
@@ -336,6 +364,12 @@
     // árvores (campo)
     this.anims.create({ key: 'tree-sway', frameRate: 5, repeat: -1, yoyo: true,
       frames: this.anims.generateFrameNumbers('tree', { start: 0, end: 3 }) });
+    this.anims.create({ key: 'broadleaf-tree-sway', frameRate: 5, repeat: -1, yoyo: true,
+      frames: this.anims.generateFrameNumbers('prop-forest-broadleaf_tree', { start: 0, end: 3 }) });
+    this.anims.create({ key: 'saguaro-sway', frameRate: 4, repeat: -1, yoyo: true,
+      frames: this.anims.generateFrameNumbers('prop-desert-saguaro', { start: 0, end: 3 }) });
+    this.anims.create({ key: 'thorn-bush-sway', frameRate: 4, repeat: -1, yoyo: true,
+      frames: this.anims.generateFrameNumbers('prop-desert-thorn_bush', { start: 0, end: 3 }) });
     TREES.forEach(([x, y]) => {
       const t = this.add.sprite(x * TILE + 32, y * TILE + 56, 'tree').setOrigin(0.5, 0.85);
       t.setDepth(t.y).play({ key: 'tree-sway', startFrame: (x + y) % 4 });
@@ -359,6 +393,19 @@
     deco(ISLES.campo, ['01', '02', '03', '07', '08'], 8);
     deco(ISLES.deserto, ['14', '15', '16', '17'], 6);
     deco(ISLES.pedra, ['09', '10', '11'], 6);
+    FOREST_PROPS.forEach(([name, x, y, scale, solid]) => {
+      const prop = name === 'broadleaf_tree'
+        ? this.add.sprite(x * TILE + 32, y * TILE + 60, 'prop-forest-' + name).play('broadleaf-tree-sway')
+        : this.add.image(x * TILE + 32, y * TILE + 60, 'prop-forest-' + name);
+      prop.setOrigin(0.5, 1).setScale(scale).setDepth(solid ? y * TILE + 60 : -20);
+    });
+    DESERT_PROPS.forEach(([name, x, y, scale, solid]) => {
+      const prop = name === 'saguaro' || name === 'thorn_bush'
+        ? this.add.sprite(x * TILE + 32, y * TILE + 60, 'prop-desert-' + name)
+            .play(name === 'saguaro' ? 'saguaro-sway' : 'thorn-bush-sway')
+        : this.add.image(x * TILE + 32, y * TILE + 60, 'prop-desert-' + name);
+      prop.setOrigin(0.5, 1).setScale(scale).setDepth(solid ? y * TILE + 60 : -20);
+    });
     [[13.5, 10], [26.5, 4]].forEach(([x, y]) =>
       this.add.sprite(x * TILE, y * TILE, 'rocks1', 0).setDepth(-86));
 
@@ -647,14 +694,14 @@
       this.mobs.push(wander);
       this.foes.push(foe);
     }
-    // Tartaruga do Prado: tanque lento que ataca girando dentro do casco.
+    // Tartaruga: tanque lento de casco rochoso.
     mk('meadow-turtle-walk', 'meadow-turtle-walk', 0, 5, 8, -1);
     mk('meadow-turtle-attack', 'meadow-turtle-attack', 0, 5, 12, 0);
     {
       const cont = this.add.container(0, 0);
       const spr = this.add.sprite(0, 34, 'meadow-turtle-idle')
         .setOrigin(0.5, 184 / 192).setScale(0.40);
-      const lbl = this.add.text(0, -47, 'Tartaruga do Prado', {
+      const lbl = this.add.text(0, -47, 'Tartaruga', {
         fontFamily: 'sans-serif', fontSize: '12px', color: '#e8f5a4',
         stroke: '#000', strokeThickness: 3,
       }).setOrigin(0.5);
@@ -748,6 +795,32 @@
     const aiSpr = this.aiSpr = this.add.sprite(0, 24, 'aihero-idle', 2)
       .setOrigin(0.5, 0.93).setVisible(false);
     doll.add([mountB, legSpr, ...Object.values(layers), aiSpr, mountF]);
+
+    // Ferreiro rúnico do CAMPO. O painel é DOM, mas proximidade e interação pertencem ao mundo.
+    {
+      // Recebe o jogador logo na entrada do CAMPO e não disputa silhueta com os monstros.
+      const bx = 2.8 * TILE, by = 7.45 * TILE;
+      const smith = this.add.sprite(0, 0, 'blacksmith', 1).setOrigin(0.5, 1).setScale(1.35);
+      smith.setTint(0xc08a54);
+      const name = this.add.text(0, -91, 'Ferreiro Rúnico', {
+        fontFamily: '"Pixelify Sans", sans-serif', fontSize: '15px', fontStyle: 'bold',
+        color: '#ffd982', stroke: '#241307', strokeThickness: 5,
+      }).setOrigin(0.5);
+      const prompt = this.add.text(0, -116, '⚒  CRAFT', {
+        fontFamily: '"Pixelify Sans", sans-serif', fontSize: '15px', fontStyle: 'bold',
+        color: '#fff2b0', backgroundColor: '#3a180ccc', padding: { x: 9, y: 5 },
+        stroke: '#7a2808', strokeThickness: 3,
+      }).setOrigin(0.5).setVisible(false).setInteractive({ useHandCursor: true });
+      prompt.on('pointerdown', () => {
+        if (window.__blacksmithNearby && !window.__craftOpen)
+          window.__openCraftPanel && window.__openCraftPanel();
+      });
+      const cont = this.add.container(bx, by, [smith, name, prompt]).setDepth(by);
+      this.blacksmith = { x: bx, y: by, cont, prompt };
+      this.anims.create({ key: 'blacksmith-idle', frameRate: 5, repeat: -1, yoyo: true,
+        frames: this.anims.generateFrameNumbers('blacksmith', { start: 0, end: 3 }) });
+      smith.play('blacksmith-idle');
+    }
     for (const [d, r] of Object.entries(ROWS)) {
       this.anims.create({ key: 'aihero-walk-' + d, frameRate: 11, repeat: -1,
         frames: this.anims.generateFrameNumbers('aihero-walk', { start: r * 6, end: r * 6 + 5 }) });
@@ -1184,6 +1257,19 @@
       xp: P.xp, xpMax: P.xpMax, nivel: P.nivel, gold: P.gold, idade: P.idade, portrait,
     });
     window.__hudRefresh = () => { window.dispatchEvent(new CustomEvent('hudchange')); };
+    window.__getGold = () => P.gold;
+    window.__spendGold = amount => {
+      amount = Math.max(0, Math.round(Number(amount) || 0));
+      if (P.gold < amount) return false;
+      P.gold -= amount;
+      window.__hudRefresh();
+      return true;
+    };
+    window.__addTestGold = amount => {
+      P.gold += Math.max(0, Math.round(Number(amount) || 0));
+      window.__hudRefresh();
+      return P.gold;
+    };
     this.setHp = (v) => {
       P.hp = Math.max(0, Math.min(P.hpMax, Math.round(v)));
       window.__hudRefresh();
@@ -1196,6 +1282,7 @@
     window.__hudRefresh();
 
     this.keys = makeKeys(this);
+    this.craftKey = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.F);
     this.joy = new Joystick(this);
     new ActionButton(this, 'atk', attack);
     this.keys.space.on('down', attack);
@@ -1367,6 +1454,42 @@
       this.setHp(P.hp - damage);
       this.cameras.main.shake(180, shake);
     };
+    const pushPlayerFrom = (sourceX, sourceY, distance = 96) => {
+      const dx = this.player.x - sourceX, dy = this.player.y - sourceY;
+      const len = Math.hypot(dx, dy) || 1;
+      const nx = dx / len, ny = dy / len;
+      let targetX = this.player.x, targetY = this.player.y;
+      // Usa a própria colisão do jogador, inclusive quando ele está montado.
+      for (let pushed = 0; pushed < distance; pushed += 6) {
+        const nextX = targetX + nx * 6, nextY = targetY + ny * 6;
+        let moved = false;
+        if (this.player.free(nextX, targetY)) { targetX = nextX; moved = true; }
+        if (this.player.free(targetX, nextY)) { targetY = nextY; moved = true; }
+        if (!moved) break;
+      }
+      this.player.x = targetX;
+      this.player.y = targetY;
+      this.playerKnockbackUntil = this.time.now + 260;
+      if (this._playerPushTween) this._playerPushTween.stop();
+      this._playerPushTween = this.tweens.add({
+        targets: this.player.sprite,
+        x: Math.round(targetX), y: Math.round(targetY),
+        duration: 240, ease: 'Cubic.easeOut',
+        onComplete: () => {
+          this.player.sprite.setPosition(Math.round(this.player.x), Math.round(this.player.y));
+          this._playerPushTween = null;
+        },
+      });
+      const impactX = sourceX + nx * 34, impactY = sourceY + ny * 24 + 8;
+      const ring = this.add.image(impactX, impactY, 'fx-ring')
+        .setTint(0xffc46b).setBlendMode(Phaser.BlendModes.ADD)
+        .setScale(0.25, 0.13).setAlpha(0.9).setDepth(impactY + 5);
+      this.tweens.add({ targets: ring, scaleX: 1.25, scaleY: 0.62,
+        alpha: 0, duration: 300, ease: 'Cubic.easeOut',
+        onComplete: () => ring.destroy() });
+      burst('fx-p-dust', impactX, impactY, 0xd09a5a, 13);
+      this.cameras.main.shake(180, 0.006);
+    };
     this.deerKingAttack = (f) => {
       if (!f || f.dead || f.attacking) return;
       f.attacking = true;
@@ -1404,6 +1527,7 @@
           ease: 'Cubic.easeIn', onComplete: () => {
             if (Math.hypot(f.cont.x - this.player.x, f.cont.y - this.player.y) < 62) {
               bossHitPlayer(f.enraged ? 18 : 14, 0.007);
+              pushPlayerFrom(f.cont.x, f.cont.y, 96);
             }
           } });
         finish(760);
@@ -1896,6 +2020,18 @@
   }
 
   function update(time, delta) {
+    const nearSmith = this.blacksmith
+      && Math.hypot(this.player.x - this.blacksmith.x, this.player.y - this.blacksmith.y) <= 92;
+    if (this.blacksmith) this.blacksmith.prompt.setVisible(nearSmith && !window.__craftOpen);
+    if (window.__blacksmithNearby !== !!nearSmith) {
+      window.__blacksmithNearby = !!nearSmith;
+      window.dispatchEvent(new CustomEvent('blacksmithproximity', { detail: { nearby: !!nearSmith } }));
+    }
+    if (nearSmith && Phaser.Input.Keyboard.JustDown(this.craftKey) && !window.__craftOpen)
+      window.__openCraftPanel && window.__openCraftPanel();
+    // A forja é uma tela segura: não há movimento nem combate enquanto o painel está aberto.
+    if (window.__craftOpen) return;
+
     const cloverRemaining = Math.max(0, (this.P.cloverBuffUntil || 0) - time);
     if (this.cloverBuffText) {
       this.cloverBuffText.setX(this.scale.width - 20);
@@ -1952,7 +2088,7 @@
       ? (AI_MOUNTS[this.P.mount] ? AI_MOUNTS[this.P.mount].speed : 260)
       : 165;
     this.player.speed = time < (this.webSlowUntil || 0) ? baseSpeed * 0.55 : baseSpeed;
-    if (time >= (this.playerKnockbackUntil || 0)) {
+    if (time >= (this.playerKnockbackUntil || 0) && !window.__craftOpen) {
       this.player.update(keyboardVec(this.keys) || this.joy.vec, delta);
     }
     this.mobs.forEach(m => { if (!m.walker.__dead) m.update(delta); });
